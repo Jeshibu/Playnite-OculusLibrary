@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("OculusLibrary")]
 [assembly: AssemblyDescription("Playnite Library provider for Oculus")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Shaw Young")]
+[assembly: AssemblyCompany("Robert Ansel & Shaw Young")]
 [assembly: AssemblyProduct("OculusLibrary")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyCopyright("Copyright ©  2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

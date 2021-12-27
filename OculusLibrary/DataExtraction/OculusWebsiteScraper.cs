@@ -33,7 +33,8 @@ namespace OculusLibrary.DataExtraction
 
                 // get the json block from the source which contains the games meta data
 
-                Regex regex = new Regex(@"<script type=""application\/ld\+json"">([\s\S]*?)<\/script>");
+                //Regex regex = new Regex(@"<script type=""application\/ld\+json"">([\s\S]*?)<\/script>");
+                Regex regex = new Regex(@"<meta name=""json-ld"" content=""([\s\S]*?)"">");
                 var json = regex.Match(source);
 
                 if (json == null)
@@ -47,7 +48,9 @@ namespace OculusLibrary.DataExtraction
                     return null;
                 }
 
-                var manifest = serialiser.Deserialize<OculusWebsiteJson>(json.Groups[1].Value);
+                String reencoded_json = json.Groups[1].Value.Replace("&quot;", "\"").Replace("&amp;", "&");
+
+                var manifest = serialiser.Deserialize<OculusWebsiteJson>(reencoded_json);
 
                 return manifest;
             }
