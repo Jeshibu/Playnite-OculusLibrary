@@ -38,46 +38,58 @@ namespace OculusLibrary
 
             var oculusLibraryLocations = pathSniffer.GetOculusLibraryLocations();
 
+            // May or may not be installed
+            var sqliteIds = new List<string>();
+            var coreDataIds = new List<string>();
+
+            // Definitely Installed
+            var softwareIds = new List<string>();
+
+            // ID -> GameMetadata
+            var finalGameInfos = new Dictionary<string, GameMetadata>();
+
             if (oculusLibraryLocations == null || !oculusLibraryLocations.Any())
             {
                 logger.Error($"Cannot ascertain Oculus library locations");
                 return gameInfos;
             }
 
-            using (var view = PlayniteApi.WebViews.CreateOffscreenView())
+            foreach (var currentLibraryBasePath in oculusLibraryLocations)
             {
-                foreach (var currentLibraryBasePath in oculusLibraryLocations)
+                logger.Info($"Processing Oculus library location {currentLibraryBasePath}");
+
+                foreach (var manifest in GetOculusAppManifests(currentLibraryBasePath, false))
                 {
-                    logger.Info($"Processing Oculus library location {currentLibraryBasePath}");
+                    logger.Info($"Processing manifest {manifest.CanonicalName} {manifest.AppId}");
 
-                    foreach (var manifest in GetOculusAppManifests(currentLibraryBasePath))
+                    softwareIds.Add(manifest.AppId);
+
+                    try
                     {
-                        logger.Info($"Processing manifest {manifest.CanonicalName} {manifest.AppId}");
+                        var installationPath = $@"{currentLibraryBasePath}\Software\{manifest.CanonicalName}";
+                        var executableFullPath = $@"{installationPath}\{manifest.LaunchFile}";
 
-                        try
+                        // set a default name
+                        var executableName = Path.GetFileNameWithoutExtension(executableFullPath);
+
+                        var icon = $@"{currentLibraryBasePath}\..\CoreData\Software\StoreAssets\{manifest.CanonicalName}_assets\icon_image.jpg";
+
+                        if (!File.Exists(icon))
                         {
-                            var installationPath = $@"{currentLibraryBasePath}\Software\{manifest.CanonicalName}";
-                            var executableFullPath = $@"{installationPath}\{manifest.LaunchFile}";
+                            logger.Debug($"Oculus store icon missing from file system- reverting to executable icon");
+                            icon = executableFullPath;
+                        }
 
-                            // set a default name
-                            var executableName = Path.GetFileNameWithoutExtension(executableFullPath);
+                        var backgroundImage = $@"{currentLibraryBasePath}\..\CoreData\Software\StoreAssets\{manifest.CanonicalName}_assets\cover_landscape_image_large.png";
 
-                            var icon = $@"{currentLibraryBasePath}\..\CoreData\Software\StoreAssets\{manifest.CanonicalName}_assets\icon_image.jpg";
+                        if (!File.Exists(backgroundImage))
+                        {
+                            logger.Debug($"Oculus store background missing from file system- selecting no background");
+                            backgroundImage = string.Empty;
+                        }
 
-                            if (!File.Exists(icon))
-                            {
-                                logger.Debug($"Oculus store icon missing from file system- reverting to executable icon");
-                                icon = executableFullPath;
-                            }
-
-                            var backgroundImage = $@"{currentLibraryBasePath}\..\CoreData\Software\StoreAssets\{manifest.CanonicalName}_assets\cover_landscape_image_large.png";
-
-                            if (!File.Exists(backgroundImage))
-                            {
-                                logger.Debug($"Oculus store background missing from file system- selecting no background");
-                                backgroundImage = string.Empty;
-                            }
-
+                        using (var view = PlayniteApi.WebViews.CreateOffscreenView())
+                        {
                             var scrapedData = oculusScraper.ScrapeDataForApplicationId(view, manifest.AppId);
 
                             if (scrapedData == null)
@@ -98,7 +110,7 @@ namespace OculusLibrary
                                 }
                             };
 
-                            gameInfos.Add(new GameMetadata
+                            var gameMetadata = new GameMetadata
                             {
                                 Name = scrapedData?.Name ?? executableName,
                                 Description = scrapedData?.Description ?? string.Empty,
@@ -108,13 +120,68 @@ namespace OculusLibrary
                                 IsInstalled = true,
                                 Icon = new MetadataFile(icon),
                                 BackgroundImage = new MetadataFile(backgroundImage)
-                            });
+                            };
+
+                            gameInfos.Add(gameMetadata);
+                            finalGameInfos.Add(manifest.AppId, gameMetadata);
 
                             logger.Info($"Completed manifest {manifest.CanonicalName} {manifest.AppId}");
                         }
-                        catch (Exception ex)
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error($"Exception while adding game for manifest {manifest.AppId} : {ex}");
+                    }
+                }
+            }
+
+
+            foreach (var currentLibraryBasePath in oculusLibraryLocations)
+            {
+                logger.Info($"Processing Oculus library location {currentLibraryBasePath}");
+
+                if (Directory.Exists($@"{currentLibraryBasePath}\..\CoreData\Manifests"))
+                {
+                    foreach (var manifest in GetOculusAppManifests($@"{currentLibraryBasePath}\..\CoreData", true))
+                    {
+                        if (manifest.AppId == null || finalGameInfos.ContainsKey(manifest.AppId))
                         {
-                            logger.Error($"Exception while adding game for manifest {manifest.AppId} : {ex}");
+                            // We only want actual Oculus Games that we haven't seen yet
+                            continue;
+                        }
+
+                        var icon = $@"{currentLibraryBasePath}\..\CoreData\Software\StoreAssets\{manifest.CanonicalName}_assets\icon_image.jpg";
+                        if (!File.Exists(icon))
+                        {
+                            icon = string.Empty;
+                        }
+                        var backgroundImage = $@"{currentLibraryBasePath}\..\CoreData\Software\StoreAssets\{manifest.CanonicalName}_assets\cover_landscape_image_large.png";
+                        if (!File.Exists(backgroundImage))
+                        {
+                            logger.Debug($"Oculus store background missing from file system- selecting no background");
+                            backgroundImage = string.Empty;
+                        }
+
+                        using (var view = PlayniteApi.WebViews.CreateOffscreenView())
+                        {
+                            var scrapedData = oculusScraper.ScrapeDataForApplicationId(view, manifest.AppId);
+
+                            if (scrapedData == null)
+                            {
+                                logger.Debug($"Failed to retrieve scraped data for game");
+                            }
+
+                            var gameMetadata = new GameMetadata
+                            {
+                                Name = scrapedData?.Name ?? manifest.CanonicalName,
+                                Description = scrapedData?.Description ?? string.Empty,
+                                GameId = manifest.AppId,
+                                IsInstalled = false,
+                                Icon = new MetadataFile(icon),
+                                BackgroundImage = new MetadataFile(backgroundImage)
+                            };
+
+                            gameInfos.Add(gameMetadata);
                         }
                     }
                 }
@@ -125,7 +192,7 @@ namespace OculusLibrary
             return gameInfos;
         }
 
-        private List<OculusManifest> GetOculusAppManifests(string oculusBasePath)
+        private List<OculusManifest> GetOculusAppManifests(string oculusBasePath, bool return_assets)
         {
             logger.Debug($"Listing Oculus manifests");
 
@@ -142,15 +209,19 @@ namespace OculusLibrary
             {
                 try
                 {
-                    if (fileName.EndsWith("_assets.json"))
+                    if (fileName.EndsWith("_assets.json") && !return_assets)
                     {
                         // not interested in the asset json files
                         continue;
                     }
 
                     var json = File.ReadAllText(fileName);
-                    
+
                     var manifest = OculusManifest.Parse(json);
+                    if (manifest.CanonicalName.EndsWith("_assets"))
+                    {
+                        manifest.CanonicalName = manifest.CanonicalName.Substring(0, manifest.CanonicalName.Length - 7);
+                    }
 
                     manifests.Add(manifest);
                 }
