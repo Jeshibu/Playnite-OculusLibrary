@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Web.Script.Serialization;
 
 namespace OculusLibrary
@@ -31,11 +30,11 @@ namespace OculusLibrary
             oculusScraper = new OculusWebsiteScraper(logger);
         }
 
-        public override IEnumerable<GameInfo> GetGames()
+        public override IEnumerable<GameMetadata> GetGames(LibraryGetGamesArgs args)
         {
             logger.Info($"Executing Oculus GetGames");
 
-            var gameInfos = new List<GameInfo>();
+            var gameInfos = new List<GameMetadata>();
 
             var oculusLibraryLocations = pathSniffer.GetOculusLibraryLocations();
 
@@ -88,21 +87,27 @@ namespace OculusLibrary
 
                             logger.Info($"Executable {executableFullPath}");
 
-                            gameInfos.Add(new GameInfo
+                            List<GameAction> gameActions = new List<GameAction>
+                            {
+                                new GameAction
+                                {
+                                    IsPlayAction = true,
+                                    Type = GameActionType.File,
+                                    Path = executableFullPath,
+                                    Arguments = manifest.LaunchParameters
+                                }
+                            };
+
+                            gameInfos.Add(new GameMetadata
                             {
                                 Name = scrapedData?.Name ?? executableName,
                                 Description = scrapedData?.Description ?? string.Empty,
                                 GameId = manifest.AppId,
                                 InstallDirectory = installationPath,
-                                PlayAction = new GameAction
-                                {
-                                    Type = GameActionType.File,
-                                    Path = executableFullPath,
-                                    Arguments = manifest.LaunchParameters
-                                },
+                                GameActions = gameActions,
                                 IsInstalled = true,
-                                Icon = icon,
-                                BackgroundImage = backgroundImage
+                                Icon = new MetadataFile(icon),
+                                BackgroundImage = new MetadataFile(backgroundImage)
                             });
 
                             logger.Info($"Completed manifest {manifest.CanonicalName} {manifest.AppId}");
