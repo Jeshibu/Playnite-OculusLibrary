@@ -54,6 +54,8 @@
   <ItemGroup>
     <Compile Include="DataExtraction\IOculusPathSniffer.cs" />
     <Compile Include="DataExtraction\OculusApiScraper.cs" />
+    <Compile Include="DataExtraction\OculusJsonResponse.cs" />
+    <Compile Include="DataExtraction\WebClientWrapper.cs" />
     <Compile Include="ManifestParseException.cs" />
     <Compile Include="OS\IPathNormaliser.cs" />
     <Compile Include="OS\IRegistryValueProvider.cs" />
@@ -61,9 +63,6 @@
     <Compile Include="OculusLibraryPlugin.cs" />
     <Compile Include="OculusManifest.cs" />
     <Compile Include="DataExtraction\OculusPathSniffer.cs" />
-    <Compile Include="DataExtraction\OculusWebsiteAggregateRating.cs" />
-    <Compile Include="DataExtraction\OculusWebsiteJson.cs" />
-    <Compile Include="DataExtraction\OculusWebsiteScraper.cs" />
     <Compile Include="OS\PathNormaliser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OS\RegistryValueProvider.cs" />

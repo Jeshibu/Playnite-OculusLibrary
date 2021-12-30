@@ -5,5 +5,6 @@ namespace OculusLibrary.DataExtraction
     public interface IOculusPathSniffer
     {
         List<string> GetOculusLibraryLocations();
+        string GetOculusSoftwareInstallationPath();
     }
 }
