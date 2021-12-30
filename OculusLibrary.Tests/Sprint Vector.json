@@ -1,1 +1,448 @@
-{"data":{"viewer":{"user":null},"node":{"__typename":"Application","__isAppStoreItem":"Application","id":"1425858557493354","display_name":"Sprint Vector","platform":"PC","iarc_cert":{"iarc_rating":{"descriptors":[],"interactive_elements":["Users Interact"],"id":"1988931008031740","large_age_rating_image":{"uri":"https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/12138845_169332346868547_134368769114898432_n.png?_nc_cat=1&ccb=1-5&_nc_sid=79b88e&_nc_ohc=HgaOFkzKNEAAX-_r_HF&_nc_ht=scontent.oculuscdn.com&oh=00_AT9e1VyjTzzIcxFXetfueFz9OZzYOuKK_uRnDjBy7Wurtw&oe=61D251CD"},"small_age_rating_image":{"uri":"https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/12482345_1839933169554530_3608172115217350656_n.png?_nc_cat=1&ccb=1-5&_nc_sid=79b88e&_nc_ohc=wa6OUTmLEeEAX9HZFKM&_nc_ht=scontent.oculuscdn.com&oh=00_AT9nRLLfRrNWg55QrU4GA0BjOYMS1J3bF_3ONWRPl5bEFg&oe=61D27644"},"age_rating_text":"PEGI 3","rating_definition_uri":"https:\/\/www.globalratings.com\/ratings-guide-pegi","__typename":"IARCRating"},"id":"1988930991365075"},"category":"GAMES","item_bundles":[],"__isWithHeroMediaCarousel":"Application","hero":{"uri":"https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/s2048x2048\/12386401_1792950484346426_6766072808448458752_n.jpg?_nc_cat=107&ccb=1-5&_nc_sid=79b88e&_nc_ohc=tZImdpmu4TsAX-3gim6&_nc_ht=scontent.oculuscdn.com&oh=00_AT8bVj8c8y2PcB4GVEQFR6krBkRBwa1UtLDTrehXizzmYQ&oe=61D31976"},"screenshots":[{"uri":"https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/s1440x1440\/12139031_597895657222968_6109034548366934016_n.jpg?_nc_cat=107&ccb=1-5&_nc_sid=79b88e&_nc_ohc=4fKCj1wzAPAAX_-veg5&_nc_ht=scontent.oculuscdn.com&oh=00_AT-XFYpnIVfMC3orG-xqFnofHWGaWRzUHkf9ndW0PjBaxA&oe=61D275C6"},{"uri":"https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/s1440x1440\/11162732_1693629410658740_2383044384934330368_n.jpg?_nc_cat=105&ccb=1-5&_nc_sid=79b88e&_nc_ohc=9juWpu_Vd3kAX-4I47Y&_nc_ht=scontent.oculuscdn.com&oh=00_AT_lvoGbTkOxIYHodVtxhmCaFKGwHPhKPDueNnWpTV8QUA&oe=61D20403"},{"uri":"https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/s1440x1440\/12410280_875335552645069_3580792458914562048_n.jpg?_nc_cat=101&ccb=1-5&_nc_sid=79b88e&_nc_ohc=P5NQwmaYya8AX-LdJVu&_nc_ht=scontent.oculuscdn.com&oh=00_AT9f4QzOe8RGtO4e1kVU-apJndLNjmCW--edlEYZjRkSOA&oe=61D35BB8"},{"uri":"https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/s1440x1440\/12386245_365352577271907_5088351668009959424_n.jpg?_nc_cat=106&ccb=1-5&_nc_sid=79b88e&_nc_ohc=iNYe7Nyk1xMAX-JvQH1&_nc_ht=scontent.oculuscdn.com&oh=00_AT9IoZU_-7pe3P6gcrOejpw56JZAJzNPlFDCPvD-lTgqEw&oe=61D20B29"},{"uri":"https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/s1440x1440\/11162754_2002626043283640_4055485064945860608_n.jpg?_nc_cat=102&ccb=1-5&_nc_sid=79b88e&_nc_ohc=PWg-MzSVP5QAX9o8l1I&_nc_ht=scontent.oculuscdn.com&oh=00_AT-GHu2zptHDmjVHjKKnti6O61MOEf-0q1KrHtfh-x5tjw&oe=61D34CC6"}],"trailer":{"thumbnail":{"uri":"https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/s1440x1440\/38974788_551147961996532_6508102529891434496_n.jpg?_nc_cat=110&ccb=1-5&_nc_sid=79b88e&_nc_ohc=Q6m-6D9BdUoAX-KaR6G&_nc_ht=scontent.oculuscdn.com&oh=00_AT-7AK3DsimE-DRq49cgMm7sjYA36ZEMBpqWshHzCiwQqA&oe=61D25163"},"uri":"https:\/\/scontent.oculuscdn.com\/v\/t64.7195-25\/10000000_450042905440372_5904553603535732736_n.mp4?_nc_cat=105&ccb=1-5&_nc_sid=0ed769&_nc_ohc=PawrFCCO-AYAX9kWoHN&_nc_ht=scontent.oculuscdn.com&oh=00_AT-pAwC-Kz93cs9n9QfG-bbSkuFhdMJvrWfzkqe5F9UdHQ&oe=61D2EAA5"},"quality_rating_histogram_aggregate_all":[{"star_rating":1,"count":23,"starRating":1},{"star_rating":2,"count":11,"starRating":2},{"star_rating":3,"count":12,"starRating":3},{"star_rating":4,"count":27,"starRating":4},{"star_rating":5,"count":128,"starRating":5}],"display_long_description":"Sprint Vector is officially in the VR League! Race your way to victory and grab Sprint Vector on sale now. Register now to compete!\n\nSprint Vector is the ultimate competitive VR game: a multiplayer parkour racing game that merges the physical thrill of athletic competition with the unhinged energy of a crazy game show. Survios\u2019 innovative Fluid Locomotion System allows players to comfortably run, jump, climb, and fly at extreme speeds.\n\nHigh-Octane Single and Multiplayer Racing: Compete against up to eight contestants live before the entire galaxy, or train hard for the title on hazardous solo challenge maps.\n\nActive VR Gameplay: Use your entire body to run, jump, drift, zip, climb, fling, shoot, dodge, and fly with intuitive motion controls.\n\nWeapons and Items: What\u2019s a little friendly competition without a bit of self-serving sabotage? Take aim at both the course and your competitors with glove blasts and game-changing power-ups.\n\nChoose Your Racer: From space kids and disc jockeys, to graffiti artists and gangster sharks, enjoy a diverse cast of playable characters from every corner of the galaxy.","developer_privacy_policy_url":"https:\/\/survios.com\/privacy\/","developer_terms_of_service_url":"https:\/\/survios.com\/terms\/","supported_player_modes":["SITTING","STANDING","ROOM_SCALE"],"publisher_name":"Survios","supported_in_app_languages":[{"name":"English"}],"supported_hmd_platforms":["RIFT","LAGUNA"],"supported_input_device_names":["Oculus Touch"],"user_interaction_mode_names":["Multiplayer","Single User"],"age_rating":null,"category_name":"Games","developer_name":"Survios","genre_names":["Action","Racing","Sports"],"is_360_sensor_setup_required":false,"is_concept":false,"latest_supported_binary":{"__typename":"PCBinary","version":"0.0.0.111496","change_log":"Update 1.31\n\nGDPR Compliance - Updates language in EULA\/Privacy Policy to be compliant with GDPR","supported_hmd_types":["RIFT","LAGUNA"],"total_installed_space":"5171804931","id":"1767419303337276","required_space_adjusted":"7319288579","storeAddOns":null,"firstIapItems":null,"windows_min_spec":{"display_name":"Windows 10","release_version":"10.0.10240","tag":"WINDOWS_10"},"redistributables":{"edges":[{"node":{"id":"1183534128364060","name":"Visual C++ 2015 Update 3","show_on_pdp":false}},{"node":{"id":"822786567843179","name":"DirectX (June 2010)","show_on_pdp":false}}]}},"recommended_graphics":"NVIDIA GTX 1080","recommended_memory_gb":null,"recommended_processor":"Intel i5 4590","release_date":1517590162,"supported_tracking_modes":["FRONT_FACING","DEGREE_360"],"website_url":"http:\/\/www.sprintvector.com\/","current_offer":{"__typename":"AppStoreOffer","offer_type":"APPSTORE_OFFER","id":"193012764778889","__isPurchasableOfferWithApp":"AppStoreOffer","price":{"currency":"EUR","offset_amount":"2999","formatted":"\u20ac29.99"},"strikethrough_price":null,"promo_benefit":null,"end_time":0,"show_timer":false,"buy_button_captions":[]},"viewer_release_channel":{"id":"1699730233654628"},"live_release_channel":{"id":"1699730233654628","channel_name":"LIVE","latest_supported_binary":{"__typename":"PCBinary","id":"1767419303337276"}},"release_channels":{"count":1,"nodes":[{"channel_name":"LIVE","id":"1699730233654628","latest_supported_binary":{"__typename":"PCBinary","version":"0.0.0.111496","id":"1767419303337276"}}]},"grouping":{"upcoming_events":{"edges":[]},"id":"1967637340139587","posts":{"nodes":[]},"iap_items_2":{"edges":[]}},"externalReviewsForDisplay":{"nodes":[]},"externalReviewsComplete":{"count":0},"user_data_disclosure_translated":null,"__isItemWithComfortRating":"Application","comfort_rating":"COMFORTABLE_FOR_FEW","is_viewer_subscribed_coming_soon":false,"internet_connection":"NOT_REQUIRED","internet_connection_name":"Internet connection not required","__isItemWithHmdPlatformInformaton":"Application","supported_input_devices_list":[{"name":"Oculus Touch","tag":"OCULUS_TOUCH"}],"has_in_app_ads":false,"external_subscription_type":"NOT_REQUIRED","subscriptionItems":{"count":0,"nodes":[]},"can_viewer_purchase":true,"canonicalName":"survios-sprint-vector","viewer_has_preorder":false,"purchase_alerts":[],"is_granted_on_hardware_registration":false,"current_trial_offer":null,"extra_buy_box_section":{"content":"Oculus Refund Policy","link_uri":"https:\/\/www.oculus.com\/legal\/quest-rift-content-refund-policy\/"},"is_viewer_entitled":false,"baseline_offer":{"price":{"offset_amount":"2999"},"id":"193012764778889"},"__isWishlistableItem":"Application","entry":null,"is_demo_of":null,"appName":"Sprint Vector","platformOffer":null,"is_giftable":true,"current_gift_offer":{"__typename":"AppStoreOffer","id":"193012764778889"},"available_gift_coupons":{"__typename":"ApplicationAvailableGiftCouponsConnection","nodes":[]},"externalReviews":{"count":0},"quality_rating_aggregate":4.1243781094527,"support_website_url":null,"quality_ratings_by_viewer":[],"reviewInfo":{"count":109,"orderings":[{"key":"top","label":"Most Relevant"},{"key":"most_recent","label":"Most recent"}]},"firstQualityRatings":{"count":109,"page_info":{"end_cursor":"AQHRIXjZz53KuwCeV9j1ndtGikGHOFyAU7bb-LtSU2X5vJEWz2ghtd4FjE7Cf_DASfVUi6XfyJhl9-wL0vblb56gsg","start_cursor":"AQHRpqZkkZFFAr8daoVUYiS0zD3o1SyYqZKkPkX6y_jEhAWbVFExF2zSZ9XjVIKDpr-Pb35n1rhIpO7IsGD1SpWswQ"},"edges":[{"node":{"id":"122836373143138","author":{"id":"103135635113212","display_name":"krissyagain","profile_photo":{"uri":"https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/c0.0.304.304a\/s160x160\/39036703_103135998446509_2131063464855740944_n.jpg?_nc_cat=108&ccb=1-5&_nc_sid=79b88e&_nc_ohc=G6Tlm3JmDfUAX8noKrw&_nc_ht=scontent.oculuscdn.com&oh=00_AT8UnFdZHBfWhnAvrGuCc8Jfz9TjJbs6g00ia5JOrVz3gw&oe=61D20C97"}},"score":5,"reviewDescription":"I just have to praise the  makers of this game. I bought this game and out of the box was having problems; I could not connect to multiplayer servers at all. A quicjk email to support and they had me fixed up super quick.\n\nFor the game itself, it is fun. The mechinics can be a little daunting to get the hang of but the concept is fun and a great workout. I'm sure with practice I'll get good at it but for now it is fun trying.","reviewTitle":"Great support team","review_helpful_count":5,"review_rank_by_viewer":null,"date":1616626132,"developerResponse":null}},{"node":{"id":"142040077717788","author":{"id":"118460313409098","display_name":"StalwartNeon","profile_photo":{"uri":"https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/c0.0.720.720a\/s160x160\/39031561_126248162630313_6579503751297065747_n.jpg?_nc_cat=102&ccb=1-5&_nc_sid=79b88e&_nc_ohc=UY4Y5_p8zmAAX_eSpn9&_nc_ht=scontent.oculuscdn.com&oh=00_AT8WwiEGlj4xuYYK_qw_YnXAIlTwv51rZ3Ueq7PJZT5v8g&oe=61D389A7"}},"score":5,"reviewDescription":"If you thought Beatsaber was a workout, just give this game five minutes of your time and you'll come to realize how many towels you'll need. Looking at this game critically, I say that it is a perfect concept for a vr racing game, rather than being stuck in a vehicle, you are the vehicle. The mix of Mariokart esque power ups and the movement of Jet Set Radio Future blend incredbly well and lend themselves to a unique experience! That being said however, for any new player it will take a few days to grasp the running mechanic, but once you do you'll be in for the time of your life. My final note is, unfortunantely due the current state of VR, online mulitiplayer is lacking, however this isn't to fault Survios, because they put out an amazing game with immense replayability and a sizeable amount of content for the price. Sprint Vector is a solid game with loads of content and should be a mainstay for any VR user.","reviewTitle":"Run, Jump, and sweat like heck!","review_helpful_count":22,"review_rank_by_viewer":null,"date":1609043993,"developerResponse":null}},{"node":{"id":"162461645712401","author":{"id":"101341835157716","display_name":"ranqiz","profile_photo":{"uri":"https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/c0.0.176.176a\/s160x160\/38974909_102198935072006_297836570272249520_n.jpg?_nc_cat=102&ccb=1-5&_nc_sid=79b88e&_nc_ohc=kP2AuNsMns4AX-48so2&_nc_ht=scontent.oculuscdn.com&oh=00_AT-v6FkCOtL3-URe07Winv6P5hCcc7ZjijrJkdZk-ytGVA&oe=61D28B90"}},"score":1,"reviewDescription":"With Virtual Desktop. Actual drivers. ASUS ROG Strix Scar 15 Laptop with RTX 3080 115+W, Ryzen 7 5800H, 16GB RAM. What is wrong here?","reviewTitle":"Game CRASHES at startup.","review_helpful_count":5,"review_rank_by_viewer":null,"date":1615039939,"developerResponse":null}},{"node":{"id":"305746470699721","author":{"id":"105744807366556","display_name":"AliceHalley","profile_photo":{"uri":"https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/c0.0.1080.1080a\/s160x160\/39031587_505375864070113_8287031439642987696_n.jpg?_nc_cat=108&ccb=1-5&_nc_sid=79b88e&_nc_ohc=3TMX3mBJxJ4AX-C-zW1&_nc_ht=scontent.oculuscdn.com&oh=00_AT-jzckD38OflcQd6u1JdUhVFO6F_eDDtAbvirw3viqOOg&oe=61D2AB8D"}},"score":5,"reviewDescription":"I truly feel this is the pinnacle of VR gaming. It's incredibly fun, utilizes the most of physical movement, and it is bursting with character and fun visuals. It's Perfect.","reviewTitle":"Excellent, Engaging, Physical Game!","review_helpful_count":13,"review_rank_by_viewer":null,"date":1598693901,"developerResponse":null}},{"node":{"id":"2489595784665658","author":{"id":"1787238734901370","display_name":"cwolfgang","profile_photo":{"uri":"https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/c0.0.379.379a\/s160x160\/11162702_1866036497021593_1664235488589905920_n.jpg?_nc_cat=101&ccb=1-5&_nc_sid=79b88e&_nc_ohc=KCFHFYsyVysAX_Rugg3&_nc_ht=scontent.oculuscdn.com&oh=00_AT_xeGuWMjYb-bWD_CMMdTmxiIHgrOSiMPhVe9H8LCMUqA&oe=61D34A68"}},"score":5,"reviewDescription":"If you grew up on jetset radio future you will love this game desgin and musical vibe and thrilling sensation of areana races, and a large practice skate park. You skate with roller blades and move your hands in that fashion in order to move about. IT is everything I want in a vr game, adrenline but the lack of practice can make anyone easily frustrated in this game. Give it some serious practice to get the skating arms movement and timing right, it's def a workout. Compared to most vr comfort levels. it say this i scales 5\/5 but just be aware of your play space","reviewTitle":"jetset radio is back in vr!","review_helpful_count":14,"review_rank_by_viewer":null,"date":1589651539,"developerResponse":null}}]},"can_viewer_review":false,"is_offer_region_restricted":false,"__isWithWebsitePageMeta":"Application","website_page_meta":{"description":"Sprint Vector is officially in the VR League! Race your way to victory and grab Sprint Vector on sale now. Register now to compete!\n\nRun, jump, climb, and fly at extreme speeds as you race through challenging courses and battle obstacles in this frenetic VR adrenaline platformer.","image_height":405,"image_type":"image\/jpeg","image_url":"https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/s720x720\/38974678_337093023505659_2813792384536543232_n.jpg?_nc_cat=1&ccb=1-5&_nc_sid=79b88e&_nc_ohc=5uQ0Z3ZmD1kAX_zvVpG&_nc_ht=scontent.oculuscdn.com&oh=00_AT-ztzjoKwcOm51zY0_M_Q_piuisZMfqmjVcPXaCOv-ppg&oe=61D2B67F","image_width":720,"og_locale":"en_US","og_type":"website","page_url":"https:\/\/www.oculus.com\/experiences\/rift\/1425858557493354\/","site_name":"Oculus","title":"Sprint Vector on Oculus Rift"},"fallback_ranking_trace":""}},"errors":[{"message":"A server error field_exception occured. Check server logs for details.","severity":"ERROR","path":["node","current_offer","buy_button_captions"]},{"message":"A server error field_exception occured. Check server logs for details.","severity":"ERROR","path":["node","purchase_alerts"]}]}
+{
+  "data": {
+    "viewer": {
+      "user": null
+    },
+    "node": {
+      "__typename": "Application",
+      "__isAppStoreItem": "Application",
+      "id": "1425858557493354",
+      "display_name": "Sprint Vector",
+      "platform": "PC",
+      "iarc_cert": {
+        "iarc_rating": {
+          "descriptors": [
+          ],
+          "interactive_elements": [
+            "Users Interact"
+          ],
+          "id": "1988931008031740",
+          "large_age_rating_image": {
+            "uri": "https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/12138845_169332346868547_134368769114898432_n.png?_nc_cat=1&ccb=1-5&_nc_sid=79b88e&_nc_ohc=HgaOFkzKNEAAX-_r_HF&_nc_ht=scontent.oculuscdn.com&oh=00_AT9e1VyjTzzIcxFXetfueFz9OZzYOuKK_uRnDjBy7Wurtw&oe=61D251CD"
+          },
+          "small_age_rating_image": {
+            "uri": "https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/12482345_1839933169554530_3608172115217350656_n.png?_nc_cat=1&ccb=1-5&_nc_sid=79b88e&_nc_ohc=wa6OUTmLEeEAX9HZFKM&_nc_ht=scontent.oculuscdn.com&oh=00_AT9nRLLfRrNWg55QrU4GA0BjOYMS1J3bF_3ONWRPl5bEFg&oe=61D27644"
+          },
+          "age_rating_text": "PEGI 3",
+          "rating_definition_uri": "https:\/\/www.globalratings.com\/ratings-guide-pegi",
+          "__typename": "IARCRating"
+        },
+        "id": "1988930991365075"
+      },
+      "category": "GAMES",
+      "item_bundles": [
+      ],
+      "__isWithHeroMediaCarousel": "Application",
+      "hero": {
+        "uri": "https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/s2048x2048\/12386401_1792950484346426_6766072808448458752_n.jpg?_nc_cat=107&ccb=1-5&_nc_sid=79b88e&_nc_ohc=tZImdpmu4TsAX-3gim6&_nc_ht=scontent.oculuscdn.com&oh=00_AT8bVj8c8y2PcB4GVEQFR6krBkRBwa1UtLDTrehXizzmYQ&oe=61D31976"
+      },
+      "screenshots": [
+        {
+          "uri": "https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/s1440x1440\/12139031_597895657222968_6109034548366934016_n.jpg?_nc_cat=107&ccb=1-5&_nc_sid=79b88e&_nc_ohc=4fKCj1wzAPAAX_-veg5&_nc_ht=scontent.oculuscdn.com&oh=00_AT-XFYpnIVfMC3orG-xqFnofHWGaWRzUHkf9ndW0PjBaxA&oe=61D275C6"
+        },
+        {
+          "uri": "https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/s1440x1440\/11162732_1693629410658740_2383044384934330368_n.jpg?_nc_cat=105&ccb=1-5&_nc_sid=79b88e&_nc_ohc=9juWpu_Vd3kAX-4I47Y&_nc_ht=scontent.oculuscdn.com&oh=00_AT_lvoGbTkOxIYHodVtxhmCaFKGwHPhKPDueNnWpTV8QUA&oe=61D20403"
+        },
+        {
+          "uri": "https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/s1440x1440\/12410280_875335552645069_3580792458914562048_n.jpg?_nc_cat=101&ccb=1-5&_nc_sid=79b88e&_nc_ohc=P5NQwmaYya8AX-LdJVu&_nc_ht=scontent.oculuscdn.com&oh=00_AT9f4QzOe8RGtO4e1kVU-apJndLNjmCW--edlEYZjRkSOA&oe=61D35BB8"
+        },
+        {
+          "uri": "https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/s1440x1440\/12386245_365352577271907_5088351668009959424_n.jpg?_nc_cat=106&ccb=1-5&_nc_sid=79b88e&_nc_ohc=iNYe7Nyk1xMAX-JvQH1&_nc_ht=scontent.oculuscdn.com&oh=00_AT9IoZU_-7pe3P6gcrOejpw56JZAJzNPlFDCPvD-lTgqEw&oe=61D20B29"
+        },
+        {
+          "uri": "https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/s1440x1440\/11162754_2002626043283640_4055485064945860608_n.jpg?_nc_cat=102&ccb=1-5&_nc_sid=79b88e&_nc_ohc=PWg-MzSVP5QAX9o8l1I&_nc_ht=scontent.oculuscdn.com&oh=00_AT-GHu2zptHDmjVHjKKnti6O61MOEf-0q1KrHtfh-x5tjw&oe=61D34CC6"
+        }
+      ],
+      "trailer": {
+        "thumbnail": {
+          "uri": "https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/s1440x1440\/38974788_551147961996532_6508102529891434496_n.jpg?_nc_cat=110&ccb=1-5&_nc_sid=79b88e&_nc_ohc=Q6m-6D9BdUoAX-KaR6G&_nc_ht=scontent.oculuscdn.com&oh=00_AT-7AK3DsimE-DRq49cgMm7sjYA36ZEMBpqWshHzCiwQqA&oe=61D25163"
+        },
+        "uri": "https:\/\/scontent.oculuscdn.com\/v\/t64.7195-25\/10000000_450042905440372_5904553603535732736_n.mp4?_nc_cat=105&ccb=1-5&_nc_sid=0ed769&_nc_ohc=PawrFCCO-AYAX9kWoHN&_nc_ht=scontent.oculuscdn.com&oh=00_AT-pAwC-Kz93cs9n9QfG-bbSkuFhdMJvrWfzkqe5F9UdHQ&oe=61D2EAA5"
+      },
+      "quality_rating_histogram_aggregate_all": [
+        {
+          "star_rating": 1,
+          "count": 23,
+          "starRating": 1
+        },
+        {
+          "star_rating": 2,
+          "count": 11,
+          "starRating": 2
+        },
+        {
+          "star_rating": 3,
+          "count": 12,
+          "starRating": 3
+        },
+        {
+          "star_rating": 4,
+          "count": 27,
+          "starRating": 4
+        },
+        {
+          "star_rating": 5,
+          "count": 128,
+          "starRating": 5
+        }
+      ],
+      "display_long_description": "Sprint Vector is officially in the VR League! Race your way to victory and grab Sprint Vector on sale now. Register now to compete!\n\nSprint Vector is the ultimate competitive VR game: a multiplayer parkour racing game that merges the physical thrill of athletic competition with the unhinged energy of a crazy game show. Survios\u2019 innovative Fluid Locomotion System allows players to comfortably run, jump, climb, and fly at extreme speeds.\n\nHigh-Octane Single and Multiplayer Racing: Compete against up to eight contestants live before the entire galaxy, or train hard for the title on hazardous solo challenge maps.\n\nActive VR Gameplay: Use your entire body to run, jump, drift, zip, climb, fling, shoot, dodge, and fly with intuitive motion controls.\n\nWeapons and Items: What\u2019s a little friendly competition without a bit of self-serving sabotage? Take aim at both the course and your competitors with glove blasts and game-changing power-ups.\n\nChoose Your Racer: From space kids and disc jockeys, to graffiti artists and gangster sharks, enjoy a diverse cast of playable characters from every corner of the galaxy.",
+      "developer_privacy_policy_url": "https:\/\/survios.com\/privacy\/",
+      "developer_terms_of_service_url": "https:\/\/survios.com\/terms\/",
+      "supported_player_modes": [
+        "SITTING",
+        "STANDING",
+        "ROOM_SCALE"
+      ],
+      "publisher_name": "Survios",
+      "supported_in_app_languages": [
+        {
+          "name": "English"
+        }
+      ],
+      "supported_hmd_platforms": [
+        "RIFT",
+        "LAGUNA"
+      ],
+      "supported_input_device_names": [
+        "Oculus Touch"
+      ],
+      "user_interaction_mode_names": [
+        "Multiplayer",
+        "Single User"
+      ],
+      "age_rating": null,
+      "category_name": "Games",
+      "developer_name": "Survios",
+      "genre_names": [
+        "Action",
+        "Racing",
+        "Sports"
+      ],
+      "is_360_sensor_setup_required": false,
+      "is_concept": false,
+      "latest_supported_binary": {
+        "__typename": "PCBinary",
+        "version": "0.0.0.111496",
+        "change_log": "Update 1.31\n\nGDPR Compliance - Updates language in EULA\/Privacy Policy to be compliant with GDPR",
+        "supported_hmd_types": [
+          "RIFT",
+          "LAGUNA"
+        ],
+        "total_installed_space": "5171804931",
+        "id": "1767419303337276",
+        "required_space_adjusted": "7319288579",
+        "storeAddOns": null,
+        "firstIapItems": null,
+        "windows_min_spec": {
+          "display_name": "Windows 10",
+          "release_version": "10.0.10240",
+          "tag": "WINDOWS_10"
+        },
+        "redistributables": {
+          "edges": [
+            {
+              "node": {
+                "id": "1183534128364060",
+                "name": "Visual C++ 2015 Update 3",
+                "show_on_pdp": false
+              }
+            },
+            {
+              "node": {
+                "id": "822786567843179",
+                "name": "DirectX (June 2010)",
+                "show_on_pdp": false
+              }
+            }
+          ]
+        }
+      },
+      "recommended_graphics": "NVIDIA GTX 1080",
+      "recommended_memory_gb": null,
+      "recommended_processor": "Intel i5 4590",
+      "release_date": 1517590162,
+      "supported_tracking_modes": [
+        "FRONT_FACING",
+        "DEGREE_360"
+      ],
+      "website_url": "http:\/\/www.sprintvector.com\/",
+      "current_offer": {
+        "__typename": "AppStoreOffer",
+        "offer_type": "APPSTORE_OFFER",
+        "id": "193012764778889",
+        "__isPurchasableOfferWithApp": "AppStoreOffer",
+        "price": {
+          "currency": "EUR",
+          "offset_amount": "2999",
+          "formatted": "\u20ac29.99"
+        },
+        "strikethrough_price": null,
+        "promo_benefit": null,
+        "end_time": 0,
+        "show_timer": false,
+        "buy_button_captions": [
+        ]
+      },
+      "viewer_release_channel": {
+        "id": "1699730233654628"
+      },
+      "live_release_channel": {
+        "id": "1699730233654628",
+        "channel_name": "LIVE",
+        "latest_supported_binary": {
+          "__typename": "PCBinary",
+          "id": "1767419303337276"
+        }
+      },
+      "release_channels": {
+        "count": 1,
+        "nodes": [
+          {
+            "channel_name": "LIVE",
+            "id": "1699730233654628",
+            "latest_supported_binary": {
+              "__typename": "PCBinary",
+              "version": "0.0.0.111496",
+              "id": "1767419303337276"
+            }
+          }
+        ]
+      },
+      "grouping": {
+        "upcoming_events": {
+          "edges": [
+          ]
+        },
+        "id": "1967637340139587",
+        "posts": {
+          "nodes": [
+          ]
+        },
+        "iap_items_2": {
+          "edges": [
+          ]
+        }
+      },
+      "externalReviewsForDisplay": {
+        "nodes": [
+        ]
+      },
+      "externalReviewsComplete": {
+        "count": 0
+      },
+      "user_data_disclosure_translated": null,
+      "__isItemWithComfortRating": "Application",
+      "comfort_rating": "COMFORTABLE_FOR_FEW",
+      "is_viewer_subscribed_coming_soon": false,
+      "internet_connection": "NOT_REQUIRED",
+      "internet_connection_name": "Internet connection not required",
+      "__isItemWithHmdPlatformInformaton": "Application",
+      "supported_input_devices_list": [
+        {
+          "name": "Oculus Touch",
+          "tag": "OCULUS_TOUCH"
+        }
+      ],
+      "has_in_app_ads": false,
+      "external_subscription_type": "NOT_REQUIRED",
+      "subscriptionItems": {
+        "count": 0,
+        "nodes": [
+        ]
+      },
+      "can_viewer_purchase": true,
+      "canonicalName": "survios-sprint-vector",
+      "viewer_has_preorder": false,
+      "purchase_alerts": [
+      ],
+      "is_granted_on_hardware_registration": false,
+      "current_trial_offer": null,
+      "extra_buy_box_section": {
+        "content": "Oculus Refund Policy",
+        "link_uri": "https:\/\/www.oculus.com\/legal\/quest-rift-content-refund-policy\/"
+      },
+      "is_viewer_entitled": false,
+      "baseline_offer": {
+        "price": {
+          "offset_amount": "2999"
+        },
+        "id": "193012764778889"
+      },
+      "__isWishlistableItem": "Application",
+      "entry": null,
+      "is_demo_of": null,
+      "appName": "Sprint Vector",
+      "platformOffer": null,
+      "is_giftable": true,
+      "current_gift_offer": {
+        "__typename": "AppStoreOffer",
+        "id": "193012764778889"
+      },
+      "available_gift_coupons": {
+        "__typename": "ApplicationAvailableGiftCouponsConnection",
+        "nodes": [
+        ]
+      },
+      "externalReviews": {
+        "count": 0
+      },
+      "quality_rating_aggregate": 4.1243781094527,
+      "support_website_url": null,
+      "quality_ratings_by_viewer": [
+      ],
+      "reviewInfo": {
+        "count": 109,
+        "orderings": [
+          {
+            "key": "top",
+            "label": "Most Relevant"
+          },
+          {
+            "key": "most_recent",
+            "label": "Most recent"
+          }
+        ]
+      },
+      "firstQualityRatings": {
+        "count": 109,
+        "page_info": {
+          "end_cursor": "AQHRIXjZz53KuwCeV9j1ndtGikGHOFyAU7bb-LtSU2X5vJEWz2ghtd4FjE7Cf_DASfVUi6XfyJhl9-wL0vblb56gsg",
+          "start_cursor": "AQHRpqZkkZFFAr8daoVUYiS0zD3o1SyYqZKkPkX6y_jEhAWbVFExF2zSZ9XjVIKDpr-Pb35n1rhIpO7IsGD1SpWswQ"
+        },
+        "edges": [
+          {
+            "node": {
+              "id": "122836373143138",
+              "author": {
+                "id": "103135635113212",
+                "display_name": "krissyagain",
+                "profile_photo": {
+                  "uri": "https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/c0.0.304.304a\/s160x160\/39036703_103135998446509_2131063464855740944_n.jpg?_nc_cat=108&ccb=1-5&_nc_sid=79b88e&_nc_ohc=G6Tlm3JmDfUAX8noKrw&_nc_ht=scontent.oculuscdn.com&oh=00_AT8UnFdZHBfWhnAvrGuCc8Jfz9TjJbs6g00ia5JOrVz3gw&oe=61D20C97"
+                }
+              },
+              "score": 5,
+              "reviewDescription": "I just have to praise the  makers of this game. I bought this game and out of the box was having problems; I could not connect to multiplayer servers at all. A quicjk email to support and they had me fixed up super quick.\n\nFor the game itself, it is fun. The mechinics can be a little daunting to get the hang of but the concept is fun and a great workout. I'm sure with practice I'll get good at it but for now it is fun trying.",
+              "reviewTitle": "Great support team",
+              "review_helpful_count": 5,
+              "review_rank_by_viewer": null,
+              "date": 1616626132,
+              "developerResponse": null
+            }
+          },
+          {
+            "node": {
+              "id": "142040077717788",
+              "author": {
+                "id": "118460313409098",
+                "display_name": "StalwartNeon",
+                "profile_photo": {
+                  "uri": "https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/c0.0.720.720a\/s160x160\/39031561_126248162630313_6579503751297065747_n.jpg?_nc_cat=102&ccb=1-5&_nc_sid=79b88e&_nc_ohc=UY4Y5_p8zmAAX_eSpn9&_nc_ht=scontent.oculuscdn.com&oh=00_AT8WwiEGlj4xuYYK_qw_YnXAIlTwv51rZ3Ueq7PJZT5v8g&oe=61D389A7"
+                }
+              },
+              "score": 5,
+              "reviewDescription": "If you thought Beatsaber was a workout, just give this game five minutes of your time and you'll come to realize how many towels you'll need. Looking at this game critically, I say that it is a perfect concept for a vr racing game, rather than being stuck in a vehicle, you are the vehicle. The mix of Mariokart esque power ups and the movement of Jet Set Radio Future blend incredbly well and lend themselves to a unique experience! That being said however, for any new player it will take a few days to grasp the running mechanic, but once you do you'll be in for the time of your life. My final note is, unfortunantely due the current state of VR, online mulitiplayer is lacking, however this isn't to fault Survios, because they put out an amazing game with immense replayability and a sizeable amount of content for the price. Sprint Vector is a solid game with loads of content and should be a mainstay for any VR user.",
+              "reviewTitle": "Run, Jump, and sweat like heck!",
+              "review_helpful_count": 22,
+              "review_rank_by_viewer": null,
+              "date": 1609043993,
+              "developerResponse": null
+            }
+          },
+          {
+            "node": {
+              "id": "162461645712401",
+              "author": {
+                "id": "101341835157716",
+                "display_name": "ranqiz",
+                "profile_photo": {
+                  "uri": "https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/c0.0.176.176a\/s160x160\/38974909_102198935072006_297836570272249520_n.jpg?_nc_cat=102&ccb=1-5&_nc_sid=79b88e&_nc_ohc=kP2AuNsMns4AX-48so2&_nc_ht=scontent.oculuscdn.com&oh=00_AT-v6FkCOtL3-URe07Winv6P5hCcc7ZjijrJkdZk-ytGVA&oe=61D28B90"
+                }
+              },
+              "score": 1,
+              "reviewDescription": "With Virtual Desktop. Actual drivers. ASUS ROG Strix Scar 15 Laptop with RTX 3080 115+W, Ryzen 7 5800H, 16GB RAM. What is wrong here?",
+              "reviewTitle": "Game CRASHES at startup.",
+              "review_helpful_count": 5,
+              "review_rank_by_viewer": null,
+              "date": 1615039939,
+              "developerResponse": null
+            }
+          },
+          {
+            "node": {
+              "id": "305746470699721",
+              "author": {
+                "id": "105744807366556",
+                "display_name": "AliceHalley",
+                "profile_photo": {
+                  "uri": "https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/c0.0.1080.1080a\/s160x160\/39031587_505375864070113_8287031439642987696_n.jpg?_nc_cat=108&ccb=1-5&_nc_sid=79b88e&_nc_ohc=3TMX3mBJxJ4AX-C-zW1&_nc_ht=scontent.oculuscdn.com&oh=00_AT-jzckD38OflcQd6u1JdUhVFO6F_eDDtAbvirw3viqOOg&oe=61D2AB8D"
+                }
+              },
+              "score": 5,
+              "reviewDescription": "I truly feel this is the pinnacle of VR gaming. It's incredibly fun, utilizes the most of physical movement, and it is bursting with character and fun visuals. It's Perfect.",
+              "reviewTitle": "Excellent, Engaging, Physical Game!",
+              "review_helpful_count": 13,
+              "review_rank_by_viewer": null,
+              "date": 1598693901,
+              "developerResponse": null
+            }
+          },
+          {
+            "node": {
+              "id": "2489595784665658",
+              "author": {
+                "id": "1787238734901370",
+                "display_name": "cwolfgang",
+                "profile_photo": {
+                  "uri": "https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/c0.0.379.379a\/s160x160\/11162702_1866036497021593_1664235488589905920_n.jpg?_nc_cat=101&ccb=1-5&_nc_sid=79b88e&_nc_ohc=KCFHFYsyVysAX_Rugg3&_nc_ht=scontent.oculuscdn.com&oh=00_AT_xeGuWMjYb-bWD_CMMdTmxiIHgrOSiMPhVe9H8LCMUqA&oe=61D34A68"
+                }
+              },
+              "score": 5,
+              "reviewDescription": "If you grew up on jetset radio future you will love this game desgin and musical vibe and thrilling sensation of areana races, and a large practice skate park. You skate with roller blades and move your hands in that fashion in order to move about. IT is everything I want in a vr game, adrenline but the lack of practice can make anyone easily frustrated in this game. Give it some serious practice to get the skating arms movement and timing right, it's def a workout. Compared to most vr comfort levels. it say this i scales 5\/5 but just be aware of your play space",
+              "reviewTitle": "jetset radio is back in vr!",
+              "review_helpful_count": 14,
+              "review_rank_by_viewer": null,
+              "date": 1589651539,
+              "developerResponse": null
+            }
+          }
+        ]
+      },
+      "can_viewer_review": false,
+      "is_offer_region_restricted": false,
+      "__isWithWebsitePageMeta": "Application",
+      "website_page_meta": {
+        "description": "Sprint Vector is officially in the VR League! Race your way to victory and grab Sprint Vector on sale now. Register now to compete!\n\nRun, jump, climb, and fly at extreme speeds as you race through challenging courses and battle obstacles in this frenetic VR adrenaline platformer.",
+        "image_height": 405,
+        "image_type": "image\/jpeg",
+        "image_url": "https:\/\/scontent.oculuscdn.com\/v\/t64.5771-25\/q92\/s720x720\/38974678_337093023505659_2813792384536543232_n.jpg?_nc_cat=1&ccb=1-5&_nc_sid=79b88e&_nc_ohc=5uQ0Z3ZmD1kAX_zvVpG&_nc_ht=scontent.oculuscdn.com&oh=00_AT-ztzjoKwcOm51zY0_M_Q_piuisZMfqmjVcPXaCOv-ppg&oe=61D2B67F",
+        "image_width": 720,
+        "og_locale": "en_US",
+        "og_type": "website",
+        "page_url": "https:\/\/www.oculus.com\/experiences\/rift\/1425858557493354\/",
+        "site_name": "Oculus",
+        "title": "Sprint Vector on Oculus Rift"
+      },
+      "fallback_ranking_trace": ""
+    }
+  },
+  "errors": [
+    {
+      "message": "A server error field_exception occured. Check server logs for details.",
+      "severity": "ERROR",
+      "path": [
+        "node",
+        "current_offer",
+        "buy_button_captions"
+      ]
+    },
+    {
+      "message": "A server error field_exception occured. Check server logs for details.",
+      "severity": "ERROR",
+      "path": [
+        "node",
+        "purchase_alerts"
+      ]
+    }
+  ]
+}

@@ -37,6 +37,29 @@ namespace OculusLibrary.Tests
             Assert.AreEqual(89, data.CommunityScore);
         }
 
+        [Test]
+        public void Sprint_Vector_Parses_Correctly()
+        {
+            var subject = Setup("Sprint Vector", out var webClient);
+            string appId = "1425858557493354";
+
+            var data = subject.GetMetaData(appId);
+            Assert.AreEqual("Sprint Vector", data.Name);
+            Assert.NotNull(data.Description);
+            Assert.AreEqual("0.0.0.111496", data.Version);
+            ReleaseDateEquals(2018, 2, 2, data.ReleaseDate.Value);
+            Assert.AreEqual(appId, data.GameId);
+            Assert.NotNull(data.BackgroundImage?.Path);
+            MetadataPropertyCollectionsMatch(data.Features, new[] { "Single Player", "Multiplayer", "VR", "VR Standing", "VR Seated", "VR Room-Scale", "VR Motion Controllers" });
+            MetadataPropertyCollectionsMatch(data.Platforms, new[] { "Oculus Rift", "Oculus Rift S" }, new[] { "pc_windows" });
+            MetadataPropertyCollectionsMatch(data.Tags, new[] { "VR Comfort: Intense" });
+            MetadataPropertyCollectionsMatch(data.Developers, new[] { "Survios" });
+            MetadataPropertyCollectionsMatch(data.Publishers, new[] { "Survios" });
+            MetadataPropertyCollectionsMatch(data.AgeRatings, new[] { "PEGI 3" });
+            MetadataPropertyCollectionsMatch(data.Genres, new[] { "Action", "Racing", "Sports" });
+            Assert.AreEqual(82, data.CommunityScore);
+        }
+
         private void ReleaseDateEquals(int expectedYear, int expectedMonth, int expectedDay, ReleaseDate actual)
         {
             Assert.AreEqual(expectedYear, actual.Year);
@@ -46,7 +69,12 @@ namespace OculusLibrary.Tests
 
         private void MetadataPropertyCollectionsMatch(HashSet<MetadataProperty> metadataProperties, string[] namePropertyValues, string[] specPropertyValues = null)
         {
-            Assert.AreEqual(namePropertyValues.Length + (specPropertyValues?.Length ?? 0), metadataProperties.Count);
+            string propertyString = string.Join(", ", metadataProperties.Select(x => x.ToString()).OrderBy(x => x).ToArray());
+            var expectedStrings = namePropertyValues.ToList();
+            expectedStrings.AddRange(specPropertyValues ?? new string[0]);
+            string expectedString = string.Join(", ", expectedStrings);
+
+            Assert.AreEqual(namePropertyValues.Length + (specPropertyValues?.Length ?? 0), metadataProperties.Count, "Expected [{0}] but found[{1}]", expectedString, propertyString);
             foreach (var nameProp in namePropertyValues)
             {
                 bool contains = metadataProperties.OfType<MetadataNameProperty>().Any(x => x.Name == nameProp);

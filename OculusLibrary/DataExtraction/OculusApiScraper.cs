@@ -128,6 +128,7 @@ namespace OculusLibrary.DataExtraction
                 case "COMFORTABLE_FOR_MOST": return "VR Comfort: Comfortable";
                 case "COMFORTABLE_FOR_SOME": return "VR Comfort: Moderate";
                 case "COMFORTABLE_FOR_FEW": return "VR Comfort: Intense";
+                case "NOT_RATED": return "VR Comfort: Unrated";
                 default: return null;
             }
         }
