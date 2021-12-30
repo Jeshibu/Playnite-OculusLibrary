@@ -116,6 +116,11 @@ namespace OculusLibrary.DataExtraction
             return data;
         }
 
+        /// <summary>
+        /// The developer field sometimes contains multiple developers. This splits them while also discarding the ", Ltd." in "Initech, Ltd."
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         private static IEnumerable<string> SplitCompanies(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -124,8 +129,10 @@ namespace OculusLibrary.DataExtraction
             string[] splitValues = value.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var val in splitValues)
             {
-                if (!Regex.IsMatch(val, @"^\s*(llc|ltd|inc)\.?\s*$", RegexOptions.IgnoreCase))
-                    yield return val;
+                if (Regex.IsMatch(val, @"^\s*(llc|ltd|inc)\.?\s*$", RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture))
+                    continue;
+
+                yield return val;
             }
         }
 
@@ -162,9 +169,9 @@ namespace OculusLibrary.DataExtraction
         {
             switch (playerMode)
             {
-                case "Sitting": return "VR Seated";
-                case "Standing": return "VR Standing";
-                case "Roomscale": return "VR Room-Scale";
+                case "SITTING": return "VR Seated";
+                case "STANDING": return "VR Standing";
+                case "ROOM_SCALE": return "VR Room-Scale";
                 default:
                     logger.Info("Unknown player mode: " + playerMode);
                     return null;
@@ -180,6 +187,12 @@ namespace OculusLibrary.DataExtraction
                 case "Touch (as Gamepad)": return "VR Motion Controllers";
                 case "Racing Wheel": return "Racing Wheel Support"; //found on Dirt Rally
                 case "Flight Stick": return "Flight Stick Support"; //found on End Space
+
+                case "Keyboard & Mouse":
+                case "Oculus Remote":
+                case "Other Device":
+                    return null; //Unsure if these should be features, disregard for now
+
                 default:
                     logger.Info("Unknown input device: " + inputDevice);
                     return null;
