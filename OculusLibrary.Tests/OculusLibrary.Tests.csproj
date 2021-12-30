@@ -75,6 +75,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OculusApiScraperTests.cs" />
     <Compile Include="OculusWebsiteParserTests.cs" />
     <Compile Include="PathNormaliserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

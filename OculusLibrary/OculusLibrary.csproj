@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataExtraction\IOculusPathSniffer.cs" />
+    <Compile Include="DataExtraction\OculusApiScraper.cs" />
     <Compile Include="ManifestParseException.cs" />
     <Compile Include="OS\IPathNormaliser.cs" />
     <Compile Include="OS\IRegistryValueProvider.cs" />
