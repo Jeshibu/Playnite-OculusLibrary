@@ -13,10 +13,10 @@ namespace OculusLibrary.Tests
     public class OculusApiScraperTests
     {
         [Test]
-        public void GetJsonData()
+        public void GetMetadata()
         {
             var subject = new OculusApiScraper(Substitute.For<ILogger>(), null);
-            var data = subject.GetJsonData("1180401875303371");
+            var data = subject.GetMetaData("1180401875303371");
             Assert.NotNull(data);
         }
     }
