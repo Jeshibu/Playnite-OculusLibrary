@@ -34,18 +34,16 @@ namespace OculusLibrary
         {
             logger.Info($"Executing Oculus GetGames");
 
-            var gameInfos = new List<GameMetadata>();
-
             var oculusLibraryLocations = pathSniffer.GetOculusLibraryLocations();
             var oculusInstallDir = pathSniffer.GetOculusSoftwareInstallationPath();
 
             // ID -> GameMetadata
-            var finalGameInfos = new Dictionary<string, GameMetadata>();
+            var gamesById = new Dictionary<string, GameMetadata>();
 
             if (oculusLibraryLocations == null || !oculusLibraryLocations.Any())
             {
                 logger.Error($"Cannot ascertain Oculus library locations");
-                return gameInfos;
+                return gamesById.Values;
             }
 
             //go through each library directory to get installed games
@@ -68,8 +66,7 @@ namespace OculusLibrary
                             metadata = oculusScraper.GetMetaData(manifest.AppId, metadata);
                         }
 
-                        gameInfos.Add(metadata);
-                        finalGameInfos.Add(manifest.AppId, metadata);
+                        gamesById.Add(manifest.AppId, metadata);
 
                         logger.Info($"Completed manifest {manifest.CanonicalName} {manifest.AppId}");
                     }
@@ -80,18 +77,22 @@ namespace OculusLibrary
                 }
             }
 
+            logger.Debug("Installed manifests processed. Moving on to uninstalled.");
+
             //get all games via the oculus software folder
             if (Directory.Exists($@"{oculusInstallDir}\CoreData\Manifests"))
             {
                 foreach (var manifest in GetOculusAppManifests($@"{oculusInstallDir}\CoreData", true))
                 {
-                    if (manifest.AppId == null || finalGameInfos.ContainsKey(manifest.AppId))
+                    logger.Info($"Processing manifest {manifest.CanonicalName} {manifest.AppId}");
+
+                    if (manifest.AppId == null || gamesById.ContainsKey(manifest.AppId))
                     {
                         // We only want actual Oculus Games that we haven't seen yet
                         continue;
                     }
                     var metadata = CreateMetadata(manifest, oculusInstallDir);
-                    var existingGame = this.PlayniteApi.Database.Games.FirstOrDefault(g => g.PluginId == this.Id && g.GameId == metadata.GameId);
+                    var existingGame = PlayniteApi.Database.Games.FirstOrDefault(g => g.PluginId == this.Id && g.GameId == metadata.GameId);
                     if (existingGame == null)
                     {
                         //only scrape oculus' api for new games, otherwise only installation data is interesting
@@ -99,13 +100,14 @@ namespace OculusLibrary
                         metadata = oculusScraper.GetMetaData(manifest.AppId, metadata);
                     }
 
-                    gameInfos.Add(metadata);
+                    gamesById.Add(manifest.AppId, metadata);
+                    logger.Info($"Completed manifest {manifest.CanonicalName} {manifest.AppId}");
                 }
             }
 
             logger.Info($"Oculus GetGames Completing");
 
-            return gameInfos;
+            return gamesById.Values;
         }
 
         private GameMetadata CreateMetadata(OculusManifest manifest, string oculusInstallDir, string currentLibraryBasePath = null)
