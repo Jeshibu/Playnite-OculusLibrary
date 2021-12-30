@@ -129,6 +129,7 @@ namespace OculusLibrary
                 Genres = new HashSet<MetadataProperty>(),
                 AgeRatings = new HashSet<MetadataProperty>(),
                 Links = new List<Link>(),
+                Tags = new HashSet<MetadataProperty>(),
             };
 
             #region images

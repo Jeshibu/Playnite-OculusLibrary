@@ -21,7 +21,7 @@ namespace OculusLibrary.DataExtraction
 
         private IWebClient WebClient { get; }
 
-        private static string GetStoreUrl(string appId)
+        public static string GetStoreUrl(string appId)
         {
             return $"https://www.oculus.com/experiences/rift/{appId}";
         }
@@ -80,6 +80,7 @@ namespace OculusLibrary.DataExtraction
                 Genres = new HashSet<MetadataProperty>(),
                 AgeRatings = new HashSet<MetadataProperty>(),
                 Links = new List<Link>(),
+                Tags = new HashSet<MetadataProperty>(),
             };
             data.Features.Add(new MetadataNameProperty("VR"));
 
@@ -113,7 +114,22 @@ namespace OculusLibrary.DataExtraction
             SetPropertiesForCollection(SplitCompanies(json.PublisherName), data.Publishers);
             SetPropertiesForCollection(json.GenreNames, data.Genres);
 
+            var comfortRating = GetComfortRating(json.ComfortRating);
+            if (comfortRating != null)
+                data.Tags.Add(new MetadataNameProperty(comfortRating));
+
             return data;
+        }
+
+        private static string GetComfortRating(string jsonComfortRating)
+        {
+            switch (jsonComfortRating)
+            {
+                case "COMFORTABLE_FOR_MOST": return "VR Comfort: Comfortable";
+                case "COMFORTABLE_FOR_SOME": return "VR Comfort: Moderate";
+                case "COMFORTABLE_FOR_FEW": return "VR Comfort: Intense";
+                default: return null;
+            }
         }
 
         /// <summary>
