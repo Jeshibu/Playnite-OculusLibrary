@@ -90,7 +90,7 @@ namespace OculusLibrary
 
                         using (var view = PlayniteApi.WebViews.CreateOffscreenView())
                         {
-                            var scrapedData = oculusScraper.ScrapeDataForApplicationId(view, manifest.AppId);
+                            var scrapedData = oculusScraper.GetGameData(view, manifest.AppId);
 
                             if (scrapedData == null)
                             {
@@ -99,7 +99,8 @@ namespace OculusLibrary
 
                             logger.Info($"Executable {executableFullPath}");
 
-                            List<GameAction> gameActions = new List<GameAction>
+                            var gameMetadata = ConvertToGameMetadata(scrapedData, executableName, installationPath, icon, backgroundImage);
+                            gameMetadata.GameActions = new List<GameAction>
                             {
                                 new GameAction
                                 {
@@ -108,18 +109,6 @@ namespace OculusLibrary
                                     Path = executableFullPath,
                                     Arguments = manifest.LaunchParameters
                                 }
-                            };
-
-                            var gameMetadata = new GameMetadata
-                            {
-                                Name = scrapedData?.Name ?? executableName,
-                                Description = scrapedData?.Description ?? string.Empty,
-                                GameId = manifest.AppId,
-                                InstallDirectory = installationPath,
-                                GameActions = gameActions,
-                                IsInstalled = true,
-                                Icon = new MetadataFile(icon),
-                                BackgroundImage = new MetadataFile(backgroundImage)
                             };
 
                             gameInfos.Add(gameMetadata);
@@ -164,22 +153,14 @@ namespace OculusLibrary
 
                         using (var view = PlayniteApi.WebViews.CreateOffscreenView())
                         {
-                            var scrapedData = oculusScraper.ScrapeDataForApplicationId(view, manifest.AppId);
+                            var scrapedData = oculusScraper.GetGameData(view, manifest.AppId);
 
                             if (scrapedData == null)
                             {
                                 logger.Debug($"Failed to retrieve scraped data for game");
                             }
 
-                            var gameMetadata = new GameMetadata
-                            {
-                                Name = scrapedData?.Name ?? manifest.CanonicalName,
-                                Description = scrapedData?.Description ?? string.Empty,
-                                GameId = manifest.AppId,
-                                IsInstalled = false,
-                                Icon = new MetadataFile(icon),
-                                BackgroundImage = new MetadataFile(backgroundImage)
-                            };
+                            var gameMetadata = ConvertToGameMetadata(scrapedData, manifest.CanonicalName, null, icon, backgroundImage);
 
                             gameInfos.Add(gameMetadata);
                         }
@@ -190,6 +171,80 @@ namespace OculusLibrary
             logger.Info($"Oculus GetGames Completing");
 
             return gameInfos;
+        }
+
+        private static GameMetadata ConvertToGameMetadata(OculusGameData oculusGameData, string manifestName, string installDirectory = null, string iconPath = null, string backgroundImagePath = null)
+        {
+            var output = new GameMetadata
+            {
+                Name = oculusGameData?.Name ?? manifestName,
+                Description = oculusGameData?.Description ?? string.Empty,
+                GameId = oculusGameData.AppId,
+                IsInstalled = installDirectory != null,
+                InstallDirectory = installDirectory,
+                Icon = new MetadataFile(iconPath),
+                BackgroundImage = new MetadataFile(backgroundImagePath ?? oculusGameData?.BackgroundImageUrl),
+                Version = oculusGameData?.Version,
+                Features = new HashSet<MetadataProperty> { new MetadataNameProperty("VR") },
+                Platforms = new HashSet<MetadataProperty>(),
+                Developers = new HashSet<MetadataProperty>(),
+                Publishers = new HashSet<MetadataProperty>(),
+                Genres = new HashSet<MetadataProperty>(),
+                AgeRatings = new HashSet<MetadataProperty>(),
+                Links = new List<Link>(),
+            };
+            output.Features.Add(new MetadataNameProperty("VR"));
+
+            if (oculusGameData != null)
+            {
+                CopyMetadataNameProperties(oculusGameData.Developers, output.Developers);
+                CopyMetadataNameProperties(oculusGameData.Publishers, output.Publishers);
+                CopyMetadataNameProperties(oculusGameData.Genres, output.Genres);
+                CopyMetadataNameProperties(oculusGameData.SupportedPlatforms.Select(x => "Oculus " + x), output.Platforms);
+                CopyMetadataNameProperties(oculusGameData.AgeRatings, output.AgeRatings);
+                #pragma warning disable IDE0055 //disable formatting
+                AddIfPresent(oculusGameData.SupportedPlatforms,     "Rift",                 output.Platforms, "PC (Windows)");
+                AddIfPresent(oculusGameData.GameModes,              "Single User",          output.Features, "Single Player");
+                AddIfPresent(oculusGameData.GameModes,              "Multiplayer",          output.Features, "Multiplayer");
+                AddIfPresent(oculusGameData.GameModes,              "Co-op",                output.Features, "Co-Op");
+                AddIfPresent(oculusGameData.PlayerModes,            "Sitting",              output.Features, "VR Seated");
+                AddIfPresent(oculusGameData.PlayerModes,            "Standing",             output.Features, "VR Standing");
+                AddIfPresent(oculusGameData.PlayerModes,            "Roomscale",            output.Features, "VR Room-Scale");
+                AddIfPresent(oculusGameData.SupportedControllers,   "Gamepad",              output.Features, "VR Gamepad", "Full Controller Support");
+                AddIfPresent(oculusGameData.SupportedControllers,   "Oculus Touch",         output.Features, "VR Motion Controllers");
+                AddIfPresent(oculusGameData.SupportedControllers,   "Touch (as Gamepad)",   output.Features, "VR Motion Controllers");
+                AddIfPresent(oculusGameData.SupportedControllers,   "Racing Wheel",         output.Features, "Racing Wheel Support"); //found on Dirt Rally
+                AddIfPresent(oculusGameData.SupportedControllers,   "Flight Stick",         output.Features, "Flight Stick Support"); //found on End Space
+                #pragma warning restore IDE0055
+                //not sure if these controller values should be passed along or if they'd just be clutter: Touchpad, Gear VR Controller, Keyboard & Mouse, Oculus Remote
+
+                if (oculusGameData.ReleaseDate.HasValue)
+                    output.ReleaseDate = new ReleaseDate(oculusGameData.ReleaseDate.Value);
+                if (!string.IsNullOrEmpty(oculusGameData.StoreUrl))
+                    output.Links.Add(new Link("Oculus Store", oculusGameData.StoreUrl));
+                if (!string.IsNullOrEmpty(oculusGameData.Website))
+                    output.Links.Add(new Link("Website", oculusGameData.Website));
+            }
+            return output;
+        }
+
+        private static void AddIfPresent(string[] oculusData, string oculusName, HashSet<MetadataProperty> metadataProperties, params string[] playniteNames)
+        {
+            if (oculusData.Contains(oculusName))
+            {
+                foreach (var playniteName in playniteNames)
+                {
+                    metadataProperties.Add(new MetadataNameProperty(playniteName));
+                }
+            }
+        }
+
+        private static void CopyMetadataNameProperties(IEnumerable<string> from, HashSet<MetadataProperty> to)
+        {
+            foreach (var f in from)
+            {
+                to.Add(new MetadataNameProperty(f));
+            }
         }
 
         private List<OculusManifest> GetOculusAppManifests(string oculusBasePath, bool return_assets)
