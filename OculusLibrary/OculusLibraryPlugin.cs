@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web.Script.Serialization;
 
 namespace OculusLibrary
@@ -51,7 +52,7 @@ namespace OculusLibrary
             {
                 logger.Info($"Processing Oculus library location {currentLibraryBasePath}");
 
-                foreach (var manifest in GetOculusAppManifests(currentLibraryBasePath, false))
+                foreach (var manifest in GetOculusAppManifests(currentLibraryBasePath))
                 {
                     logger.Info($"Processing manifest {manifest.CanonicalName} {manifest.AppId}");
 
@@ -82,7 +83,7 @@ namespace OculusLibrary
             //get all games via the oculus software folder
             if (Directory.Exists($@"{oculusInstallDir}\CoreData\Manifests"))
             {
-                foreach (var manifest in GetOculusAppManifests($@"{oculusInstallDir}\CoreData", true))
+                foreach (var manifest in GetOculusAppManifests($@"{oculusInstallDir}\CoreData"))
                 {
                     logger.Info($"Processing manifest {manifest.CanonicalName} {manifest.AppId}");
 
@@ -182,32 +183,43 @@ namespace OculusLibrary
             return output;
         }
 
-        private List<OculusManifest> GetOculusAppManifests(string oculusBasePath, bool return_assets)
+        private List<OculusManifest> GetOculusAppManifests(string oculusBasePath)
         {
             logger.Debug($"Listing Oculus manifests");
 
-            string[] fileEntries = Directory.GetFiles($@"{oculusBasePath}\Manifests\");
+            string[] fileEntries = Directory.GetFiles($@"{oculusBasePath}\Manifests\", "*.json");
 
             if (!fileEntries.Any())
             {
                 logger.Info($"No Oculus game manifests found");
             }
 
+            var groupedFiles = fileEntries.GroupBy(f => Regex.Replace(f, @"(_assets)?\.json$", string.Empty));
+
             var manifests = new List<OculusManifest>();
 
-            foreach (string fileName in fileEntries.Where(x => x.EndsWith(".json")))
+            foreach (var fileGroup in groupedFiles)
             {
                 try
                 {
-                    if (fileName.EndsWith("_assets.json") && !return_assets)
+                    //try for non *_assets.json manifests first
+                    //if the game is installed the normal manifest will have install data
+                    //the assets manifest will never have install data
+                    string fileName = fileGroup.FirstOrDefault(f => !f.EndsWith("_assets.json"));
+
+                    if (fileName == default)
                     {
-                        // not interested in the asset json files
-                        continue;
+                        fileName = fileGroup.First();
                     }
 
                     var json = File.ReadAllText(fileName);
 
                     var manifest = OculusManifest.Parse(json);
+                    if (manifest.ThirdParty)
+                    {
+                        continue; //The Oculus app also makes manifests for non-Oculus programs that it's seen running, ignore those
+                    }
+
                     if (manifest.CanonicalName.EndsWith("_assets"))
                     {
                         manifest.CanonicalName = manifest.CanonicalName.Substring(0, manifest.CanonicalName.Length - 7);
@@ -217,7 +229,7 @@ namespace OculusLibrary
                 }
                 catch (Exception ex)
                 {
-                    logger.Error($"Exception while processing manifest ({fileName}) : {ex}");
+                    logger.Error($"Exception while processing manifest ({fileGroup}) : {ex}");
                 }
             }
 
