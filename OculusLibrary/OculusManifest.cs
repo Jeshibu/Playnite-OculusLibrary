@@ -9,6 +9,7 @@ namespace OculusLibrary
         public string LaunchFile { get; set; }
         public string LaunchParameters { get; set; }
         public string CanonicalName { get; set; }
+        public bool ThirdParty { get; set; }
 
         public static OculusManifest Parse(string json)
         {

@@ -1,6 +1,7 @@
-﻿Name: Oculus Library Importer
-Author: Shaw Young
-Version: 1.0.0
+﻿Id: OculusLibraryPlugin_Playnite_Plugin
+Name: Oculus Library Importer
+Author: Robert Ansel & Shaw Young
+Version: 2.0.0
 Module: OculusLibrary.dll
 Type: GameLibrary
 Icon: Resources\oculusicon.png

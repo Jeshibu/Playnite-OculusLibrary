@@ -84,5 +84,34 @@ namespace OculusLibrary.DataExtraction
 
             return libraryLocations;
         }
+
+        private string GetOculusSoftwareInstallationPath(RegistryView platformView)
+        {
+            try
+            {
+                return registryValueProvider.GetValueForPath(platformView, RegistryHive.LocalMachine, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Oculus", "InstallLocation");
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Exception opening registry key: {ex}");
+                return null;
+            }
+
+        }
+
+        public string GetOculusSoftwareInstallationPath()
+        {
+            logger.Debug("Trying to get Oculus install path (REG64)");
+
+            var installDir = GetOculusSoftwareInstallationPath(RegistryView.Registry64);
+
+            if (installDir == null)
+            {
+                logger.Debug("Trying to get Oculus install path (REG32)");
+                installDir = GetOculusSoftwareInstallationPath(RegistryView.Registry32);
+            }
+
+            return installDir;
+        }
     }
 }
