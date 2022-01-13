@@ -25,7 +25,7 @@ namespace OculusLibrary
                 throw new ManifestParseException("Could not deserialise json");
             }
 
-            manifest.LaunchFile = manifest?.LaunchFile?.Replace("/", @"\");
+            manifest.LaunchFile = manifest.LaunchFile?.Replace("/", @"\");
 
             return manifest;
         }

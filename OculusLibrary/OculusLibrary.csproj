@@ -40,6 +40,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -49,11 +50,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AggregateOculusMetadataCollector.cs" />
     <Compile Include="DataExtraction\IOculusPathSniffer.cs" />
     <Compile Include="DataExtraction\OculusApiScraper.cs" />
     <Compile Include="DataExtraction\OculusJsonResponse.cs" />
     <Compile Include="DataExtraction\WebClientWrapper.cs" />
     <Compile Include="ManifestParseException.cs" />
+    <Compile Include="DataExtraction\OculusManifestScraper.cs" />
     <Compile Include="OS\IPathNormaliser.cs" />
     <Compile Include="OS\IRegistryValueProvider.cs" />
     <Compile Include="OS\IWindowsManagementObjectQueryProvider.cs" />

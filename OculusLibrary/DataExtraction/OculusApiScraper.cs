@@ -6,11 +6,14 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace OculusLibrary.DataExtraction
 {
     public class OculusApiScraper
     {
+        private static Regex tokenRegex = new Regex(@"\bid=""OC_ACCESS_TOKEN""\s+value=""(?<token>[^""]+)""", RegexOptions.Compiled);
+        private static Regex titleRegex = new Regex(@"<title\b[^>]*>(?<page_title>.+?)</title>", RegexOptions.Compiled);
         private readonly ILogger logger;
 
         public OculusApiScraper(ILogger logger, IWebClient webClient = null)
@@ -26,13 +29,13 @@ namespace OculusLibrary.DataExtraction
             return $"https://www.oculus.com/experiences/rift/{appId}";
         }
 
-        private string GetToken(string appId)
+        private async Task<string> GetToken(string appId)
         {
             string url = GetStoreUrl(appId);
-            var src = WebClient.DownloadString(url);
+            var src = await WebClient.DownloadStringAsync(url);
 
             //this is part of HTML in a <script> tag, so that's why it's not being HTML parsed
-            var match = Regex.Match(src, @"\bid=""OC_ACCESS_TOKEN""\s+value=""(?<token>[^""]+)""");
+            var match = tokenRegex.Match(src);
             if (!match.Success)
             {
                 logger.Error($"Couldn't find token in {url}");
@@ -41,48 +44,63 @@ namespace OculusLibrary.DataExtraction
             return match.Groups["token"].Value;
         }
 
-        private OculusJsonResponse GetJsonData(string token, string appId)
+        private async Task<OculusJsonResponse> GetJsonData(string token, string appId)
         {
             NameValueCollection values = new NameValueCollection();
             values.Add("access_token", token);
             values.Add("variables", $"{{\"itemId\":\"{appId}\",\"first\":5,\"last\":null,\"after\":null,\"before\":null,\"forward\":true,\"ordering\":null,\"ratingScores\":null,\"hmdType\":\"RIFT\"}}");
             values.Add("doc_id", "4282918028433524"); //hardcoded?
-            string jsonStr = WebClient.UploadValues("https://graph.oculus.com/graphql?forced_locale=en_US", "POST", values);
+            string jsonStr = await WebClient.UploadValuesAsync("https://graph.oculus.com/graphql?forced_locale=en_US", "POST", values);
             var data = JsonConvert.DeserializeObject<OculusJsonResponse>(jsonStr);
             return data;
         }
 
-        public GameMetadata GetMetaData(string appId, GameMetadata data = null)
+        public async Task<OculusJsonResponseDataNode> GetJsonData(string appId)
         {
             try
             {
-                string token = GetToken(appId);
-                var json = GetJsonData(token, appId);
-                if (json?.Data?.Node == null) return null;
-                var metadata = ToGameMetadata(json.Data.Node, data);
-                return metadata;
+                string token = await GetToken(appId);
+                var json = await GetJsonData(token, appId);
+                return json?.Data?.Node;
             }
             catch (Exception ex)
             {
                 logger.Error(ex, $"Error scraping Oculus API for appId {appId}");
-                return data;
+                return null;
             }
         }
 
-        private GameMetadata ToGameMetadata(OculusJsonResponseDataNode json, GameMetadata data = null)
+        public async Task<GameMetadata> GetMetadata(string appId, GameMetadata data = null)
         {
-            data = data ?? new GameMetadata
+            var json = await GetJsonData(appId);
+            if (json == null) return null;
+            var metadata = ToGameMetadata(json, data);
+            return metadata;
+        }
+
+        public async Task<string> GetGameName(string appId)
+        {
+            string url = GetStoreUrl(appId);
+            var src = await WebClient.DownloadStringAsync(url);
+
+            //expecting titles like <title id="pageTitle">Asgard&#039;s Wrath on Oculus Rift | Oculus</title>
+            var match = titleRegex.Match(src);
+            if (!match.Success)
             {
-                Features = new HashSet<MetadataProperty>(),
-                Platforms = new HashSet<MetadataProperty>(),
-                Developers = new HashSet<MetadataProperty>(),
-                Publishers = new HashSet<MetadataProperty>(),
-                Genres = new HashSet<MetadataProperty>(),
-                AgeRatings = new HashSet<MetadataProperty>(),
-                Links = new List<Link>(),
-                Tags = new HashSet<MetadataProperty>(),
-            };
-            data.Features.Add(new MetadataNameProperty("VR"));
+                logger.Error($"Couldn't find title in {url}");
+                return null;
+            }
+
+            string pageTitle = match.Groups["page_title"].Value;
+            var onIndex = pageTitle.LastIndexOf(" on "); //___ on Oculus Rift | Oculus
+            string gameTitle = onIndex < 0 ? pageTitle : pageTitle.Remove(onIndex);
+            gameTitle = HttpUtility.HtmlDecode(gameTitle);
+            return gameTitle;
+        }
+
+        public GameMetadata ToGameMetadata(OculusJsonResponseDataNode json, GameMetadata data = null)
+        {
+            data = data ?? OculusLibraryPlugin.GetBaseMetadata();
 
             data.GameId = json.Id;
             data.Name = json.DisplayName;
