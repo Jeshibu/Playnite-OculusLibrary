@@ -101,6 +101,7 @@ namespace OculusLibrary.DataExtraction
         public GameMetadata ToGameMetadata(OculusJsonResponseDataNode json, GameMetadata data = null)
         {
             data = data ?? OculusLibraryPlugin.GetBaseMetadata();
+            data.Features.Add(new MetadataNameProperty("VR"));
 
             data.GameId = json.Id;
             data.Name = json.DisplayName;

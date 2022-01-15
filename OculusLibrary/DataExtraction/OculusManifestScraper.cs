@@ -204,15 +204,10 @@ namespace OculusLibrary.DataExtraction
                 icon = executableFullPath;
             }
 
-            var backgroundImage = GetAssetPathIfItExists(manifest.CanonicalName, "cover_landscape_image_large.png");
-            var coverImage = GetAssetPathIfItExists(manifest.CanonicalName, "cover_square_image.jpg");
-
             if (!string.IsNullOrEmpty(icon))
                 output.Icon = new MetadataFile(icon);
 
-            if (!string.IsNullOrEmpty(backgroundImage))
-                output.BackgroundImage = new MetadataFile(backgroundImage);
-
+            var coverImage = GetAssetPathIfItExists(manifest.CanonicalName, "cover_square_image.jpg");
             if (!string.IsNullOrEmpty(coverImage))
                 output.CoverImage = new MetadataFile(coverImage);
             #endregion images

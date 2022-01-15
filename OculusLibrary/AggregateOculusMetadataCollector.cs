@@ -22,7 +22,9 @@ namespace OculusLibrary
 
         public override GameMetadata GetMetadata(Game game)
         {
-            return GetMetadata(game?.GameId);
+            var task = apiScraper.GetMetadata(game?.GameId);
+            task.Wait();
+            return task.Result;
         }
 
         public GameMetadata GetMetadata(string appId)
@@ -32,8 +34,8 @@ namespace OculusLibrary
                 return null;
             }
 
-            var metadata = manifestScraper.GetMetadata(appId);
             var jsonTask = apiScraper.GetJsonData(appId);
+            var metadata = manifestScraper.GetMetadata(appId);
             jsonTask.Wait();
             return apiScraper.ToGameMetadata(jsonTask.Result, metadata);
         }

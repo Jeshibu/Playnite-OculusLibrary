@@ -43,7 +43,7 @@ namespace OculusLibrary
             return new GameMetadata
             {
                 Source = new MetadataNameProperty("Oculus"),
-                Features = new HashSet<MetadataProperty> { new MetadataNameProperty("VR") },
+                Features = new HashSet<MetadataProperty>(),
                 Platforms = new HashSet<MetadataProperty>(),
                 Developers = new HashSet<MetadataProperty>(),
                 Publishers = new HashSet<MetadataProperty>(),
@@ -52,10 +52,6 @@ namespace OculusLibrary
                 Links = new List<Link>(),
                 Tags = new HashSet<MetadataProperty>(),
             };
-        }
-
-
-
         }
 
         public override LibraryMetadataProvider GetMetadataDownloader()
