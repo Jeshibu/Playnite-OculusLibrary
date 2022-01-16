@@ -27,19 +27,6 @@ namespace OculusLibrary
             return task.Result;
         }
 
-        public GameMetadata GetMetadata(string appId)
-        {
-            if (string.IsNullOrEmpty(appId))
-            {
-                return null;
-            }
-
-            var jsonTask = apiScraper.GetJsonData(appId);
-            var metadata = manifestScraper.GetMetadata(appId);
-            jsonTask.Wait();
-            return apiScraper.ToGameMetadata(jsonTask.Result, metadata);
-        }
-
         public IEnumerable<GameMetadata> GetGames(CancellationToken cancellationToken)
         {
             var manifestGames = manifestScraper.GetGames(cancellationToken);
