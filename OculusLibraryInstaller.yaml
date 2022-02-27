@@ -9,3 +9,9 @@ Packages:
       - Added support for uninstalled games
       - Added GraphQL API metadata lookup instead of web UI scraper
       - Gets real metadata instead of just executable file names for game names
+  - Version: 2.1
+    RequiredApiVersion: 6.2.1
+    ReleaseDate: 2022-02-16
+    PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.1.0/OculusLibraryPlugin_Playnite_Plugin_2_1_0.pext
+    Changelog:
+      - Split metadata collection from import process, allowing for use as a store metadata source and speeding up the initial import
