@@ -1,6 +1,7 @@
 ﻿using OculusLibrary.DataExtraction;
 using Playnite.SDK;
 using Playnite.SDK.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -12,19 +13,29 @@ namespace OculusLibrary
         private readonly OculusManifestScraper manifestScraper;
         private readonly OculusApiScraper apiScraper;
         private readonly IPlayniteAPI api;
+        private readonly ILogger logger;
 
-        public AggregateOculusMetadataCollector(OculusManifestScraper manifestScraper, OculusApiScraper apiScraper, IPlayniteAPI api)
+        public AggregateOculusMetadataCollector(OculusManifestScraper manifestScraper, OculusApiScraper apiScraper, IPlayniteAPI api, ILogger logger)
         {
             this.manifestScraper = manifestScraper;
             this.apiScraper = apiScraper;
             this.api = api;
+            this.logger = logger;
         }
 
         public override GameMetadata GetMetadata(Game game)
         {
-            var task = apiScraper.GetMetadata(game?.GameId);
-            task.Wait();
-            return task.Result;
+            try
+            {
+                var task = apiScraper.GetMetadata(game?.GameId);
+                task.Wait();
+                return task.Result;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Error fetching metadata");
+                return null;
+            }
         }
 
         public IEnumerable<GameMetadata> GetGames(CancellationToken cancellationToken)
@@ -43,7 +54,7 @@ namespace OculusLibrary
                 }
                 else
                 {
-                    //for new games, we have to immediately set the name, because game name isn't overridden by a post-import metadata pass
+                    //for new games, we have to immediately set the name, because game name isn't overridden by a post-import metadata pass (by default)
                     var nameTask = apiScraper.GetGameName(game.GameId);
                     nameTask.Wait();
                     game.Name = nameTask.Result;

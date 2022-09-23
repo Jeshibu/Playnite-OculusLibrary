@@ -27,15 +27,32 @@ namespace OculusLibrary
         public OculusLibraryPlugin(IPlayniteAPI api) : base(api)
         {
             logger = LogManager.GetLogger();
-            pathSniffer = new OculusPathSniffer(new RegistryValueProvider(), new PathNormaliser(new WMODriveQueryProvider()), logger);
-            apiScraper = new OculusApiScraper(logger);
-            manifestScraper = new OculusManifestScraper(pathSniffer, logger);
-            metadataCollector = new AggregateOculusMetadataCollector(manifestScraper, apiScraper, api);
+            try
+            {
+                pathSniffer = new OculusPathSniffer(new RegistryValueProvider(), new PathNormaliser(new WMODriveQueryProvider()), logger);
+                apiScraper = new OculusApiScraper(logger);
+                manifestScraper = new OculusManifestScraper(pathSniffer, logger);
+                metadataCollector = new AggregateOculusMetadataCollector(manifestScraper, apiScraper, api, logger);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Error in OculusLibraryPlugin constructor");
+                throw;
+            }
         }
 
         public override IEnumerable<GameMetadata> GetGames(LibraryGetGamesArgs args)
         {
-            return metadataCollector.GetGames(args.CancelToken);
+            try
+            {
+                return metadataCollector.GetGames(args.CancelToken);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Error getting Oculus games");
+                PlayniteApi.Notifications.Add(new NotificationMessage("oculus-import-error", $"Error during Oculus library import: {ex.Message}", NotificationType.Error));
+                return new GameMetadata[0];
+            }
         }
 
         public static GameMetadata GetBaseMetadata()
