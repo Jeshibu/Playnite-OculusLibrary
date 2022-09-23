@@ -1,7 +1,7 @@
 ﻿Id: OculusLibraryPlugin_Playnite_Plugin
 Name: Oculus Library Importer
-Author: Jeshibu, Robert Ansel & Shaw Young
-Version: 2.1.0
+Author: Jeshibu
+Version: 2.2.0
 Module: OculusLibrary.dll
 Type: GameLibrary
 Icon: Resources\oculusicon.png

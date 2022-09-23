@@ -15,3 +15,10 @@ Packages:
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.1.0/OculusLibraryPlugin_Playnite_Plugin_2_1_0.pext
     Changelog:
       - Split metadata collection from import process, allowing for use as a store metadata source and speeding up the initial import
+  - Version: 2.2
+    RequiredApiVersion: 6.4.0
+    ReleaseDate: 2022-09-23
+    PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.2.0/OculusLibraryPlugin_Playnite_Plugin_2_2_0.pext
+    Changelog:
+      - Added file size fetching from "Official Store" metadata
+      - Some extra exception handling and logging
