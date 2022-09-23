@@ -137,6 +137,9 @@ namespace OculusLibrary.DataExtraction
             if (comfortRating != null)
                 data.Tags.Add(new MetadataNameProperty(comfortRating));
 
+            if (ulong.TryParse(json.LatestSupportedBinary?.TotalInstalledSpace, out ulong size))
+                data.InstallSize = size;
+
             return data;
         }
 

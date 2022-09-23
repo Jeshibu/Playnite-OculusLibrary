@@ -100,6 +100,9 @@ namespace OculusLibrary.DataExtraction
         [JsonProperty("change_log")]
         public string ChangeLog { get; set; }
 
+        [JsonProperty("total_installed_space")]
+        public string TotalInstalledSpace { get; set; }
+
         [JsonProperty("required_space_adjusted")]
         public string RequiredSpaceAdjusted { get; set; }
     }
