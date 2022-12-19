@@ -37,17 +37,21 @@
     <Reference Include="Playnite.SDK, Version=6.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\PlayniteSDK.6.4.0\lib\net462\Playnite.SDK.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AggregateOculusMetadataCollector.cs" />
@@ -57,6 +61,11 @@
     <Compile Include="DataExtraction\WebClientWrapper.cs" />
     <Compile Include="ManifestParseException.cs" />
     <Compile Include="DataExtraction\OculusManifestScraper.cs" />
+    <Compile Include="OculusClient.cs" />
+    <Compile Include="OculusLibrarySettings.cs" />
+    <Compile Include="OculusLibrarySettingsView.xaml.cs">
+      <DependentUpon>OculusLibrarySettingsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="OS\IPathNormaliser.cs" />
     <Compile Include="OS\IRegistryValueProvider.cs" />
     <Compile Include="OS\IWindowsManagementObjectQueryProvider.cs" />
@@ -64,6 +73,8 @@
     <Compile Include="OculusManifest.cs" />
     <Compile Include="DataExtraction\OculusPathSniffer.cs" />
     <Compile Include="OS\PathNormaliser.cs" />
+    <Compile Include="Playnite\PluginSettingsViewModel.cs" />
+    <Compile Include="Playnite\Programs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OS\RegistryValueProvider.cs" />
     <Compile Include="OS\WMODrive.cs" />
@@ -75,11 +86,16 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <None Include="Resources\oculusicon.png">
+    <Page Include="OculusLibrarySettingsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\oculusicon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

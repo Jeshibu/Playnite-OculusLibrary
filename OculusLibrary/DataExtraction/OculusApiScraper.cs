@@ -14,11 +14,10 @@ namespace OculusLibrary.DataExtraction
     {
         private static Regex tokenRegex = new Regex(@"\bid=""OC_ACCESS_TOKEN""\s+value=""(?<token>[^""]+)""", RegexOptions.Compiled);
         private static Regex titleRegex = new Regex(@"<title\b[^>]*>(?<page_title>.+?)</title>", RegexOptions.Compiled);
-        private readonly ILogger logger;
+        private readonly ILogger logger = LogManager.GetLogger();
 
-        public OculusApiScraper(ILogger logger, IWebClient webClient = null)
+        public OculusApiScraper(IWebClient webClient = null)
         {
-            this.logger = logger;
             WebClient = webClient ?? new WebClientWrapper();
         }
 

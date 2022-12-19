@@ -14,16 +14,14 @@ namespace OculusLibrary.DataExtraction
     {
         private readonly IRegistryValueProvider registryValueProvider;
         private readonly IPathNormaliser pathNormaliser;
-        private readonly ILogger logger;
+        private readonly ILogger logger = LogManager.GetLogger();
 
         public OculusPathSniffer(
             IRegistryValueProvider registryValueProvider,
-            IPathNormaliser pathNormaliser,
-            ILogger logger)
+            IPathNormaliser pathNormaliser)
         {
             this.registryValueProvider = registryValueProvider;
             this.pathNormaliser = pathNormaliser;
-            this.logger = logger;
         }
 
         private List<string> GetOculusLibraryLocations(RegistryView platformView)

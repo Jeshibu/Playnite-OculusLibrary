@@ -3,7 +3,7 @@ using System;
 
 namespace OculusLibrary
 {
-    internal class OculusManifest
+    public class OculusManifest
     {
         public string AppId { get; set; }
         public string LaunchFile { get; set; }
@@ -11,14 +11,14 @@ namespace OculusLibrary
         public string CanonicalName { get; set; }
         public bool ThirdParty { get; set; }
 
-        public static OculusManifest Parse(string json)
+        public static T Parse<T>(string json) where T : OculusManifest
         {
             if (string.IsNullOrWhiteSpace(json))
             {
                 throw new ArgumentException("JSON string cannot be null and empty");
             }
 
-            var manifest = JsonConvert.DeserializeObject<OculusManifest>(json);
+            var manifest = JsonConvert.DeserializeObject<T>(json);
 
             if (manifest == null)
             {
@@ -29,5 +29,13 @@ namespace OculusLibrary
 
             return manifest;
         }
+    }
+
+    public class ExpandedOculusManifest : OculusManifest
+    {
+        public string LibraryBasePath { get; set; }
+
+        public string InstallationPath { get => $@"{LibraryBasePath}\Software\{CanonicalName}"; }
+        public string ExecutableFullPath { get => $@"{InstallationPath}\{LaunchFile}"; }
     }
 }

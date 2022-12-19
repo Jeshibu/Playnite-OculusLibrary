@@ -119,7 +119,7 @@ namespace OculusLibrary.Tests
 
             var fakeLogger = Substitute.For<ILogger>();
 
-            return new OculusApiScraper(fakeLogger, webclient);
+            return new OculusApiScraper(webclient);
         }
     }
 }

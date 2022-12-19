@@ -13,14 +13,13 @@ namespace OculusLibrary
         private readonly OculusManifestScraper manifestScraper;
         private readonly OculusApiScraper apiScraper;
         private readonly IPlayniteAPI api;
-        private readonly ILogger logger;
+        private readonly ILogger logger = LogManager.GetLogger();
 
-        public AggregateOculusMetadataCollector(OculusManifestScraper manifestScraper, OculusApiScraper apiScraper, IPlayniteAPI api, ILogger logger)
+        public AggregateOculusMetadataCollector(OculusManifestScraper manifestScraper, OculusApiScraper apiScraper, IPlayniteAPI api)
         {
             this.manifestScraper = manifestScraper;
             this.apiScraper = apiScraper;
             this.api = api;
-            this.logger = logger;
         }
 
         public override GameMetadata GetMetadata(Game game)
@@ -28,8 +27,21 @@ namespace OculusLibrary
             try
             {
                 var task = apiScraper.GetMetadata(game?.GameId);
+                var manifestData = manifestScraper.GetGames(minimal: false).FirstOrDefault(g => g.GameId == game.GameId);
                 task.Wait();
-                return task.Result;
+                var apiData = task.Result;
+                if (apiData == null)
+                    return null;
+
+                if (manifestData == null)
+                    return apiData;
+
+                apiData.Icon = manifestData.Icon;
+                apiData.CoverImage = manifestData.CoverImage;
+                apiData.IsInstalled = manifestData.IsInstalled;
+                apiData.InstallDirectory = manifestData.InstallDirectory;
+
+                return apiData;
             }
             catch (Exception ex)
             {
@@ -40,7 +52,7 @@ namespace OculusLibrary
 
         public IEnumerable<GameMetadata> GetGames(CancellationToken cancellationToken)
         {
-            var manifestGames = manifestScraper.GetGames(cancellationToken);
+            var manifestGames = manifestScraper.GetGames(minimal: true);
             foreach (var game in manifestGames)
             {
                 if (cancellationToken.IsCancellationRequested)

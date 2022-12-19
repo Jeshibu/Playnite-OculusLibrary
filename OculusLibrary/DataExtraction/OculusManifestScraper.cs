@@ -12,7 +12,7 @@ namespace OculusLibrary.DataExtraction
     public class OculusManifestScraper
     {
         private static Regex normalizeFilenameToCanonicalName = new Regex(@"(_assets)?\.json$", RegexOptions.Compiled);
-        private readonly ILogger logger;
+        private readonly ILogger logger = LogManager.GetLogger();
         private readonly IOculusPathSniffer pathSniffer;
         private List<string> _libraryLocations;
         private string _oculusInstallDir;
@@ -25,18 +25,20 @@ namespace OculusLibrary.DataExtraction
             get { return _oculusInstallDir ?? (_oculusInstallDir = pathSniffer.GetOculusSoftwareInstallationPath()); }
         }
 
-        public OculusManifestScraper(IOculusPathSniffer pathSniffer, ILogger logger)
+        public OculusManifestScraper(IOculusPathSniffer pathSniffer)
         {
             this.pathSniffer = pathSniffer;
-            this.logger = logger;
         }
 
-        public IEnumerable<GameMetadata> GetGames()
+        public IEnumerable<GameMetadata> GetGames(bool minimal)
         {
-            return GetGames(new CancellationToken());
+            logger.Info($"Executing OculusManifestScraper.GetGames");
+
+            var manifests = GetManifests();
+            return manifests.Select(m => CreateMetadataFromExpandedManifest(m, minimal));
         }
 
-        public IEnumerable<GameMetadata> GetGames(CancellationToken cancellationToken)
+        public IEnumerable<ExpandedOculusManifest> GetManifests(bool installedOnly = false)
         {
             logger.Info($"Executing OculusManifestScraper.GetGames");
 
@@ -55,12 +57,6 @@ namespace OculusLibrary.DataExtraction
 
                 foreach (var manifest in GetOculusAppManifests(currentLibraryBasePath))
                 {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        logger.Debug("Canceling out of OculusManifestScraper.GetGames");
-                        yield break;
-                    }
-
                     logger.Info($"Processing manifest {manifest.CanonicalName} {manifest.AppId}");
 
                     if (manifest.AppId == null || !parsedIds.Add(manifest.AppId)) //skip duplicates and games without AppId
@@ -68,38 +64,19 @@ namespace OculusLibrary.DataExtraction
                         continue;
                     }
 
-                    GameMetadata metadata = null;
+                    manifest.LibraryBasePath = currentLibraryBasePath;
 
-                    try
-                    {
-                        metadata = CreateMetadata(manifest, currentLibraryBasePath);
-                        logger.Info($"Completed manifest {manifest.CanonicalName} {manifest.AppId}");
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error($"Exception while adding game for manifest {manifest.AppId} : {ex}");
-                    }
-
-                    if (metadata != null)
-                    {
-                        yield return metadata;
-                    }
+                    yield return manifest;
                 }
             }
 
             logger.Debug("Installed manifests processed. Moving on to uninstalled.");
 
             //get all games via the oculus software folder
-            if (Directory.Exists($@"{oculusInstallDir}\CoreData\Manifests"))
+            if (Directory.Exists($@"{oculusInstallDir}\CoreData\Manifests") && !installedOnly)
             {
                 foreach (var manifest in GetOculusAppManifests($@"{oculusInstallDir}\CoreData"))
                 {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        logger.Debug("Canceling out of OculusManifestScraper.GetGames");
-                        yield break;
-                    }
-
                     logger.Info($"Processing manifest {manifest.CanonicalName} {manifest.AppId}");
 
                     if (manifest.AppId == null || !parsedIds.Add(manifest.AppId)) //skip duplicates and games without AppId
@@ -107,16 +84,14 @@ namespace OculusLibrary.DataExtraction
                         continue;
                     }
 
-                    var metadata = CreateMetadata(manifest);
-                    logger.Info($"Completed manifest {manifest.CanonicalName} {manifest.AppId}");
-                    yield return metadata;
+                    yield return manifest;
                 }
             }
 
             logger.Info($"OculusManifestScraper.GetGames Completing");
         }
 
-        private IEnumerable<OculusManifest> GetOculusAppManifests(string oculusBasePath)
+        private IEnumerable<ExpandedOculusManifest> GetOculusAppManifests(string oculusBasePath)
         {
             logger.Debug($"Listing Oculus manifests");
 
@@ -129,11 +104,9 @@ namespace OculusLibrary.DataExtraction
 
             var groupedFiles = fileEntries.GroupBy(f => normalizeFilenameToCanonicalName.Replace(f, string.Empty));
 
-            var manifests = new List<OculusManifest>();
-
             foreach (var fileGroup in groupedFiles)
             {
-                OculusManifest manifest = null;
+                ExpandedOculusManifest manifest = null;
 
                 try
                 {
@@ -149,11 +122,13 @@ namespace OculusLibrary.DataExtraction
 
                     var json = File.ReadAllText(fileName);
 
-                    manifest = OculusManifest.Parse(json);
+                    manifest = OculusManifest.Parse<ExpandedOculusManifest>(json);
                     if (manifest.ThirdParty || manifest.AppId == null)
                     {
                         continue; //The Oculus app also makes manifests for non-Oculus programs that it's seen running, ignore those
                     }
+
+                    manifest.LibraryBasePath = oculusBasePath;
 
                     if (manifest.CanonicalName.EndsWith("_assets"))
                     {
@@ -184,56 +159,44 @@ namespace OculusLibrary.DataExtraction
             }
         }
 
-        private GameMetadata CreateMetadata(OculusManifest manifest, string currentLibraryBasePath = null)
+        private GameMetadata CreateMetadataFromExpandedManifest(ExpandedOculusManifest manifest, bool minimal)
         {
-            var installationPath = $@"{currentLibraryBasePath}\Software\{manifest.CanonicalName}";
-            var executableFullPath = $@"{installationPath}\{manifest.LaunchFile}";
-
-            bool installed = !string.IsNullOrEmpty(currentLibraryBasePath) && !string.IsNullOrEmpty(manifest.LaunchFile) && File.Exists(executableFullPath);
+            bool installed = !string.IsNullOrEmpty(manifest.LibraryBasePath) && !string.IsNullOrEmpty(manifest.LaunchFile) && File.Exists(manifest.ExecutableFullPath);
 
             var output = OculusLibraryPlugin.GetBaseMetadata();
             output.Name = manifest.LaunchFile ?? manifest.CanonicalName;
             output.GameId = manifest.AppId;
 
-            #region images
-            var icon = GetAssetPathIfItExists(manifest.CanonicalName, "icon_image.jpg");
-
-            if (icon == null && installed)
+            if (!minimal)
             {
-                logger.Debug($"Oculus store icon missing from file system- reverting to executable icon");
-                icon = executableFullPath;
+                var icon = GetAssetPathIfItExists(manifest.CanonicalName, "icon_image.jpg");
+
+                if (icon == null && installed)
+                {
+                    logger.Debug($"Oculus store icon missing from file system- reverting to executable icon");
+                    icon = manifest.ExecutableFullPath;
+                }
+
+                if (!string.IsNullOrEmpty(icon))
+                    output.Icon = new MetadataFile(icon);
+
+                var coverImage = GetAssetPathIfItExists(manifest.CanonicalName, "cover_square_image.jpg");
+                if (!string.IsNullOrEmpty(coverImage))
+                    output.CoverImage = new MetadataFile(coverImage);
             }
-
-            if (!string.IsNullOrEmpty(icon))
-                output.Icon = new MetadataFile(icon);
-
-            var coverImage = GetAssetPathIfItExists(manifest.CanonicalName, "cover_square_image.jpg");
-            if (!string.IsNullOrEmpty(coverImage))
-                output.CoverImage = new MetadataFile(coverImage);
-            #endregion images
 
             output.IsInstalled = installed;
             if (installed)
             {
-                output.InstallDirectory = installationPath;
-                output.GameActions = new List<GameAction>
-                {
-                    new GameAction
-                    {
-                        IsPlayAction = true,
-                        Type = GameActionType.File,
-                        Path = executableFullPath,
-                        Arguments = manifest.LaunchParameters
-                    }
-                };
+                output.InstallDirectory = manifest.InstallationPath;
             }
 
             return output;
         }
 
-        public GameMetadata GetMetadata(string appId)
+        public ExpandedOculusManifest GetManifest(string appId, bool installedOnly = false)
         {
-            return GetGames().FirstOrDefault(g => g.GameId == appId);
+            return GetManifests(installedOnly).FirstOrDefault(g => g.AppId == appId);
         }
     }
 }
