@@ -22,3 +22,14 @@ Packages:
     Changelog:
       - Added file size fetching from "Official Store" metadata
       - Some extra exception handling and logging
+  - Version: 2.3
+    RequiredApiVersion: 6.4.0
+    ReleaseDate: 2022-12-20
+    PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.3.0/Oculus.pext
+    Changelog:
+      - Added option to launch Oculus games in SteamVR via Revive (https://github.com/LibreVR/Revive/)
+      - Added play actions for 2D game launching when applicable
+      - Added icon and cover image to "Official Store" metadata provider, removed them from initial import
+      - Removed play actions in favor of dynamically provided play actions (when upgrading, all play actions will be removed from Oculus games)
+      - Added icon to "Update Game Library" menu option
+      - Small fixes to metadata collection
