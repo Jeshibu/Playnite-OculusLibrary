@@ -14,6 +14,5 @@
             <TextBox Text="{Binding Settings.RevivePath}" IsEnabled="{Binding Settings.UseRevive}" MinWidth="250" x:Name="RevivePath"/>
             <Button IsEnabled="{Binding Settings.UseRevive}" x:Name="BrowseButton" Click="Browse_Click" Content="&#xED25;" FontFamily="Segoe MDL2 Assets" ToolTip="Browse"/>
         </StackPanel>
-        <CheckBox IsChecked="{Binding Settings.ImportCovers}" Content="Import Oculus covers" Margin="0,20,0,0"/>
     </StackPanel>
 </UserControl>
