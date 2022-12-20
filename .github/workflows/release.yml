@@ -23,9 +23,17 @@ jobs:
            cd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\"
            .\MSBuild.exe $Env:GITHUB_WORKSPACE\OculusLibrary.sln -p:Configuration=Release -restore
 
-      - name: Zip Build artifacts
+      - name: Setup Playnite
         run: |
-           Compress-Archive -Path $Env:GITHUB_WORKSPACE\OculusLibrary\bin\Release\* -DestinationPath $Env:GITHUB_WORKSPACE\Oculus.pext
+           Invoke-WebRequest -Uri "https://github.com/JosefNemec/Playnite/releases/download/10.9/Playnite109.zip" -OutFile "$Env:GITHUB_WORKSPACE\Playnite.zip"
+           Expand-Archive "$Env:GITHUB_WORKSPACE\Playnite.zip" -DestinationPath "$Env:GITHUB_WORKSPACE\Playnite"
+
+      - name: Pack with Playnite
+        run: |
+           cd "$Env:GITHUB_WORKSPACE\Playnite"
+           .\Toolbox.exe pack "$Env:GITHUB_WORKSPACE\OculusLibrary\bin\Release\" "$Env:GITHUB_WORKSPACE\"
+           cd "$Env:GITHUB_WORKSPACE"
+           Get-ChildItem -Filter *.pext | Rename-Item -NewName Oculus.pext
 
       - name: Create Release
         id: create_release
