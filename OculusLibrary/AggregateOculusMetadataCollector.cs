@@ -26,21 +26,10 @@ namespace OculusLibrary
         {
             try
             {
-                var task = apiScraper.GetMetadata(game?.GameId);
                 var manifestData = manifestScraper.GetGames(minimal: false).FirstOrDefault(g => g.GameId == game.GameId);
+                var task = apiScraper.GetMetadata(game?.GameId, manifestData);
                 task.Wait();
                 var apiData = task.Result;
-                if (apiData == null)
-                    return null;
-
-                if (manifestData == null)
-                    return apiData;
-
-                apiData.Icon = manifestData.Icon;
-                apiData.CoverImage = manifestData.CoverImage;
-                apiData.IsInstalled = manifestData.IsInstalled;
-                apiData.InstallDirectory = manifestData.InstallDirectory;
-
                 return apiData;
             }
             catch (Exception ex)

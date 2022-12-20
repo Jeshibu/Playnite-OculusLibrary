@@ -72,7 +72,7 @@ namespace OculusLibrary.DataExtraction
         public async Task<GameMetadata> GetMetadata(string appId, GameMetadata data = null)
         {
             var json = await GetJsonData(appId);
-            if (json == null) return null;
+            if (json == null) return data;
             var metadata = ToGameMetadata(json, data);
             return metadata;
         }
@@ -198,7 +198,7 @@ namespace OculusLibrary.DataExtraction
                 case "Multiplayer": return "Multiplayer";
                 case "Co-op": return "Co-Op";
                 default:
-                    logger.Info("Unknown interaction mode: " + interactionMode);
+                    logger.Warn("Unknown interaction mode: " + interactionMode);
                     return null;
             }
         }
@@ -211,7 +211,7 @@ namespace OculusLibrary.DataExtraction
                 case "STANDING": return "VR Standing";
                 case "ROOM_SCALE": return "VR Room-Scale";
                 default:
-                    logger.Info("Unknown player mode: " + playerMode);
+                    logger.Warn("Unknown player mode: " + playerMode);
                     return null;
             }
         }
@@ -221,6 +221,7 @@ namespace OculusLibrary.DataExtraction
             switch (inputDevice)
             {
                 case "Gamepad": return "VR Gamepad";
+                case "Touch Controllers":
                 case "Oculus Touch": return "VR Motion Controllers";
                 case "Touch (as Gamepad)": return "VR Motion Controllers";
                 case "Racing Wheel": return "Racing Wheel Support"; //found on Dirt Rally
@@ -232,7 +233,7 @@ namespace OculusLibrary.DataExtraction
                     return null; //Unsure if these should be features, disregard for now
 
                 default:
-                    logger.Info("Unknown input device: " + inputDevice);
+                    logger.Warn("Unknown input device: " + inputDevice);
                     return null;
             }
         }
