@@ -151,7 +151,7 @@ namespace OculusLibrary
 
                 string relativeExePath = manifestData.ExecutableFullPath.Replace(manifestData.LibraryBasePath, string.Empty).TrimStart('\\');
                 string arguments = $"/app {manifestData.CanonicalName} /library {manifestData.LibraryKey} \"{relativeExePath}\"{manifestData.LaunchParameters}";
-                logger.Debug(arguments);
+                logger.Debug($"Revive arguments: {arguments}");
                 yield return new AutomaticPlayController(args.Game)
                 {
                     Type = AutomaticPlayActionType.File,
@@ -181,6 +181,7 @@ namespace OculusLibrary
                     if (game.GameActions?.Count > 0)
                     {
                         game.GameActions = null;
+                        game.IncludeLibraryPluginAction = true;
                         PlayniteApi.Database.Games.Update(game);
                     }
                 }
