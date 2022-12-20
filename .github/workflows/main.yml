@@ -7,13 +7,13 @@ name: CI
 
 jobs:
   build:
-    runs-on: [windows-2019]
+    runs-on: windows-2019
     steps:
       - name: checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
 
       - name: Setup Nuget.exe
-        uses: warrenbuckley/Setup-Nuget@v1
+        uses: NuGet/setup-nuget@v1.1.1
 
       - name: Nuget Restore 
         run: nuget restore .\OculusLibrary.sln
