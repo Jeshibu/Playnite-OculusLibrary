@@ -115,6 +115,7 @@ namespace OculusLibrary
                 PlayniteApi.Dialogs.ShowErrorMessage(warning);
             }
 
+
             if (settings.Settings.UseOculus)
             {
                 yield return new AutomaticPlayController(args.Game)
@@ -128,32 +129,35 @@ namespace OculusLibrary
                 };
             }
 
+            if (manifestData.LaunchFile2D != null)
+            {
+                yield return new AutomaticPlayController(args.Game)
+                {
+                    Type = AutomaticPlayActionType.File,
+                    Path = manifestData.ExecutableFullPath2D,
+                    Arguments = manifestData.LaunchParameters2D,
+                    Name = $"Play {args.Game.Name} without VR",
+                    TrackingMode = TrackingMode.Directory,
+                    TrackingPath = manifestData.InstallationPath,
+                };
+            }
+
             if (settings.Settings.UseRevive)
             {
+                if (!string.IsNullOrEmpty(manifestData.LaunchParameters) && !manifestData.LaunchParameters.StartsWith(" "))
+                    manifestData.LaunchParameters = " " + manifestData.LaunchParameters;
+
                 //string parameters = $"/app {manifest["canonicalName"]} /library {library} \"Software\\{manifest["canonicalName"]}\\{launch}\"{parameters}";
 
                 string relativeExePath = manifestData.ExecutableFullPath.Replace(manifestData.LibraryBasePath, string.Empty).TrimStart('\\');
-                string arguments = $"/app {manifestData.CanonicalName} /library \"{manifestData.LibraryBasePath}\" {relativeExePath} {manifestData.LaunchParameters}";
+                string arguments = $"/app {manifestData.CanonicalName} /library {manifestData.LibraryKey} \"{relativeExePath}\"{manifestData.LaunchParameters}";
                 logger.Debug(arguments);
                 yield return new AutomaticPlayController(args.Game)
                 {
                     Type = AutomaticPlayActionType.File,
                     Path = settings.Settings.RevivePath,
                     Arguments = arguments,
-                    Name = $"Play {args.Game.Name} with Revive (LAUNCH STEAMVR FIRST)",
-                    TrackingMode = TrackingMode.Directory,
-                    TrackingPath = manifestData.InstallationPath,
-                };
-
-                string steamVrArgs = HttpUtility.UrlEncode($"\"{settings.Settings.RevivePath}\" \"{arguments}\"");
-                string steamVrLaunchPath = $"steam://run/250820//{steamVrArgs}/";
-                logger.Debug(steamVrLaunchPath);
-
-                yield return new AutomaticPlayController(args.Game)
-                {
-                    Type = AutomaticPlayActionType.Url,
-                    Path = steamVrLaunchPath,
-                    Name = $"Play {args.Game.Name} with Revive (experiment)",
+                    Name = $"Play {args.Game.Name} with Revive (LAUNCH STEAMVR FIRST!)",
                     TrackingMode = TrackingMode.Directory,
                     TrackingPath = manifestData.InstallationPath,
                 };

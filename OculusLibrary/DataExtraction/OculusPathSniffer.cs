@@ -24,9 +24,9 @@ namespace OculusLibrary.DataExtraction
             this.pathNormaliser = pathNormaliser;
         }
 
-        private List<string> GetOculusLibraryLocations(RegistryView platformView)
+        private Dictionary<Guid, string> GetOculusLibraryLocations(RegistryView platformView)
         {
-            var libraryPaths = new List<string>();
+            var libraries = new Dictionary<Guid, string>();
 
             logger.Debug($"Getting Oculus library locations from registry ({platformView})");
 
@@ -44,6 +44,12 @@ namespace OculusLibrary.DataExtraction
 
                 foreach (var libraryKeyTitle in libraryKeyTitles)
                 {
+                    if (!Guid.TryParse(libraryKeyTitle, out Guid libraryKey))
+                    {
+                        logger.Warn($"Could not parse library key {libraryKeyTitle} as a GUID");
+                        continue;
+                    }
+
                     var libraryPath = registryValueProvider.GetValueForPath(platformView,
                                                                             RegistryHive.CurrentUser,
                                                                             $@"Software\Oculus VR, LLC\Oculus\Libraries\{libraryKeyTitle}",
@@ -52,14 +58,14 @@ namespace OculusLibrary.DataExtraction
                     if (!string.IsNullOrWhiteSpace(libraryPath))
                     {
                         libraryPath = pathNormaliser.Normalise(libraryPath);
-                        libraryPaths.Add(libraryPath);
+                        libraries.Add(libraryKey, libraryPath);
                         logger.Debug($"Found library: {libraryPath}");
                     }
                 }
 
-                logger.Debug($"Libraries located: {libraryPaths.Count}");
+                logger.Debug($"Libraries located: {libraries.Count}");
 
-                return libraryPaths;
+                return libraries;
             }
             catch (Exception ex)
             {
@@ -68,7 +74,7 @@ namespace OculusLibrary.DataExtraction
             }
         }
 
-        public List<string> GetOculusLibraryLocations()
+        public Dictionary<Guid, string> GetOculusLibraryLocations()
         {
             logger.Debug("Trying to get Oculus base path (REG64)");
 

@@ -8,6 +8,8 @@ namespace OculusLibrary
         public string AppId { get; set; }
         public string LaunchFile { get; set; }
         public string LaunchParameters { get; set; }
+        public string LaunchFile2D { get; set; }
+        public string LaunchParameters2D { get; set; }
         public string CanonicalName { get; set; }
         public bool ThirdParty { get; set; }
 
@@ -37,5 +39,7 @@ namespace OculusLibrary
 
         public string InstallationPath { get => $@"{LibraryBasePath}\Software\{CanonicalName}"; }
         public string ExecutableFullPath { get => $@"{InstallationPath}\{LaunchFile}"; }
+        public string ExecutableFullPath2D { get => LaunchFile2D == null ? null : $@"{InstallationPath}\{LaunchFile2D}"; }
+        public Guid LibraryKey { get; internal set; }
     }
 }

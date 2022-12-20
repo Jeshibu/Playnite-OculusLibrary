@@ -14,9 +14,9 @@ namespace OculusLibrary.DataExtraction
         private static Regex normalizeFilenameToCanonicalName = new Regex(@"(_assets)?\.json$", RegexOptions.Compiled);
         private readonly ILogger logger = LogManager.GetLogger();
         private readonly IOculusPathSniffer pathSniffer;
-        private List<string> _libraryLocations;
+        private Dictionary<Guid, string> _libraryLocations;
         private string _oculusInstallDir;
-        private List<string> libraryLocations
+        private Dictionary<Guid, string> libraryLocations
         {
             get { return _libraryLocations ?? (_libraryLocations = pathSniffer.GetOculusLibraryLocations()); }
         }
@@ -40,7 +40,7 @@ namespace OculusLibrary.DataExtraction
 
         public IEnumerable<ExpandedOculusManifest> GetManifests(bool installedOnly = false)
         {
-            logger.Info($"Executing OculusManifestScraper.GetGames");
+            logger.Info($"Executing OculusManifestScraper.GetManifests");
 
             if (libraryLocations == null || !libraryLocations.Any() || string.IsNullOrEmpty(oculusInstallDir))
             {
@@ -51,11 +51,11 @@ namespace OculusLibrary.DataExtraction
             var parsedIds = new HashSet<string>();
 
             //go through each library directory to get installed games
-            foreach (var currentLibraryBasePath in libraryLocations)
+            foreach (var currentLibrary in libraryLocations)
             {
-                logger.Info($"Processing Oculus library location {currentLibraryBasePath}");
+                logger.Info($"Processing Oculus library location {currentLibrary}");
 
-                foreach (var manifest in GetOculusAppManifests(currentLibraryBasePath))
+                foreach (var manifest in GetOculusAppManifests(currentLibrary.Value))
                 {
                     logger.Info($"Processing manifest {manifest.CanonicalName} {manifest.AppId}");
 
@@ -64,7 +64,8 @@ namespace OculusLibrary.DataExtraction
                         continue;
                     }
 
-                    manifest.LibraryBasePath = currentLibraryBasePath;
+                    manifest.LibraryKey = currentLibrary.Key;
+                    manifest.LibraryBasePath = currentLibrary.Value;
 
                     yield return manifest;
                 }
@@ -88,7 +89,7 @@ namespace OculusLibrary.DataExtraction
                 }
             }
 
-            logger.Info($"OculusManifestScraper.GetGames Completing");
+            logger.Info($"OculusManifestScraper.GetManifests Completing");
         }
 
         private IEnumerable<ExpandedOculusManifest> GetOculusAppManifests(string oculusBasePath)
@@ -127,8 +128,6 @@ namespace OculusLibrary.DataExtraction
                     {
                         continue; //The Oculus app also makes manifests for non-Oculus programs that it's seen running, ignore those
                     }
-
-                    manifest.LibraryBasePath = oculusBasePath;
 
                     if (manifest.CanonicalName.EndsWith("_assets"))
                     {

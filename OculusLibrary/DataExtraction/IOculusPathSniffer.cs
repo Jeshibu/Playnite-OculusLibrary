@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace OculusLibrary.DataExtraction
 {
     public interface IOculusPathSniffer
     {
-        List<string> GetOculusLibraryLocations();
+        Dictionary<Guid, string> GetOculusLibraryLocations();
         string GetOculusSoftwareInstallationPath();
     }
 }
