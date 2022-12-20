@@ -7,13 +7,13 @@ name: Release Build
 
 jobs:
   build:
-    runs-on: [windows-2019]
+    runs-on: windows-2019
     steps:
       - name: checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
 
       - name: Setup Nuget.exe
-        uses: warrenbuckley/Setup-Nuget@v1
+        uses: NuGet/setup-nuget@v1
 
       - name: Nuget Restore 
         run: nuget restore .\OculusLibrary.sln
@@ -25,7 +25,7 @@ jobs:
 
       - name: Zip Build artifacts
         run: |
-           Compress-Archive -Path $Env:GITHUB_WORKSPACE\OculusLibrary\bin\Release\* -DestinationPath $Env:GITHUB_WORKSPACE\Oculus.zip
+           Compress-Archive -Path $Env:GITHUB_WORKSPACE\OculusLibrary\bin\Release\* -DestinationPath $Env:GITHUB_WORKSPACE\Oculus.pext
 
       - name: Create Release
         id: create_release
@@ -39,16 +39,16 @@ jobs:
             Changes in this Release
             - First Change
             - Second Change
-          draft: false
+          draft: true
           prerelease: false
  
       - name: Upload Release Asset
         id: upload-release-asset 
-        uses: actions/upload-release-asset@v1.0.1
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: .\Oculus.zip
-          asset_name: Oculus.zip
+          asset_path: .\Oculus.pext
+          asset_name: Oculus.pext
           asset_content_type: application/zip
