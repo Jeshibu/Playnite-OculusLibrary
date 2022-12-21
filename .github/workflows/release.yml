@@ -25,7 +25,7 @@ jobs:
       
       - name: Test
         run: |
-           $Env:GITHUB_WORKSPACE\packages\xunit.runner.console.2.4.2\tools\net462\xunit.console.x86.exe "$Env:GITHUB_WORKSPACE\OculusLibrary.Tests\bin\Debug\OculusLibrary.Tests.dll"
+           & "$Env:GITHUB_WORKSPACE\packages\xunit.runner.console.2.4.2\tools\net462\xunit.console.x86.exe" "$Env:GITHUB_WORKSPACE\OculusLibrary.Tests\bin\Debug\OculusLibrary.Tests.dll"
 
       - name: Setup Playnite
         run: |
