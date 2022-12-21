@@ -22,6 +22,10 @@ jobs:
         run: |
            cd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\"
            .\MSBuild.exe $Env:GITHUB_WORKSPACE\OculusLibrary.sln -p:Configuration=Release -restore
+      
+      - name: Test
+        run: |
+           $Env:GITHUB_WORKSPACE\packages\xunit.runner.console.2.4.2\tools\net462\xunit.console.x86.exe "$Env:GITHUB_WORKSPACE\OculusLibrary.Tests\bin\Debug\OculusLibrary.Tests.dll"
 
       - name: Setup Playnite
         run: |
@@ -35,28 +39,11 @@ jobs:
            cd "$Env:GITHUB_WORKSPACE"
            Get-ChildItem -Filter *.pext | Rename-Item -NewName Oculus.pext
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Changes in this Release
-            - First Change
-            - Second Change
           draft: true
           prerelease: false
- 
-      - name: Upload Release Asset
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: .\Oculus.pext
-          asset_name: Oculus.pext
-          asset_content_type: application/zip
+          files: |
+            *.pext
