@@ -80,21 +80,29 @@ namespace OculusLibrary.DataExtraction
         public async Task<string> GetGameName(string appId)
         {
             string url = GetStoreUrl(appId);
-            var src = await WebClient.DownloadStringAsync(url);
-
-            //expecting titles like <title id="pageTitle">Asgard&#039;s Wrath on Oculus Rift | Oculus</title>
-            var match = titleRegex.Match(src);
-            if (!match.Success)
+            try
             {
-                logger.Error($"Couldn't find title in {url}");
+                var src = await WebClient.DownloadStringAsync(url);
+
+                //expecting titles like <title id="pageTitle">Asgard&#039;s Wrath on Oculus Rift | Oculus</title>
+                var match = titleRegex.Match(src);
+                if (!match.Success)
+                {
+                    logger.Error($"Couldn't find title in {url}");
+                    return null;
+                }
+
+                string pageTitle = match.Groups["page_title"].Value;
+                var onIndex = pageTitle.LastIndexOf(" on "); //___ on Oculus Rift | Oculus
+                string gameTitle = onIndex < 0 ? pageTitle : pageTitle.Remove(onIndex);
+                gameTitle = HttpUtility.HtmlDecode(gameTitle);
+                return gameTitle;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, $"Failed to get game name for app {appId}");
                 return null;
             }
-
-            string pageTitle = match.Groups["page_title"].Value;
-            var onIndex = pageTitle.LastIndexOf(" on "); //___ on Oculus Rift | Oculus
-            string gameTitle = onIndex < 0 ? pageTitle : pageTitle.Remove(onIndex);
-            gameTitle = HttpUtility.HtmlDecode(gameTitle);
-            return gameTitle;
         }
 
         public GameMetadata ToGameMetadata(OculusJsonResponseDataNode json, GameMetadata data = null)

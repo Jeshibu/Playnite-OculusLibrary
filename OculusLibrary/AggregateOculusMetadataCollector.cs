@@ -58,7 +58,10 @@ namespace OculusLibrary
                     //for new games, we have to immediately set the name, because game name isn't overridden by a post-import metadata pass (by default)
                     var nameTask = apiScraper.GetGameName(game.GameId);
                     nameTask.Wait();
-                    game.Name = nameTask.Result;
+
+                    if (nameTask.Result != null)
+                        game.Name = nameTask.Result;
+
                     yield return game;
                 }
             }

@@ -23,7 +23,7 @@ jobs:
            cd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\"
            .\MSBuild.exe $Env:GITHUB_WORKSPACE\OculusLibrary.sln -p:Configuration=Release -restore
       
-      - name: Test
+      - name: Run unit tests
         run: |
            & "$Env:GITHUB_WORKSPACE\packages\xunit.runner.console.2.4.2\tools\net462\xunit.console.x86.exe" "$Env:GITHUB_WORKSPACE\OculusLibrary.Tests\bin\Release\OculusLibrary.Tests.dll"
 
