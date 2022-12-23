@@ -33,3 +33,9 @@ Packages:
       - Removed play actions in favor of dynamically provided play actions (when upgrading, all play actions will be removed from Oculus games)
       - Added icon to "Update Game Library" menu option
       - Small fixes to metadata collection
+  - Version: 2.3.1
+    RequiredApiVersion: 6.4.0
+    ReleaseDate: 2022-12-24
+    PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.3.1/Oculus.pext
+    Changelog:
+      - Fixed error during game import when the game's Oculus store page has been removed
