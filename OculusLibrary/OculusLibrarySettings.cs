@@ -35,7 +35,7 @@ namespace OculusLibrary
             }
             else
             {
-                Settings = new OculusLibrarySettings();
+                Settings = new OculusLibrarySettings() { Version = 2 };
                 SeedRevivePath();
             }
         }
