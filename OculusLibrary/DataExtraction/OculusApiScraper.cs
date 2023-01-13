@@ -112,7 +112,9 @@ namespace OculusLibrary.DataExtraction
 
             data.GameId = json.Id;
             data.Name = json.DisplayName;
-            data.Description = json.DisplayLongDescription;
+            if (!string.IsNullOrWhiteSpace(json.DisplayLongDescription))
+                data.Description = Regex.Replace(json.DisplayLongDescription, "\r?\n", "<br>$0");
+
             data.CommunityScore = (int)(json.QualityRatingAggregate * 20); //from max 5 to max 100
             data.Version = json.LatestSupportedBinary?.Version;
             data.ReleaseDate = new ReleaseDate(DateTimeOffset.FromUnixTimeSeconds(json.ReleaseDate).DateTime);
