@@ -21,11 +21,11 @@ namespace OculusLibrary
     public partial class OculusLibraryPlugin : LibraryPlugin
     {
         public static Guid PluginId = new Guid("77346DD6-B0CC-4F7D-80F0-C1D138CCAE58");
-        private static readonly string iconPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Resources", "oculusicon.png");
+        public static readonly string IconPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Resources", "oculusicon.png");
         public override Guid Id { get; } = PluginId;
 
         public override string Name { get; } = "Oculus";
-        public override string LibraryIcon => iconPath;
+        public override string LibraryIcon => IconPath;
         public override LibraryClient Client => new OculusClient();
 
         private readonly IOculusPathSniffer pathSniffer;

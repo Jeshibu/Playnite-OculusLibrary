@@ -23,7 +23,10 @@ namespace OculusLibrary
                     return oculusUninstallEntry;
 
                 if (oculusUninstallEntry == null)
+                {
                     oculusUninstallEntry = Programs.GetOculusUninstallProgram();
+                    uninstallEntryFetched = true;
+                }
 
                 return oculusUninstallEntry;
             }
@@ -32,6 +35,7 @@ namespace OculusLibrary
         }
 
         public override bool IsInstalled => OculusUninstallEntry != null;
+        public override string Icon => OculusLibraryPlugin.IconPath;
 
         public override void Open()
         {
