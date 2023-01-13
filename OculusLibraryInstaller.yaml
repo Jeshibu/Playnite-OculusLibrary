@@ -39,3 +39,10 @@ Packages:
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.3.1/Oculus.pext
     Changelog:
       - Fixed error during game import when the game's Oculus store page has been removed
+  - Version: 2.3.2
+    RequiredApiVersion: 6.4.0
+    ReleaseDate: 2023-01-13
+    PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.3.2/Oculus.pext
+    Changelog:
+      - Added missing icon to Oculus client menu item
+      - Fixed game descriptions not having line breaks
