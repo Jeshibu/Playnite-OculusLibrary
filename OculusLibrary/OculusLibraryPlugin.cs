@@ -147,8 +147,6 @@ namespace OculusLibrary
                 if (!string.IsNullOrEmpty(manifestData.LaunchParameters) && !manifestData.LaunchParameters.StartsWith(" "))
                     manifestData.LaunchParameters = " " + manifestData.LaunchParameters;
 
-                //string parameters = $"/app {manifest["canonicalName"]} /library {library} \"Software\\{manifest["canonicalName"]}\\{launch}\"{parameters}";
-
                 string relativeExePath = manifestData.ExecutableFullPath.Replace(manifestData.LibraryBasePath, string.Empty).TrimStart('\\');
                 string arguments = $"/app {manifestData.CanonicalName} /library {manifestData.LibraryKey} \"{relativeExePath}\"{manifestData.LaunchParameters}";
                 logger.Debug($"Revive arguments: {arguments}");

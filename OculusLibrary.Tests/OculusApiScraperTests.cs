@@ -1,11 +1,12 @@
 ﻿using OculusLibrary.DataExtraction;
-using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
@@ -24,7 +25,7 @@ namespace OculusLibrary.Tests
             Assert.Equal("Asgard's Wrath", data.Name);
             Assert.NotNull(data.Description);
             Assert.Equal("1.6.0", data.Version);
-            ReleaseDateEquals(2019, 10, 10, data.ReleaseDate.Value);
+            ReleaseDateEquals(2019, 10, 9, data.ReleaseDate.Value);
             Assert.Equal(appId, data.GameId);
             Assert.NotNull(data.BackgroundImage?.Path);
             Assert.Equal(new MetadataNameProperty("Oculus"), data.Source);
@@ -47,7 +48,7 @@ namespace OculusLibrary.Tests
             var data = await subject.GetMetadata(appId);
             Assert.Equal("Sprint Vector", data.Name);
             Assert.NotNull(data.Description);
-            Assert.Equal("0.0.0.111496", data.Version);
+            Assert.Equal("0.0.0.302317", data.Version);
             ReleaseDateEquals(2018, 2, 2, data.ReleaseDate.Value);
             Assert.Equal(appId, data.GameId);
             Assert.NotNull(data.BackgroundImage?.Path);
@@ -60,17 +61,6 @@ namespace OculusLibrary.Tests
             MetadataPropertyCollectionsMatch(data.AgeRatings, new[] { "PEGI 3" });
             MetadataPropertyCollectionsMatch(data.Genres, new[] { "Action", "Racing", "Sports" });
             Assert.Equal(82, data.CommunityScore);
-        }
-
-        [Theory]
-        [InlineData("Asgard's Wrath")]
-        [InlineData("Sprint Vector")]
-        public async Task Names_Parse_Correctly(string gameName)
-        {
-            var subject = Setup(gameName, out var webClient);
-
-            var output = await subject.GetGameName("1234");
-            Assert.Equal(gameName, output);
         }
 
         private void ReleaseDateEquals(int expectedYear, int expectedMonth, int expectedDay, ReleaseDate actual)
@@ -109,42 +99,43 @@ namespace OculusLibrary.Tests
 
         private OculusApiScraper Setup(string gameName, out IWebClient webclient)
         {
-            var htmlContent = File.ReadAllText($@".\{gameName}.html");
             var jsonContent = File.ReadAllText($@".\{gameName}.json");
 
-            webclient = new FakeWebclient(htmlContent, jsonContent);
+            webclient = new FakeWebclient(jsonContent);
 
             return new OculusApiScraper(webclient);
         }
 
-        private class FakeWebclient:IWebClient
+        //[Fact]
+        public async Task TestRequest()
         {
-            public FakeWebclient(string htmlContent, string jsonContent)
+            var wc = new WebClient();
+            wc.Headers[HttpRequestHeader.UserAgent] = "Mozilla/5.0";
+            wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+            wc.Headers[HttpRequestHeader.Cookie] = "locale=en_US";
+            var values = new NameValueCollection
             {
-                HtmlContent = htmlContent;
+                { "variables", $@"{{""itemId"":""1180401875303371"",""hmdType"":""RIFT"",""requestPDPAssetsAsPNG"":false}}" },
+                { "doc_id", "7101363079925397" },
+            };
+            var bytes = await wc.UploadValuesTaskAsync("https://www.meta.com/ocapi/graphql?forced_locale=en_US", values);
+            var contentString = Encoding.UTF8.GetString(bytes);
+            Assert.NotNull(contentString);
+            dynamic obj = Newtonsoft.Json.JsonConvert.DeserializeObject(contentString);
+            string dateString = obj.data.item.release_info.display_date;
+            Assert.Equal("Oct 9, 2019", dateString);
+        }
+
+        private class FakeWebclient : IWebClient
+        {
+            public FakeWebclient(string jsonContent)
+            {
                 JsonContent = jsonContent;
             }
-
-            public string HtmlContent { get; }
             public string JsonContent { get; }
 
             public void Dispose()
             {
-            }
-
-            public string DownloadString(string address)
-            {
-                return HtmlContent;
-            }
-
-            public async Task<string> DownloadStringAsync(string address)
-            {
-                return HtmlContent;
-            }
-
-            public string UploadValues(string address, string method, NameValueCollection data)
-            {
-                return JsonContent;
             }
 
             public async Task<string> UploadValuesAsync(string address, string method, NameValueCollection data)

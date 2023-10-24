@@ -46,3 +46,10 @@ Packages:
     Changelog:
       - Added missing icon to Oculus client menu item
       - Fixed game descriptions not having line breaks
+  - Version: 2.4
+    RequiredApiVersion: 6.4.0
+    ReleaseDate: 2023-10-25
+    PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.4/Oculus.pext
+    Changelog:
+      - Fixed broken metadata collection (due to the move from oculus.com to meta.com)
+  

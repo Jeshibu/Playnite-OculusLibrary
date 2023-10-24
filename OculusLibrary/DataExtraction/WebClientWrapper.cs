@@ -8,9 +8,6 @@ namespace OculusLibrary.DataExtraction
 {
     public interface IWebClient: IDisposable
     {
-        string DownloadString(string address);
-        Task<string> DownloadStringAsync(string address);
-        string UploadValues(string address, string method, NameValueCollection data);
         Task<string> UploadValuesAsync(string address, string method, NameValueCollection data);
     }
 
@@ -28,25 +25,13 @@ namespace OculusLibrary.DataExtraction
             WebClient.Dispose();
         }
 
-        public string DownloadString(string address)
-        {
-            return WebClient.DownloadString(address);
-        }
-
-        public Task<string> DownloadStringAsync(string address)
-        {
-            return WebClient.DownloadStringTaskAsync(address);
-        }
-
-        public string UploadValues(string address, string method, NameValueCollection data)
-        {
-            var bytes = WebClient.UploadValues(address, method, data);
-            return Encoding.UTF8.GetString(bytes);
-        }
-
         public async Task<string> UploadValuesAsync(string address, string method, NameValueCollection data)
         {
+            WebClient.Headers[HttpRequestHeader.UserAgent] = "PostmanRuntime/7.33.0"; //why does this work and a regular browser user agent string doesn't
+            WebClient.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+            WebClient.Headers[HttpRequestHeader.Cookie] = "locale=en_GB";
             var bytes = await WebClient.UploadValuesTaskAsync(address, method, data);
+            WebClient.Headers.Clear();
             return Encoding.UTF8.GetString(bytes);
         }
     }

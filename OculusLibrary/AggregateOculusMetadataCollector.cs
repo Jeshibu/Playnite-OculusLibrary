@@ -56,11 +56,11 @@ namespace OculusLibrary
                 else
                 {
                     //for new games, we have to immediately set the name, because game name isn't overridden by a post-import metadata pass (by default)
-                    var nameTask = apiScraper.GetGameName(game.GameId);
+                    var nameTask = apiScraper.GetMetadata(game.GameId);
                     nameTask.Wait();
 
                     if (nameTask.Result != null)
-                        game.Name = nameTask.Result;
+                        game.Name = nameTask.Result.Name;
 
                     yield return game;
                 }

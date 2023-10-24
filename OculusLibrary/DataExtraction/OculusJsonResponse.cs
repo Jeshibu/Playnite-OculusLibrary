@@ -10,7 +10,7 @@ namespace OculusLibrary.DataExtraction
 
     public class OculusJsonResponseData
     {
-        public OculusJsonResponseDataNode Node { get; set; }
+        public OculusJsonResponseDataNode Item { get; set; }
     }
 
     public class OculusJsonResponseDataNode
@@ -28,6 +28,9 @@ namespace OculusLibrary.DataExtraction
         [JsonProperty("display_long_description")]
         public string DisplayLongDescription { get; set; }
 
+        [JsonProperty("long_description_uses_markdown")]
+        public bool LongDescriptionUsesMarkdown {  get; set; }
+
         [JsonProperty("supported_player_modes")]
         public List<string> SupportedPlayerModes { get; set; }
 
@@ -38,19 +41,19 @@ namespace OculusLibrary.DataExtraction
         public string DeveloperName { get; set; }
 
         [JsonProperty("supported_in_app_languages")]
-        public List<NameItem> SupportedInAppLanguages { get; set; }
+        public List<NameItem> SupportedInAppLanguages { get; set; } = new List<NameItem>();
 
-        [JsonProperty("supported_hmd_platforms")]
-        public List<string> SupportedHmdPlatforms { get; set; }
+        [JsonProperty("supported_platforms_i18n")]
+        public List<string> SupportedHmdPlatforms { get; set; } = new List<string>();
 
         [JsonProperty("supported_input_device_names")]
-        public List<string> SupportedInputDeviceNames { get; set; }
+        public List<string> SupportedInputDeviceNames { get; set; } = new List<string>();
 
         [JsonProperty("user_interaction_mode_names")]
-        public List<string> UserInteractionModeNames { get; set; }
+        public List<string> UserInteractionModeNames { get; set; } = new List<string>();
 
         [JsonProperty("genre_names")]
-        public List<string> GenreNames { get; set; }
+        public List<string> GenreNames { get; set; } = new List<string>();
 
         [JsonProperty("latest_supported_binary")]
         public VersionData LatestSupportedBinary { get; set; }
@@ -58,17 +61,21 @@ namespace OculusLibrary.DataExtraction
         [JsonProperty("website_url")]
         public string WebsiteUrl { get; set; }
 
-        [JsonProperty("release_date")]
-        public long ReleaseDate { get; set; }
+        [JsonProperty("release_info")]
+        public ReleaseInfo ReleaseInfo { get; set; }
 
         [JsonProperty("comfort_rating")]
         public string ComfortRating { get; set; }
         public string CanonicalName { get; set; }
         public string AppName { get; set; }
 
-        [JsonProperty("quality_rating_aggregate")]
-        public double QualityRatingAggregate { get; set; }
+        [JsonProperty("quality_rating_histogram_aggregate_all")]
+        public List<StarRatingAggregate> RatingAggregates { get; set; } = new List<StarRatingAggregate>();
 
+        [JsonProperty("icon_image")]
+        public UriItem IconImage { get; set; }
+
+        public List<UriItem> Screenshots { get; set; } = new List<UriItem>();
     }
 
     public class IarcCertification
@@ -105,5 +112,18 @@ namespace OculusLibrary.DataExtraction
 
         [JsonProperty("required_space_adjusted")]
         public string RequiredSpaceAdjusted { get; set; }
+    }
+
+    public class ReleaseInfo
+    {
+        [JsonProperty("display_date")]
+        public string DisplayDate { get; set; }
+    }
+
+    public class StarRatingAggregate
+    {
+        [JsonProperty("star_rating")]
+        public int StarRating { get; set; }
+        public int Count { get; set; }
     }
 }

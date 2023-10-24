@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29519.87
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OculusLibrary", "OculusLibrary\OculusLibrary.csproj", "{499D6789-DA1D-44B8-9CF3-7EC07666FD6A}"
 EndProject
@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Git", "Git", "{D145B60A-0A3
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		CHANGELOG.MD = CHANGELOG.MD
+		OculusLibraryInstaller.yaml = OculusLibraryInstaller.yaml
 		README.md = README.md
 	EndProjectSection
 EndProject
