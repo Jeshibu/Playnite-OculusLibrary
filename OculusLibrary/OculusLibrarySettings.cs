@@ -46,7 +46,7 @@ namespace OculusLibrary
                 return;
 
             var program = Programs.GetReviveUninstallProgram();
-            if (program == null)
+            if (program?.InstallLocation == null)
                 return;
 
             Settings.RevivePath = Path.Combine(program.InstallLocation, "ReviveInjector.exe");

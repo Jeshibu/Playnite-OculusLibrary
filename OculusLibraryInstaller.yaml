@@ -52,4 +52,10 @@ Packages:
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.4/Oculus.pext
     Changelog:
       - Fixed broken metadata collection (due to the move from oculus.com to meta.com)
+  - Version: 2.4.1
+    RequiredApiVersion: 6.4.0
+    ReleaseDate: 2023-10-25
+    PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.4.1/Oculus.pext
+    Changelog:
+      - Fixed plugin loading when Revive is not installed
   
