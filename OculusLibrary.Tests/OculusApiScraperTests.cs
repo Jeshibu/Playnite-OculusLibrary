@@ -1,9 +1,7 @@
 ﻿using OculusLibrary.DataExtraction;
 using Playnite.SDK.Models;
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -133,6 +131,8 @@ namespace OculusLibrary.Tests
                 JsonContent = jsonContent;
             }
             public string JsonContent { get; }
+
+            public WebHeaderCollection Headers { get; } = new WebHeaderCollection();
 
             public void Dispose()
             {

@@ -24,17 +24,29 @@ namespace OculusLibrary
 
         public override GameMetadata GetMetadata(Game game)
         {
+            GameMetadata output = null;
+
             try
             {
                 var manifestData = manifestScraper.GetGames(minimal: false).FirstOrDefault(g => g.GameId == game.GameId);
-                var task = apiScraper.GetMetadata(game?.GameId, manifestData);
+                output = manifestData;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Error fetching manifest metadata");
+                return null;
+            }
+
+            try
+            {
+                var task = apiScraper.GetMetadata(game?.GameId, output);
                 task.Wait();
                 var apiData = task.Result;
                 return apiData;
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "Error fetching metadata");
+                logger.Error(ex, "Error fetching API metadata");
                 return null;
             }
         }
@@ -55,12 +67,19 @@ namespace OculusLibrary
                 }
                 else
                 {
-                    //for new games, we have to immediately set the name, because game name isn't overridden by a post-import metadata pass (by default)
-                    var nameTask = apiScraper.GetMetadata(game.GameId);
-                    nameTask.Wait();
+                    try
+                    {
+                        //for new games, we have to immediately set the name, because game name isn't overridden by a post-import metadata pass (by default)
+                        var nameTask = apiScraper.GetMetadata(game.GameId);
+                        nameTask.Wait();
 
-                    if (nameTask.Result != null)
-                        game.Name = nameTask.Result.Name;
+                        if (nameTask.Result != null)
+                            game.Name = nameTask.Result.Name;
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error(ex, "Error getting game name");
+                    }
 
                     yield return game;
                 }

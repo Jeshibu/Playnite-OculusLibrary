@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -21,16 +22,22 @@ namespace OculusLibrary.DataExtraction
 
         private IWebClient WebClient { get; }
 
-        public static string GetStoreUrl(string appId) => $"https://www.meta.com/en-us/experiences/pcvr/{appId}/";
+        public static string GetStoreUrl(string appId) => $"https://www.meta.com/experiences/{appId}/";
 
         private async Task<OculusJsonResponse> GetJsonData(string appId)
         {
+            const string locale = "en_GB";
+            WebClient.Headers[HttpRequestHeader.UserAgent] = "PostmanRuntime/7.33.0"; //why does this work and a regular browser user agent string doesn't
+            WebClient.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+            WebClient.Headers[HttpRequestHeader.Cookie] = "locale=" + locale;
+            WebClient.Headers["X-FB-Friendly-Name"] = "MDCAppStoreStoreAppQuery";
+            WebClient.Headers["X-ASBD-ID"] = "129477";
             NameValueCollection values = new NameValueCollection
             {
                 { "variables", $@"{{""itemId"":""{appId}"",""hmdType"":""RIFT"",""requestPDPAssetsAsPNG"":false}}" },
                 { "doc_id", "7101363079925397" },
             };
-            string jsonStr = await WebClient.UploadValuesAsync("https://www.meta.com/ocapi/graphql?forced_locale=en_GB", "POST", values);
+            string jsonStr = await WebClient.UploadValuesAsync("https://www.meta.com/ocapi/graphql?forced_locale=" + locale, "POST", values);
             var data = JsonConvert.DeserializeObject<OculusJsonResponse>(jsonStr);
             return data;
         }

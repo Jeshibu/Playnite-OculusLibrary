@@ -15,7 +15,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Git", "Git", "{D145B60A-0A36-4FE1-BDBC-0A5C4FB88422}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		CHANGELOG.MD = CHANGELOG.MD
 		OculusLibraryInstaller.yaml = OculusLibraryInstaller.yaml
 		README.md = README.md
 	EndProjectSection

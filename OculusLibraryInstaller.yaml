@@ -58,4 +58,10 @@ Packages:
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.4.1/Oculus.pext
     Changelog:
       - Fixed plugin loading when Revive is not installed
-  
+  - Version: 2.4.2
+    RequiredApiVersion: 6.4.0
+    ReleaseDate: 2023-11-12
+    PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.4.2/Oculus.pext
+    Changelog:
+      - Fixed game import breaking when metadata collection fails
+      - Unfortunately, metadata collection is still broken for USA users (and maybe others). This is a partial fix until I figure out how to make it work globally.
