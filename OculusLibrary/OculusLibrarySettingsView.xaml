@@ -4,15 +4,54 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OculusLibrary"
+             d:DataContext="{d:DesignInstance Type=local:OculusLibrarySettingsViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel Margin="20" Width="Auto">
-        <CheckBox IsChecked="{Binding Settings.UseOculus}" Content="Use Oculus to launch games"/>
-        <CheckBox IsChecked="{Binding Settings.UseRevive}" Content="Use Revive to launch games via SteamVR" Margin="0,10,0,0"/>
-        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-            <TextBlock Text="ReviveInjector.exe path:" Margin="40,0,5,0"/>
-            <TextBox Text="{Binding Settings.RevivePath}" IsEnabled="{Binding Settings.UseRevive}" MinWidth="250" x:Name="RevivePath"/>
-            <Button IsEnabled="{Binding Settings.UseRevive}" x:Name="BrowseButton" Click="Browse_Click" Content="&#xED25;" FontFamily="Segoe MDL2 Assets" ToolTip="Browse"/>
+        <CheckBox IsChecked="{Binding Settings.ImportOculusAppGames}" Content="Import games via the Oculus app (PCVR)" />
+        <StackPanel Margin="20,5,0,0">
+            <CheckBox IsEnabled="{Binding Settings.ImportOculusAppGames}" IsChecked="{Binding Settings.UseOculus}" Content="Use Oculus to launch games"/>
+            <CheckBox IsEnabled="{Binding Settings.ImportOculusAppGames}" IsChecked="{Binding Settings.UseRevive}" Content="Use Revive to launch games via SteamVR" Margin="0,10,0,0"/>
+            <StackPanel Orientation="Horizontal" Margin="20,5,0,0" VerticalAlignment="Center">
+                <TextBlock Text="ReviveInjector.exe path:" Margin="0,0,5,0"/>
+                <TextBox Text="{Binding Settings.RevivePath}" IsEnabled="{Binding Settings.UseRevive}" MinWidth="250" x:Name="RevivePath"/>
+                <Button IsEnabled="{Binding Settings.UseRevive}" x:Name="BrowseButton" Click="Browse_Click" Content="&#xED25;" FontFamily="Segoe MDL2 Assets" ToolTip="Browse"/>
+            </StackPanel>
+        </StackPanel>
+        <CheckBox IsChecked="{Binding Settings.ImportRiftOnline}" Content="Import Oculus Rift (PCVR) games from your Oculus account" Margin="0,20,0,0"/>
+        <CheckBox IsChecked="{Binding Settings.ImportQuestOnline}" Content="Import Quest games from your Oculus account" Margin="0,5,0,0"/>
+        <CheckBox IsChecked="{Binding Settings.ImportGearGoOnline}" Content="Import Gear VR/Oculus Go games from your Oculus account" Margin="0,5,0,0"/>
+        <StackPanel Orientation="Horizontal" Margin="20,5,0,0">
+            <Button Content="Authenticate" Command="{Binding LoginCommand}" IsEnabled="{Binding Settings.ImportAnyOnline}"/>
+            <TextBlock VerticalAlignment="Center" Margin="10,0,0,0">
+                <TextBlock.Tag>
+                    <PriorityBinding>
+                        <Binding Path="AuthStatus" IsAsync="True" />
+                        <Binding Source="{x:Static local:AuthStatus.Checking}" />
+                    </PriorityBinding>
+                </TextBlock.Tag>
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+                        <Style.Triggers>
+                            <Trigger Property="Tag" Value="{x:Static local:AuthStatus.Checking}">
+                                <Setter Property="Text" Value="Checking..." />
+                            </Trigger>
+                            <Trigger Property="Tag" Value="{x:Static local:AuthStatus.Ok}">
+                                <Setter Property="Text" Value="Logged in" />
+                            </Trigger>
+                            <Trigger Property="Tag" Value="{x:Static local:AuthStatus.AuthRequired}">
+                                <Setter Property="Text" Value="Requires authentication" />
+                            </Trigger>
+                            <Trigger Property="Tag" Value="{x:Static local:AuthStatus.Failed}">
+                                <Setter Property="Text" Value="Failed to check authentication status" />
+                            </Trigger>
+                            <Trigger Property="Tag" Value="{x:Static local:AuthStatus.Disabled}">
+                                <Setter Property="Text" Value="Disabled" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
         </StackPanel>
     </StackPanel>
 </UserControl>

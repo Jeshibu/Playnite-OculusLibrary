@@ -13,36 +13,38 @@ namespace OculusLibrary
         private readonly OculusManifestScraper manifestScraper;
         private readonly OculusApiScraper apiScraper;
         private readonly IPlayniteAPI api;
+        private readonly OculusLibrarySettings settings;
         private readonly ILogger logger = LogManager.GetLogger();
 
-        public AggregateOculusMetadataCollector(OculusManifestScraper manifestScraper, OculusApiScraper apiScraper, IPlayniteAPI api)
+        public AggregateOculusMetadataCollector(OculusManifestScraper manifestScraper, OculusApiScraper apiScraper, IPlayniteAPI api, OculusLibrarySettings settings)
         {
             this.manifestScraper = manifestScraper;
             this.apiScraper = apiScraper;
             this.api = api;
+            this.settings = settings;
         }
 
         public override GameMetadata GetMetadata(Game game)
         {
-            GameMetadata output = null;
+            ExtendedGameMetadata output = null;
+
+            if (settings.ImportOculusAppGames)
+            {
+                try
+                {
+                    var manifestData = manifestScraper.GetGames(minimal: false).FirstOrDefault(g => g.GameId == game.GameId);
+                    output = manifestData;
+                }
+                catch (Exception ex)
+                {
+                    logger.Error(ex, "Error fetching manifest metadata");
+                    return null;
+                }
+            }
 
             try
             {
-                var manifestData = manifestScraper.GetGames(minimal: false).FirstOrDefault(g => g.GameId == game.GameId);
-                output = manifestData;
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex, "Error fetching manifest metadata");
-                return null;
-            }
-
-            try
-            {
-                var task = apiScraper.GetMetadata(game?.GameId, output);
-                task.Wait();
-                var apiData = task.Result;
-                return apiData;
+                return apiScraper.GetMetadata(game?.GameId, setLocale: true, data: output);
             }
             catch (Exception ex)
             {
@@ -51,39 +53,47 @@ namespace OculusLibrary
             }
         }
 
-        public IEnumerable<GameMetadata> GetGames(CancellationToken cancellationToken)
+        public IEnumerable<GameMetadata> GetGames(OculusLibrarySettings settings, CancellationToken cancellationToken)
         {
+            var onlineGames = apiScraper.GetGames(settings, cancellationToken);
+
+            var gamesById = onlineGames.ToDictionary(g => g.GameId);
+
             var manifestGames = manifestScraper.GetGames(minimal: true);
             foreach (var game in manifestGames)
             {
                 if (cancellationToken.IsCancellationRequested)
+                    return Enumerable.Empty<GameMetadata>();
+
+                if (gamesById.TryGetValue(game.GameId, out var onlineGame))
                 {
-                    yield break;
+                    onlineGame.InstallDirectory = game.InstallDirectory;
+                    onlineGame.IsInstalled = game.IsInstalled;
+                    continue;
                 }
 
-                if (api.Database.Games.Any(g => g.PluginId == OculusLibraryPlugin.PluginId && g.GameId == game.GameId))
-                {
-                    yield return game;
-                }
-                else
+                if (!GameExistsInLibrary(game.GameId))
                 {
                     try
                     {
                         //for new games, we have to immediately set the name, because game name isn't overridden by a post-import metadata pass (by default)
-                        var nameTask = apiScraper.GetMetadata(game.GameId);
-                        nameTask.Wait();
+                        var metadata = apiScraper.GetMetadata(game.GameId, setLocale: false);
 
-                        if (nameTask.Result != null)
-                            game.Name = nameTask.Result.Name;
+                        if (metadata != null)
+                            game.Name = metadata.Name;
                     }
                     catch (Exception ex)
                     {
                         logger.Error(ex, "Error getting game name");
                     }
 
-                    yield return game;
+                    gamesById.Add(game.GameId, game);
                 }
             }
+            return gamesById.Values;
         }
+
+        private bool GameExistsInLibrary(string gameId) =>
+            api.Database.Games.Any(g => g.PluginId == OculusLibraryPlugin.PluginId && g.GameId == gameId);
     }
 }

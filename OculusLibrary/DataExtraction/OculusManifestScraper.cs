@@ -30,7 +30,7 @@ namespace OculusLibrary.DataExtraction
             this.pathSniffer = pathSniffer;
         }
 
-        public IEnumerable<GameMetadata> GetGames(bool minimal)
+        public IEnumerable<ExtendedGameMetadata> GetGames(bool minimal)
         {
             logger.Info($"Executing OculusManifestScraper.GetGames");
 
@@ -158,7 +158,7 @@ namespace OculusLibrary.DataExtraction
             }
         }
 
-        private GameMetadata CreateMetadataFromExpandedManifest(ExpandedOculusManifest manifest, bool minimal)
+        private ExtendedGameMetadata CreateMetadataFromExpandedManifest(ExpandedOculusManifest manifest, bool minimal)
         {
             bool installed = !string.IsNullOrEmpty(manifest.LibraryBasePath) && !string.IsNullOrEmpty(manifest.LaunchFile) && File.Exists(manifest.ExecutableFullPath);
 

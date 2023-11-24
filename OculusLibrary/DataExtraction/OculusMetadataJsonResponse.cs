@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace OculusLibrary.DataExtraction
 {
-    public class OculusJsonResponse
+    public class OculusMetadataJsonResponse
     {
         public OculusJsonResponseData Data { get; set; }
     }
@@ -29,7 +29,7 @@ namespace OculusLibrary.DataExtraction
         public string DisplayLongDescription { get; set; }
 
         [JsonProperty("long_description_uses_markdown")]
-        public bool LongDescriptionUsesMarkdown {  get; set; }
+        public bool LongDescriptionUsesMarkdown { get; set; }
 
         [JsonProperty("supported_player_modes")]
         public List<string> SupportedPlayerModes { get; set; }
@@ -76,6 +76,13 @@ namespace OculusLibrary.DataExtraction
         public UriItem IconImage { get; set; }
 
         public List<UriItem> Screenshots { get; set; } = new List<UriItem>();
+
+        public Trailer Trailer { get; set; }
+    }
+
+    public class Trailer : UriItem
+    {
+        public string Thumbnail { get; set; }
     }
 
     public class IarcCertification

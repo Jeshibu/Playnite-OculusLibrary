@@ -3,11 +3,10 @@ using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Globalization;
-using System.Net;
+using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace OculusLibrary.DataExtraction
 {
@@ -15,42 +14,56 @@ namespace OculusLibrary.DataExtraction
     {
         private readonly ILogger logger = LogManager.GetLogger();
 
-        public OculusApiScraper(IWebClient webClient = null)
+        public OculusApiScraper(IGraphQLClient webClient = null)
         {
-            WebClient = webClient ?? new WebClientWrapper();
+            WebClient = webClient;
         }
 
-        private IWebClient WebClient { get; }
+        private IGraphQLClient WebClient { get; }
 
-        public static string GetStoreUrl(string appId) => $"https://www.meta.com/experiences/{appId}/";
+        private static string GetStoreUrl(string appId) => $"https://www.meta.com/experiences/{appId}/";
 
-        private async Task<OculusJsonResponse> GetJsonData(string appId)
+        public IEnumerable<GameMetadata> GetGames(OculusLibrarySettings settings, CancellationToken cancellationToken)
         {
-            const string locale = "en_GB";
-            WebClient.Headers[HttpRequestHeader.UserAgent] = "PostmanRuntime/7.33.0"; //why does this work and a regular browser user agent string doesn't
-            WebClient.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-            WebClient.Headers[HttpRequestHeader.Cookie] = "locale=" + locale;
-            WebClient.Headers["X-FB-Friendly-Name"] = "MDCAppStoreStoreAppQuery";
-            WebClient.Headers["X-ASBD-ID"] = "129477";
-            NameValueCollection values = new NameValueCollection
-            {
-                { "variables", $@"{{""itemId"":""{appId}"",""hmdType"":""RIFT"",""requestPDPAssetsAsPNG"":false}}" },
-                { "doc_id", "7101363079925397" },
-            };
-            string jsonStr = await WebClient.UploadValuesAsync("https://www.meta.com/ocapi/graphql?forced_locale=" + locale, "POST", values);
-            var data = JsonConvert.DeserializeObject<OculusJsonResponse>(jsonStr);
-            return data;
+            if (!settings.ImportAnyOnline || cancellationToken.IsCancellationRequested)
+                return new GameMetadata[0];
+
+            var accessToken = WebClient.GetAccessToken();
+            if (accessToken == null)
+                throw new Exception("Oculus user not authenticated");
+
+            var output = new List<GameMetadata>();
+
+            if (settings.ImportRiftOnline && !cancellationToken.IsCancellationRequested)
+                output.AddRange(GetGames(accessToken, "6549375561785664", u => u.ActivePcEntitlements, new MetadataSpecProperty("pc_windows")));
+
+            if (settings.ImportQuestOnline && !cancellationToken.IsCancellationRequested)
+                output.AddRange(GetGames(accessToken, "6260775224011087", u => u.ActiveAndroidEntitlements, new MetadataNameProperty("Meta Quest")));
+
+            if (settings.ImportGearGoOnline && !cancellationToken.IsCancellationRequested)
+                output.AddRange(GetGames(accessToken, "6040003812794294", u => u.ActiveAndroidEntitlements, new MetadataNameProperty("Oculus Go")));
+
+            return output;
         }
 
-        public async Task<GameMetadata> GetMetadata(string appId, GameMetadata data = null)
+        private IEnumerable<GameMetadata> GetGames(string accessToken, string docId, Func<OculusLibraryResponseUser, OculusLibraryResponseEntitlements> entitlementsSelector, params MetadataProperty[] platforms)
         {
-            var json = await GetJsonData(appId);
+            var responseString = WebClient.GetLibrary(accessToken, docId);
+            var responseObj = JsonConvert.DeserializeObject<OculusLibraryResponseModel>(responseString);
+            var entitlements = entitlementsSelector(responseObj.Data.Viewer.User);
+            var items = entitlements.Edges.Select(e => e.Node.Item).ToList();
+            return items.Select(i => ToGameMetadata(i, platforms));
+        }
+
+        public ExtendedGameMetadata GetMetadata(string appId, OculusLibrarySettings settings, bool setLocale, ExtendedGameMetadata data = null)
+        {
+            var json = GetOculusMetadata(appId, setLocale);
             if (json?.Data?.Item == null) return data;
-            var metadata = ToGameMetadata(json.Data.Item, data);
+            var metadata = ToGameMetadata(json.Data.Item, settings, data);
             return metadata;
         }
 
-        public GameMetadata ToGameMetadata(OculusJsonResponseDataNode json, GameMetadata data = null)
+        public ExtendedGameMetadata ToGameMetadata(OculusJsonResponseDataNode json, OculusLibrarySettings settings, ExtendedGameMetadata data = null)
         {
             data = data ?? OculusLibraryPlugin.GetBaseMetadata();
             data.Features.Add(new MetadataNameProperty("VR"));
@@ -61,6 +74,7 @@ namespace OculusLibrary.DataExtraction
                 data.Description = Regex.Replace(json.DisplayLongDescription, "\r?\n", "<br>$0");
 
             data.CommunityScore = GetAverageRating(json.RatingAggregates);
+            logger.Info($"parsing release date: {json.ReleaseInfo?.DisplayDate}");
             data.ReleaseDate = ParseReleaseDate(json.ReleaseInfo?.DisplayDate);
             data.Version = json.LatestSupportedBinary?.Version;
             data.Links.Add(new Link("Oculus Store", GetStoreUrl(json.Id)));
@@ -76,11 +90,20 @@ namespace OculusLibrary.DataExtraction
                 data.Platforms.Add(new MetadataSpecProperty("pc_windows"));
             SetPropertiesForCollection(json.SupportedHmdPlatforms, data.Platforms, GetHmdPlatformName);
 
-            //var backgroundImageUrls = new List<string>();
-            //if (json.Hero?.Uri != null)
-            //    backgroundImageUrls.Add(json.Hero.Uri);
-            //if (json.Screenshots?.Count > 0)
-            //    backgroundImageUrls.AddRange(json.Screenshots.Select(s => s.Uri));
+            if (settings.BackgroundSource == BackgroundSource.TrailerThumbnail && json.Trailer?.Thumbnail != null)
+                data.BackgroundImage = new MetadataFile(json.Trailer.Thumbnail);
+
+            if (json.Screenshots?.Count > 0
+                && (settings.BackgroundSource == BackgroundSource.Screenshots
+                || (settings.BackgroundSource == BackgroundSource.TrailerThumbnail && data.BackgroundImage == null)))
+            {
+                var random = new Random();
+                var uri = json.Screenshots.OrderBy(s => random.Next(int.MaxValue)).First().Uri;
+                data.BackgroundImage = new MetadataFile(uri);
+            }
+
+            if (data.BackgroundImage == null || settings.BackgroundSource == BackgroundSource.Hero && json.Hero?.Uri != null)
+                data.BackgroungImageUrls.Add(json.Hero.Uri);
 
             string backgroundImageUrl = json.Hero?.Uri;
             if (!string.IsNullOrEmpty(backgroundImageUrl))
@@ -101,6 +124,23 @@ namespace OculusLibrary.DataExtraction
                 data.InstallSize = size;
 
             return data;
+        }
+
+        private OculusMetadataJsonResponse GetOculusMetadata(string appId, bool setLocale)
+        {
+            var jsonStr = WebClient.GetMetadata(appId, setLocale);
+            var data = JsonConvert.DeserializeObject<OculusMetadataJsonResponse>(jsonStr);
+            return data;
+        }
+
+        private static GameMetadata ToGameMetadata(OculusLibraryResponseItem item, params MetadataProperty[] platforms)
+        {
+            var output = OculusLibraryPlugin.GetBaseMetadata();
+            output.Name = item.DisplayName;
+            output.GameId = item.Id;
+            foreach (var platform in platforms)
+                output.Platforms.Add(platform);
+            return output;
         }
 
         private static int GetAverageRating(IEnumerable<StarRatingAggregate> aggregates)
@@ -138,39 +178,42 @@ namespace OculusLibrary.DataExtraction
             if (string.IsNullOrWhiteSpace(value))
                 yield break;
 
-            string[] splitValues = value.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
+            string[] splitValues = value.Split(new[] { ", ", " / " }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var val in splitValues)
             {
-                if (Regex.IsMatch(val, @"^\s*(llc|ltd|inc)\.?\s*$", RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture))
+                if (Regex.IsMatch(val, @"^\s*(llc|ltd|inc|gmbh)\.?\s*$", RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture))
                     continue;
 
                 yield return val;
             }
         }
 
-        private static ReleaseDate ParseReleaseDate(string dateString)
+        private static ReleaseDate? ParseReleaseDate(string dateString)
         {
-            if (DateTime.TryParseExact(dateString, new[] { "MMM d, yyyy", "d MMM yyyy" }, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+            if (DateTime.TryParseExact(dateString, "MMM d, yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
                 return new ReleaseDate(date);
 
-            return default;
+            return null;
         }
 
         private string GetHmdPlatformName(string oculusJsonName)
         {
-            return $"Oculus {oculusJsonName}";
+            if (oculusJsonName.StartsWith("Rift"))
+                return $"Oculus {oculusJsonName}";
+
+            else return oculusJsonName;
         }
 
         private string GetFeatureFromInteractionMode(string interactionMode)
         {
-            switch (interactionMode)
+            switch (interactionMode.ToLowerInvariant())
             {
-                case "Single User": return "Single Player";
-                case "Multiplayer": return "Multiplayer";
-                case "Co-op": return "Co-Op";
+                case "single user":
+                case "één speler": //until I figure out how to actually consistently get en-us localization this is a workaround
+                    return "Single Player";
                 default:
                     logger.Warn("Unknown interaction mode: " + interactionMode);
-                    return null;
+                    return interactionMode;
             }
         }
 
@@ -209,7 +252,7 @@ namespace OculusLibrary.DataExtraction
             }
         }
 
-        private void SetPropertiesForCollection(IEnumerable<string> input, HashSet<MetadataProperty> target, Func<string, MetadataProperty> nameParser)
+        private static void SetPropertiesForCollection(IEnumerable<string> input, HashSet<MetadataProperty> target, Func<string, MetadataProperty> nameParser)
         {
             foreach (var i in input)
             {
@@ -219,7 +262,7 @@ namespace OculusLibrary.DataExtraction
             }
         }
 
-        private void SetPropertiesForCollection(IEnumerable<string> input, HashSet<MetadataProperty> target, Func<string, string> nameParser = null)
+        private static void SetPropertiesForCollection(IEnumerable<string> input, HashSet<MetadataProperty> target, Func<string, string> nameParser = null)
         {
             nameParser = nameParser ?? ((string x) => x);
             Func<string, MetadataProperty> func = jsonName =>

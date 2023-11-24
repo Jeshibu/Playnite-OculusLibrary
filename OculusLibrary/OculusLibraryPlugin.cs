@@ -1,6 +1,4 @@
-﻿using Microsoft.Win32;
-using Newtonsoft.Json;
-using OculusLibrary.DataExtraction;
+﻿using OculusLibrary.DataExtraction;
 using OculusLibrary.OS;
 using Playnite.SDK;
 using Playnite.SDK.Events;
@@ -8,12 +6,9 @@ using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Web;
-using System.Web.Script.Serialization;
 using System.Windows.Controls;
 
 namespace OculusLibrary
@@ -33,6 +28,7 @@ namespace OculusLibrary
         private readonly OculusApiScraper apiScraper;
         private readonly OculusManifestScraper manifestScraper;
         private readonly ILogger logger = LogManager.GetLogger();
+        private readonly IGraphQLClient graphQLClient;
         private OculusLibrarySettingsViewModel settings;
 
         public OculusLibraryPlugin(IPlayniteAPI api) : base(api)
@@ -41,9 +37,10 @@ namespace OculusLibrary
             {
                 settings = new OculusLibrarySettingsViewModel(this, api);
                 pathSniffer = new OculusPathSniffer(new RegistryValueProvider(), new PathNormaliser(new WMODriveQueryProvider()));
-                apiScraper = new OculusApiScraper();
+                graphQLClient = new GraphQLClient(api);
+                apiScraper = new OculusApiScraper(graphQLClient);
                 manifestScraper = new OculusManifestScraper(pathSniffer);
-                metadataCollector = new AggregateOculusMetadataCollector(manifestScraper, apiScraper, api);
+                metadataCollector = new AggregateOculusMetadataCollector(manifestScraper, apiScraper, api, settings.Settings);
             }
             catch (Exception ex)
             {
@@ -61,7 +58,7 @@ namespace OculusLibrary
         {
             try
             {
-                return metadataCollector.GetGames(args.CancelToken);
+                return metadataCollector.GetGames(settings.Settings, args.CancelToken);
             }
             catch (Exception ex)
             {
@@ -71,9 +68,9 @@ namespace OculusLibrary
             }
         }
 
-        public static GameMetadata GetBaseMetadata()
+        public static ExtendedGameMetadata GetBaseMetadata()
         {
-            return new GameMetadata
+            return new ExtendedGameMetadata
             {
                 Source = new MetadataNameProperty("Oculus"),
                 Features = new HashSet<MetadataProperty>(),
@@ -165,7 +162,7 @@ namespace OculusLibrary
         private void UpgradeSettings()
         {
             bool upgraded = false;
-            int latestVersion = 2;
+            int latestVersion = 3;
             if (settings.Settings.Version == latestVersion)
                 return;
 
@@ -188,10 +185,20 @@ namespace OculusLibrary
                 upgraded = true;
             }
 
-            //if(settings.Settings.Version < 3)
-            //{
-            //    upgraded = true;
-            //}
+            if (settings.Settings.Version < 3)
+            {
+                var platforms = PlayniteApi.Database.Platforms.Where(p => p.Name.StartsWith("Oculus Meta ")).ToList();
+                if (platforms.Any())
+                {
+                    using (PlayniteApi.Database.Platforms.BufferedUpdate())
+                    foreach (var platform in platforms)
+                    {
+                        platform.Name = platform.Name.Replace("Oculus Meta ", "Meta ");
+                        PlayniteApi.Database.Platforms.Update(platform);
+                    }
+                }
+                upgraded = true;
+            }
 
             if (upgraded)
             {
