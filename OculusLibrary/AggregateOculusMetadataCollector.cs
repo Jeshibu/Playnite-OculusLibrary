@@ -44,7 +44,7 @@ namespace OculusLibrary
 
             try
             {
-                return apiScraper.GetMetadata(game?.GameId, setLocale: true, data: output);
+                return apiScraper.GetMetadata(game?.GameId, settings, setLocale: true, data: output);
             }
             catch (Exception ex)
             {
@@ -77,7 +77,7 @@ namespace OculusLibrary
                     try
                     {
                         //for new games, we have to immediately set the name, because game name isn't overridden by a post-import metadata pass (by default)
-                        var metadata = apiScraper.GetMetadata(game.GameId, setLocale: false);
+                        var metadata = apiScraper.GetMetadata(game.GameId, settings, setLocale: true);
 
                         if (metadata != null)
                             game.Name = metadata.Name;

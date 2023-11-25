@@ -82,7 +82,7 @@ namespace OculusLibrary.DataExtraction
 
     public class Trailer : UriItem
     {
-        public string Thumbnail { get; set; }
+        public UriItem Thumbnail { get; set; }
     }
 
     public class IarcCertification

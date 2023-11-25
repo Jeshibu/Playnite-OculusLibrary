@@ -90,8 +90,8 @@ namespace OculusLibrary.DataExtraction
                 data.Platforms.Add(new MetadataSpecProperty("pc_windows"));
             SetPropertiesForCollection(json.SupportedHmdPlatforms, data.Platforms, GetHmdPlatformName);
 
-            if (settings.BackgroundSource == BackgroundSource.TrailerThumbnail && json.Trailer?.Thumbnail != null)
-                data.BackgroundImage = new MetadataFile(json.Trailer.Thumbnail);
+            if (settings.BackgroundSource == BackgroundSource.TrailerThumbnail && json.Trailer?.Thumbnail?.Uri != null)
+                data.BackgroundImage = new MetadataFile(json.Trailer.Thumbnail?.Uri);
 
             if (json.Screenshots?.Count > 0
                 && (settings.BackgroundSource == BackgroundSource.Screenshots
@@ -190,7 +190,7 @@ namespace OculusLibrary.DataExtraction
 
         private static ReleaseDate? ParseReleaseDate(string dateString)
         {
-            if (DateTime.TryParseExact(dateString, "MMM d, yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+            if (DateTime.TryParse(dateString, out var date))
                 return new ReleaseDate(date);
 
             return null;
@@ -209,7 +209,7 @@ namespace OculusLibrary.DataExtraction
             switch (interactionMode.ToLowerInvariant())
             {
                 case "single user":
-                case "één speler": //until I figure out how to actually consistently get en-us localization this is a workaround
+                case "eén speler": //until I figure out how to actually consistently get en-us localization this is a workaround
                     return "Single Player";
                 default:
                     logger.Warn("Unknown interaction mode: " + interactionMode);

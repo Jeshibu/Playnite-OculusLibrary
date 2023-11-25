@@ -60,7 +60,7 @@
     <Compile Include="DataExtraction\OculusApiScraper.cs" />
     <Compile Include="DataExtraction\OculusLibraryResponseModel.cs" />
     <Compile Include="DataExtraction\OculusMetadataJsonResponse.cs" />
-    <Compile Include="DataExtraction\WebClientWrapper.cs" />
+    <Compile Include="DataExtraction\GraphQLClient.cs" />
     <Compile Include="ManifestParseException.cs" />
     <Compile Include="DataExtraction\OculusManifestScraper.cs" />
     <Compile Include="OculusClient.cs" />
