@@ -126,58 +126,6 @@ namespace OculusLibrary.DataExtraction
             return string.Join("&", cookieStrings);
         }
 
-        /*
-        private string Post(string url, IDictionary<string, string> body, Cookie[] cookies)
-        {
-            var request = GetRequest(url, body, cookies);
-            return GetResponse(request).Content;
-        }
-
-        private HttpWebRequest GetRequest(string url, IDictionary<string, string> values, Cookie[] cookies)
-        {
-            var request = WebRequest.CreateHttp(url);
-            request.CookieContainer = new CookieContainer();
-            foreach (var cookie in cookies)
-                request.CookieContainer.Add(cookie);
-
-            request.Method = "POST";
-            request.ContentType = "application/x-www-form-urlencoded";
-            request.UserAgent = "PostmanRuntime/7.35.0";
-
-            var bodyString = GetRequestBody(values);
-
-            using (var stream = request.GetRequestStream())
-            using (var writer = new StreamWriter(stream, Encoding.UTF8))
-            {
-                writer.Write(bodyString);
-                writer.Flush();
-            }
-
-            return request;
-        }
-
-        private WebResponse GetResponse(WebRequest request)
-        {
-            var response = (HttpWebResponse)request.GetResponse();
-
-            using (response)
-            using (var stream = response.GetResponseStream())
-            using (var reader = new StreamReader(stream, Encoding.UTF8))
-                return new WebResponse
-                {
-                    Content = reader.ReadToEnd(),
-                    Cookies = response.Cookies.Cast<Cookie>().ToArray(),
-                    Url = response.ResponseUri.ToString(),
-                };
-        }
-        */
-
-        private string GetRequestBody(IDictionary<string, string> body)
-        {
-            var fragments = body.Select(x => $"{x.Key}={HttpUtility.UrlEncode(x.Value)}").ToArray();
-            return string.Join("&", fragments);
-        }
-
         public void Dispose()
         {
             WebClient.Dispose();

@@ -102,12 +102,8 @@ namespace OculusLibrary.DataExtraction
                 data.BackgroundImage = new MetadataFile(uri);
             }
 
-            if (data.BackgroundImage == null || settings.BackgroundSource == BackgroundSource.Hero && json.Hero?.Uri != null)
+            if ((data.BackgroundImage == null || settings.BackgroundSource == BackgroundSource.Hero) && json.Hero?.Uri != null)
                 data.BackgroungImageUrls.Add(json.Hero.Uri);
-
-            string backgroundImageUrl = json.Hero?.Uri;
-            if (!string.IsNullOrEmpty(backgroundImageUrl))
-                data.BackgroundImage = new MetadataFile(backgroundImageUrl);
 
             SetPropertiesForCollection(json.UserInteractionModeNames, data.Features, GetFeatureFromInteractionMode);
             SetPropertiesForCollection(json.SupportedPlayerModes, data.Features, GetFeatureFromPlayerMode);

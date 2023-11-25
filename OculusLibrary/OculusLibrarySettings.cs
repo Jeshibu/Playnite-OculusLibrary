@@ -18,6 +18,7 @@ namespace OculusLibrary
         private bool importRiftOnline = false;
         private bool importQuestOnline = false;
         private bool importGearGoOnline = false;
+        private BackgroundSource backgroundSource = BackgroundSource.TrailerThumbnail;
 
         public bool UseOculus { get => useOculus; set => SetValue(ref useOculus, value); }
         public bool UseRevive { get => useRevive; set => SetValue(ref useRevive, value); }
@@ -28,7 +29,7 @@ namespace OculusLibrary
         public bool ImportQuestOnline { get => importQuestOnline; set => SetOnlineImportValue(ref importQuestOnline, value); }
         public bool ImportGearGoOnline { get => importGearGoOnline; set => SetOnlineImportValue(ref importGearGoOnline, value); }
 
-        public BackgroundSource BackgroundSource { get; set; } = BackgroundSource.TrailerThumbnail;
+        public BackgroundSource BackgroundSource { get => backgroundSource; set => SetValue(ref backgroundSource, value); }
 
         [DontSerialize]
         public bool ImportAnyOnline => ImportRiftOnline || ImportQuestOnline || ImportGearGoOnline;
@@ -71,7 +72,7 @@ namespace OculusLibrary
 
         private void Settings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if(e.PropertyName == nameof(Settings.ImportAnyOnline))
+            if (e.PropertyName == nameof(Settings.ImportAnyOnline))
             {
                 OnPropertyChanged(nameof(AuthStatus));
             }
@@ -179,6 +180,13 @@ namespace OculusLibrary
                 }
             }
         }
+
+        public IDictionary<BackgroundSource, string> BackgroundSourceOptions { get; } = new Dictionary<BackgroundSource, string>
+        {
+            { BackgroundSource.Hero, "Hero (slim, wide header image)" },
+            { BackgroundSource.Screenshots, "Screenshot (random selection)" },
+            { BackgroundSource.TrailerThumbnail, "Trailer thumbnail (is usually key art)" },
+        };
     }
 
     public enum AuthStatus

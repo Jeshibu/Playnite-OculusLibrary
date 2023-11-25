@@ -65,3 +65,13 @@ Packages:
     Changelog:
       - Fixed game import breaking when metadata collection fails
       - Unfortunately, metadata collection is still broken for USA users (and maybe others). This is a partial fix until I figure out how to make it work globally.
+  - Version: 2.5
+    RequiredApiVersion: 6.4.0
+    ReleaseDate: 2023-11-25
+    PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.5/Oculus.pext
+    Changelog:
+      - Added importing Rift/Quest/Go games via the online user profile (requires logging in)
+      - Mostly fixed metadata collection to work for USA users
+      - Added background source setting (hero/trailer/screenshots)
+      - Added setting to disable game imports via Oculus app (for Quest-only users)
+      - Known issue; metadata is localized, and single/multiplayer features might not parse correctly, alongside release dates
