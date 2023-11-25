@@ -5,7 +5,6 @@ namespace OculusLibrary.DataExtraction
 {
     public class ExtendedGameMetadata : GameMetadata
     {
-        public List<string> BackgroungImageUrls { get; set; } = new List<string>();
+        public List<string> BackgroundImageUrls { get; set; } = new List<string>();
     }
-
 }
