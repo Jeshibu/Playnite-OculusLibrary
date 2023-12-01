@@ -9,6 +9,7 @@ namespace OculusLibrary
     {
         bool uninstallEntryFetched = false;
         private UninstallProgram oculusUninstallEntry;
+        private readonly IPlayniteAPI playniteAPI;
 
         private UninstallProgram OculusUninstallEntry
         {
@@ -32,12 +33,23 @@ namespace OculusLibrary
         public override bool IsInstalled => OculusUninstallEntry != null;
         public override string Icon => OculusLibraryPlugin.IconPath;
 
+        public OculusClient(IPlayniteAPI playniteAPI)
+        {
+            this.playniteAPI = playniteAPI;
+        }
+
         public override void Open()
         {
             if (!IsInstalled)
                 return;
 
-            var path = Path.Combine(OculusUninstallEntry.InstallLocation, "OculusClient.exe");
+            var path = Path.Combine(OculusUninstallEntry.InstallLocation, @"Support\oculus-client\OculusClient.exe");
+            if (!File.Exists(path))
+            {
+                playniteAPI.Dialogs.ShowErrorMessage($"Could not find {path}");
+                return;
+            }
+
             Process.Start(path);
         }
     }

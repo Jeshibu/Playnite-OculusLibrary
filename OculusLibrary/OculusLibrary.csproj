@@ -57,6 +57,7 @@
     <Compile Include="AggregateOculusMetadataCollector.cs" />
     <Compile Include="DataExtraction\ExtendedGameMetadata.cs" />
     <Compile Include="DataExtraction\IOculusPathSniffer.cs" />
+    <Compile Include="DataExtraction\NotAuthenticatedException.cs" />
     <Compile Include="DataExtraction\OculusApiScraper.cs" />
     <Compile Include="DataExtraction\OculusLibraryResponseModel.cs" />
     <Compile Include="DataExtraction\OculusMetadataJsonResponse.cs" />

@@ -21,7 +21,7 @@ namespace OculusLibrary
 
         public override string Name { get; } = "Oculus";
         public override string LibraryIcon => IconPath;
-        public override LibraryClient Client => new OculusClient();
+        public override LibraryClient Client => new OculusClient(PlayniteApi);
 
         private readonly IOculusPathSniffer pathSniffer;
         private readonly AggregateOculusMetadataCollector metadataCollector;
@@ -59,6 +59,12 @@ namespace OculusLibrary
             try
             {
                 return metadataCollector.GetGames(settings.Settings, args.CancelToken);
+            }
+            catch (NotAuthenticatedException)
+            {
+                logger.Error("Not authenticated");
+                PlayniteApi.Notifications.Add(new NotificationMessage("oculus-not-authenticated", "Oculus user not authenticated", NotificationType.Error, () => OpenSettingsView()));
+                return new GameMetadata[0];
             }
             catch (Exception ex)
             {

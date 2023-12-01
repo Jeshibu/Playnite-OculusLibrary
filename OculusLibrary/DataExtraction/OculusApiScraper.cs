@@ -3,7 +3,6 @@ using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -30,7 +29,7 @@ namespace OculusLibrary.DataExtraction
 
             var accessToken = WebClient.GetAccessToken();
             if (accessToken == null)
-                throw new Exception("Oculus user not authenticated");
+                throw new NotAuthenticatedException();
 
             var output = new List<GameMetadata>();
 
