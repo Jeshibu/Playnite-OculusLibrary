@@ -75,3 +75,10 @@ Packages:
       - Added background source setting (hero/trailer/screenshots)
       - Added setting to disable game imports via Oculus app (for Quest-only users)
       - Known issue; metadata is localized, and single/multiplayer features might not parse correctly, alongside release dates
+  - Version: 2.5.1
+    RequiredApiVersion: 6.4.0
+    ReleaseDate: 2023-12-01
+    PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.5.1/Oculus.pext
+    Changelog:
+      - Fixed client launching to account for new file location
+      - Made not-authenticated error notification clickable to open the plugin settings
