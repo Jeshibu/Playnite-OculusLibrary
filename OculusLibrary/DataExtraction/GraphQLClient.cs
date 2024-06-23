@@ -95,6 +95,7 @@ namespace OculusLibrary.DataExtraction
             var response = new WebResponse { Content = webview.GetPageSource() };
 
             response.Cookies = webview.GetCookies()
+                .Where(c => c.Value != null)
                 .Select(c => new Cookie(c.Name, c.Value, c.Path, c.Domain))
                 .ToArray();
 
