@@ -106,7 +106,7 @@ namespace OculusLibrary.DataExtraction
 
             SetPropertiesForCollection(json.UserInteractionModeNames, data.Features, GetFeatureFromInteractionMode);
             SetPropertiesForCollection(json.SupportedPlayerModes, data.Features, GetFeatureFromPlayerMode);
-            SetPropertiesForCollection(json.SupportedInputDeviceNames, data.Features, GetFeatureFromInputDevice);
+            SetPropertiesForCollection(json.SupportedInputDevicesList, data.Features, GetFeatureMetadataPropertyFromInputDevice);
             SetPropertiesForCollection(SplitCompanies(json.DeveloperName), data.Developers);
             SetPropertiesForCollection(SplitCompanies(json.PublisherName), data.Publishers);
             SetPropertiesForCollection(json.GenreNames, data.Genres);
@@ -117,6 +117,9 @@ namespace OculusLibrary.DataExtraction
 
             if (ulong.TryParse(json.LatestSupportedBinary?.TotalInstalledSpace, out ulong size))
                 data.InstallSize = size;
+
+            if (!string.IsNullOrWhiteSpace(json.IconImage?.Uri))
+                data.Icon = new MetadataFile(json.IconImage.Uri);
 
             return data;
         }
@@ -225,29 +228,33 @@ namespace OculusLibrary.DataExtraction
             }
         }
 
-        private string GetFeatureFromInputDevice(string inputDevice)
+        private string GetFeatureFromInputDevice(TagItem inputDevice)
         {
-            switch (inputDevice)
+            switch (inputDevice.Tag)
             {
-                case "Gamepad": return "VR Gamepad";
-                case "Touch Controllers":
-                case "Oculus Touch": return "VR Motion Controllers";
-                case "Touch (as Gamepad)": return "VR Motion Controllers";
-                case "Racing Wheel": return "Racing Wheel Support"; //found on Dirt Rally
-                case "Flight Stick": return "Flight Stick Support"; //found on End Space
+                case "GAMEPAD": return "VR Gamepad";
+                case "OCULUS_TOUCH": return "VR Motion Controllers";
+                case "GAMEPAD_VIA_TOUCH": return "VR Motion Controllers (As Gamepad)";
+                case "RACING_WHEEL": return "Racing Wheel Support"; //found on Dirt Rally
+                case "FLIGHT_STICK": return "Flight Stick Support"; //found on End Space
+                case "KEYBOARD_MOUSE": return "Input: Keyboard & Mouse";
 
-                case "Keyboard & Mouse":
-                case "Oculus Remote":
-                case "Other Device":
-                    return null; //Unsure if these should be features, disregard for now
-
-                default:
-                    logger.Warn("Unknown input device: " + inputDevice);
-                    return null;
+                default: //localized and unknown input devices
+                    logger.Info($"Unknown input device: {inputDevice.Tag} | {inputDevice.Name}");
+                    return $"Input: {inputDevice.Name}";
             }
         }
 
-        private static void SetPropertiesForCollection(IEnumerable<string> input, HashSet<MetadataProperty> target, Func<string, MetadataProperty> nameParser)
+        private MetadataProperty GetFeatureMetadataPropertyFromInputDevice(TagItem inputDevice)
+        {
+            var str = GetFeatureFromInputDevice(inputDevice);
+            if (str == null)
+                return null;
+
+            return new MetadataNameProperty(str);
+        }
+
+        private static void SetPropertiesForCollection<T>(IEnumerable<T> input, HashSet<MetadataProperty> target, Func<T, MetadataProperty> nameParser)
         {
             foreach (var i in input)
             {

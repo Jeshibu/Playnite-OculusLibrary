@@ -46,8 +46,8 @@ namespace OculusLibrary.DataExtraction
         [JsonProperty("supported_platforms_i18n")]
         public List<string> SupportedHmdPlatforms { get; set; } = new List<string>();
 
-        [JsonProperty("supported_input_device_names")]
-        public List<string> SupportedInputDeviceNames { get; set; } = new List<string>();
+        [JsonProperty("supported_input_devices_list")]
+        public List<TagItem> SupportedInputDevicesList { get; set; } = new List<TagItem>();
 
         [JsonProperty("user_interaction_mode_names")]
         public List<string> UserInteractionModeNames { get; set; } = new List<string>();
@@ -132,5 +132,11 @@ namespace OculusLibrary.DataExtraction
         [JsonProperty("star_rating")]
         public int StarRating { get; set; }
         public int Count { get; set; }
+    }
+
+    public class TagItem
+    {
+        public string Tag { get; set; }
+        public string Name { get; set; }
     }
 }
