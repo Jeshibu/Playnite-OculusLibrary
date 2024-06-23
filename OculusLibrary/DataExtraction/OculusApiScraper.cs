@@ -238,6 +238,7 @@ namespace OculusLibrary.DataExtraction
                 case "RACING_WHEEL": return "Racing Wheel Support"; //found on Dirt Rally
                 case "FLIGHT_STICK": return "Flight Stick Support"; //found on End Space
                 case "KEYBOARD_MOUSE": return "Input: Keyboard & Mouse";
+                case "HAND_TRACKING": return "Hand Tracking";
 
                 default: //localized and unknown input devices
                     logger.Info($"Unknown input device: {inputDevice.Tag} | {inputDevice.Name}");
