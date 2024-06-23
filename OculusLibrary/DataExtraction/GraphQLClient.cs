@@ -33,6 +33,7 @@ namespace OculusLibrary.DataExtraction
 
         private IPlayniteAPI PlayniteAPI { get; }
         private WebClient WebClient { get; }
+        private ILogger logger = LogManager.GetLogger();
 
         public GraphQLClient(IPlayniteAPI playniteAPI)
         {
@@ -88,6 +89,8 @@ namespace OculusLibrary.DataExtraction
 
         private WebResponse GetBrowserResponse(string storePageUrl)
         {
+            logger.Info($"GetBrowserResponse: {storePageUrl}");
+
             var webview = PlayniteAPI.WebViews.CreateOffscreenView(new WebViewSettings { JavaScriptEnabled = true });
 
             webview.NavigateAndWait(storePageUrl);
@@ -99,11 +102,16 @@ namespace OculusLibrary.DataExtraction
                 .Select(c => new Cookie(c.Name, c.Value, c.Path, c.Domain))
                 .ToArray();
 
+            logger.Info($"GetBrowserResponse complete with {response.Cookies.Length} cookies: {storePageUrl}");
+
             return response;
         }
 
         private string PostWithWebclient(string address, IDictionary<string, string> data, Cookie[] cookies)
         {
+            logger.Info($@"PostWithWebclient: {address} with {cookies.Length} cookies
+data: {DictionaryToString(data)}");
+
             var nameValueCollection = new NameValueCollection();
             foreach (var kvp in data)
                 nameValueCollection.Add(kvp.Key, kvp.Value);
@@ -115,6 +123,9 @@ namespace OculusLibrary.DataExtraction
 
             var bytes = WebClient.UploadValues(address, "POST", nameValueCollection);
             WebClient.Headers.Clear();
+
+            logger.Info($@"PostWithWebclient complete: {address}");
+
             return Encoding.UTF8.GetString(bytes);
         }
 
@@ -130,6 +141,16 @@ namespace OculusLibrary.DataExtraction
         public void Dispose()
         {
             WebClient.Dispose();
+        }
+
+        private static string DictionaryToString(IDictionary<string,string> dictionary)
+        {
+            var stringBuilder = new StringBuilder();
+            foreach (var kvp in dictionary)
+            {
+                stringBuilder.AppendLine($"{kvp.Key}: {kvp.Value}");
+            }
+            return stringBuilder.ToString();
         }
     }
 }

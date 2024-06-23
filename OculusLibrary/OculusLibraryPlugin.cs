@@ -56,6 +56,7 @@ namespace OculusLibrary
 
         public override IEnumerable<GameMetadata> GetGames(LibraryGetGamesArgs args)
         {
+            logger.Info("GetGames");
             try
             {
                 return metadataCollector.GetGames(settings.Settings, args.CancelToken);

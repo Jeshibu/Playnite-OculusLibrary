@@ -57,6 +57,8 @@ namespace OculusLibrary
         {
             var onlineGames = apiScraper.GetGames(settings, cancellationToken);
 
+            logger.Info("Online games fetching passed");
+
             var gamesById = onlineGames.ToDictionary(g => g.GameId);
 
             var manifestGames = manifestScraper.GetGames(minimal: true);
