@@ -82,3 +82,10 @@ Packages:
     Changelog:
       - Fixed client launching to account for new file location
       - Made not-authenticated error notification clickable to open the plugin settings
+  - Version: 2.5.2
+    RequiredApiVersion: 6.4.0
+    ReleaseDate: 2024-06-23
+    PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.6/Oculus.pext
+    Changelog:
+      - Fixed exception due to null-valued cookies
+      - Made input features more consistently named (no localization)
