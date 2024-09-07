@@ -29,12 +29,12 @@ namespace OculusLibrary.DataExtraction
             this.pathSniffer = pathSniffer;
         }
 
-        public IEnumerable<ExtendedGameMetadata> GetGames(bool minimal)
+        public IEnumerable<ExtendedGameMetadata> GetGames(OculusLibrarySettings settings, bool minimal)
         {
             logger.Info($"Executing OculusManifestScraper.GetGames");
 
             var manifests = GetManifests();
-            return manifests.Select(m => CreateMetadataFromExpandedManifest(m, minimal));
+            return manifests.Select(m => CreateMetadataFromExpandedManifest(m, settings, minimal));
         }
 
         public IEnumerable<ExpandedOculusManifest> GetManifests(bool installedOnly = false)
@@ -157,11 +157,11 @@ namespace OculusLibrary.DataExtraction
             }
         }
 
-        private ExtendedGameMetadata CreateMetadataFromExpandedManifest(ExpandedOculusManifest manifest, bool minimal)
+        private ExtendedGameMetadata CreateMetadataFromExpandedManifest(ExpandedOculusManifest manifest, OculusLibrarySettings settings, bool minimal)
         {
             bool installed = !string.IsNullOrEmpty(manifest.LibraryBasePath) && !string.IsNullOrEmpty(manifest.LaunchFile) && File.Exists(manifest.ExecutableFullPath);
 
-            var output = OculusLibraryPlugin.GetBaseMetadata();
+            var output = OculusLibraryPlugin.GetBaseMetadata(settings);
             output.Name = manifest.LaunchFile ?? manifest.CanonicalName;
             output.GameId = manifest.AppId;
 

@@ -16,17 +16,17 @@ namespace OculusLibrary
     public partial class OculusLibraryPlugin : LibraryPlugin
     {
         public static Guid PluginId = new Guid("77346DD6-B0CC-4F7D-80F0-C1D138CCAE58");
-        public static readonly string IconPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Resources", "oculusicon.png");
         public override Guid Id { get; } = PluginId;
 
-        public override string Name { get; } = "Oculus";
-        public override string LibraryIcon => IconPath;
-        public override LibraryClient Client => new OculusClient(PlayniteApi);
+        public override string Name => GetPluginName(settings.Settings);
+        public override string LibraryIcon => Path.Combine(ResourcePath, settings?.Settings.Branding == Branding.Meta ? "metaicon.png" : "oculusicon.png");
+        public override LibraryClient Client => new OculusClient(PlayniteApi, LibraryIcon);
 
         private readonly IOculusPathSniffer pathSniffer;
         private readonly OculusManifestScraper manifestScraper;
         private readonly ILogger logger = LogManager.GetLogger();
         private OculusLibrarySettingsViewModel settings;
+        private static readonly string ResourcePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Resources");
 
         private AggregateOculusMetadataCollector MetadataCollector
         {
@@ -68,22 +68,22 @@ namespace OculusLibrary
             catch (NotAuthenticatedException)
             {
                 logger.Error("Not authenticated");
-                PlayniteApi.Notifications.Add(new NotificationMessage("oculus-not-authenticated", "Oculus user not authenticated", NotificationType.Error, () => OpenSettingsView()));
+                PlayniteApi.Notifications.Add(new NotificationMessage("oculus-not-authenticated", $"{this.Name} user not authenticated", NotificationType.Error, () => OpenSettingsView()));
                 return new GameMetadata[0];
             }
             catch (Exception ex)
             {
                 logger.Error(ex, "Error getting Oculus games");
-                PlayniteApi.Notifications.Add(new NotificationMessage("oculus-import-error", $"Error during Oculus library import: {ex.Message}", NotificationType.Error));
+                PlayniteApi.Notifications.Add(new NotificationMessage("oculus-import-error", $"Error during {this.Name} library import: {ex.Message}", NotificationType.Error));
                 return new GameMetadata[0];
             }
         }
 
-        public static ExtendedGameMetadata GetBaseMetadata()
+        public static ExtendedGameMetadata GetBaseMetadata(OculusLibrarySettings settings)
         {
             return new ExtendedGameMetadata
             {
-                Source = new MetadataNameProperty("Oculus"),
+                Source = new MetadataNameProperty(GetPluginName(settings)),
                 Features = new HashSet<MetadataProperty>(),
                 Platforms = new HashSet<MetadataProperty>(),
                 Developers = new HashSet<MetadataProperty>(),
@@ -94,6 +94,8 @@ namespace OculusLibrary
                 Tags = new HashSet<MetadataProperty>(),
             };
         }
+
+        public static string GetPluginName(OculusLibrarySettings settings) => settings.Branding == Branding.Meta ? "Meta" : "Oculus";
 
         public override LibraryMetadataProvider GetMetadataDownloader()
         {

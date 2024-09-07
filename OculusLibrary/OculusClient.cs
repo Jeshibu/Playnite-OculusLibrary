@@ -31,11 +31,12 @@ namespace OculusLibrary
         }
 
         public override bool IsInstalled => OculusUninstallEntry != null;
-        public override string Icon => OculusLibraryPlugin.IconPath;
+        public override string Icon { get; }
 
-        public OculusClient(IPlayniteAPI playniteAPI)
+        public OculusClient(IPlayniteAPI playniteAPI, string iconPath)
         {
             this.playniteAPI = playniteAPI;
+            this.Icon = iconPath;
         }
 
         public override void Open()

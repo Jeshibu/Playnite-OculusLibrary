@@ -34,24 +34,24 @@ namespace OculusLibrary.DataExtraction
             var output = new List<GameMetadata>();
 
             if (settings.ImportRiftOnline && !cancellationToken.IsCancellationRequested)
-                output.AddRange(GetGames(accessToken, "6549375561785664", u => u.ActivePcEntitlements, new MetadataSpecProperty("pc_windows")));
+                output.AddRange(GetGames(settings, accessToken, "6549375561785664", u => u.ActivePcEntitlements, new MetadataSpecProperty("pc_windows")));
 
             if (settings.ImportQuestOnline && !cancellationToken.IsCancellationRequested)
-                output.AddRange(GetGames(accessToken, "6260775224011087", u => u.ActiveAndroidEntitlements, new MetadataNameProperty("Meta Quest")));
+                output.AddRange(GetGames(settings, accessToken, "6260775224011087", u => u.ActiveAndroidEntitlements, new MetadataNameProperty("Meta Quest")));
 
             if (settings.ImportGearGoOnline && !cancellationToken.IsCancellationRequested)
-                output.AddRange(GetGames(accessToken, "6040003812794294", u => u.ActiveAndroidEntitlements, new MetadataNameProperty("Oculus Go")));
+                output.AddRange(GetGames(settings, accessToken, "6040003812794294", u => u.ActiveAndroidEntitlements, new MetadataNameProperty("Oculus Go")));
 
             return output;
         }
 
-        private IEnumerable<GameMetadata> GetGames(string accessToken, string docId, Func<OculusLibraryResponseUser, OculusLibraryResponseEntitlements> entitlementsSelector, params MetadataProperty[] platforms)
+        private IEnumerable<GameMetadata> GetGames(OculusLibrarySettings settings, string accessToken, string docId, Func<OculusLibraryResponseUser, OculusLibraryResponseEntitlements> entitlementsSelector, params MetadataProperty[] platforms)
         {
             var responseString = WebClient.GetLibrary(accessToken, docId);
             var responseObj = JsonConvert.DeserializeObject<OculusLibraryResponseModel>(responseString);
             var entitlements = entitlementsSelector(responseObj.Data.Viewer.User);
             var items = entitlements.Edges.Select(e => e.Node.Item).ToList();
-            return items.Select(i => ToGameMetadata(i, platforms));
+            return items.Select(i => ToGameMetadata(i, settings, platforms));
         }
 
         public ExtendedGameMetadata GetMetadata(string appId, OculusLibrarySettings settings, bool setLocale, ExtendedGameMetadata data = null)
@@ -64,7 +64,7 @@ namespace OculusLibrary.DataExtraction
 
         public ExtendedGameMetadata ToGameMetadata(OculusJsonResponseDataNode json, OculusLibrarySettings settings, ExtendedGameMetadata data = null)
         {
-            data = data ?? OculusLibraryPlugin.GetBaseMetadata();
+            data = data ?? OculusLibraryPlugin.GetBaseMetadata(settings);
             data.Features.Add(new MetadataNameProperty("VR"));
 
             data.GameId = json.Id;
@@ -130,9 +130,9 @@ namespace OculusLibrary.DataExtraction
             return data;
         }
 
-        private static GameMetadata ToGameMetadata(OculusLibraryResponseItem item, params MetadataProperty[] platforms)
+        private static GameMetadata ToGameMetadata(OculusLibraryResponseItem item, OculusLibrarySettings settings, params MetadataProperty[] platforms)
         {
-            var output = OculusLibraryPlugin.GetBaseMetadata();
+            var output = OculusLibraryPlugin.GetBaseMetadata(settings);
             output.Name = item.DisplayName;
             output.GameId = item.Id;
             foreach (var platform in platforms)

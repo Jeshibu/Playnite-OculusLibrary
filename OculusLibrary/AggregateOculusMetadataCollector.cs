@@ -32,7 +32,7 @@ namespace OculusLibrary
             {
                 try
                 {
-                    var manifestData = manifestScraper.GetGames(minimal: false).FirstOrDefault(g => g.GameId == game.GameId);
+                    var manifestData = manifestScraper.GetGames(settings, minimal: false).FirstOrDefault(g => g.GameId == game.GameId);
                     output = manifestData;
                 }
                 catch (Exception ex)
@@ -63,7 +63,7 @@ namespace OculusLibrary
             if (!settings.ImportOculusAppGames)
                 return gamesById.Values;
 
-            var manifestGames = manifestScraper.GetGames(minimal: true);
+            var manifestGames = manifestScraper.GetGames(settings, minimal: true);
             foreach (var game in manifestGames)
             {
                 if (cancellationToken.IsCancellationRequested)

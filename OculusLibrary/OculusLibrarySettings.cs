@@ -31,6 +31,8 @@ namespace OculusLibrary
 
         public BackgroundSource BackgroundSource { get => backgroundSource; set => SetValue(ref backgroundSource, value); }
 
+        public Branding Branding { get; set; } = Branding.Meta;
+
         [DontSerialize]
         public bool ImportAnyOnline => ImportRiftOnline || ImportQuestOnline || ImportGearGoOnline;
 
@@ -48,6 +50,12 @@ namespace OculusLibrary
         Hero,
         TrailerThumbnail,
         Screenshots,
+    }
+
+    public enum Branding
+    {
+        Oculus,
+        Meta
     }
 
     public class OculusLibrarySettingsViewModel : PluginSettingsViewModel<OculusLibrarySettings, OculusLibraryPlugin>
@@ -187,6 +195,8 @@ namespace OculusLibrary
             { BackgroundSource.Screenshots, "Screenshot (random selection)" },
             { BackgroundSource.TrailerThumbnail, "Trailer thumbnail (is usually key art)" },
         };
+
+        public Branding[] BrandingOptions { get; } = new[] { Branding.Meta, Branding.Oculus };
     }
 
     public enum AuthStatus
