@@ -95,11 +95,20 @@ namespace OculusLibrary.DataExtraction
         {
             logger.Debug($"Listing Oculus manifests");
 
-            string[] fileEntries = Directory.GetFiles($@"{oculusBasePath}\Manifests\", "*.json");
+            var manifestDir = $@"{oculusBasePath}\Manifests\";
+
+            if (!Directory.Exists(oculusBasePath))
+            {
+                logger.Info($"Oculus library manifest directory does not exist: {manifestDir}");
+                yield break;
+            }
+
+            string[] fileEntries = Directory.GetFiles(manifestDir, "*.json");
 
             if (!fileEntries.Any())
             {
                 logger.Info($"No Oculus game manifests found");
+                yield break;
             }
 
             var groupedFiles = fileEntries.GroupBy(f => normalizeFilenameToCanonicalName.Replace(f, string.Empty));
