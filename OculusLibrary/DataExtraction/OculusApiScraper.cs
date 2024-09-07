@@ -284,7 +284,7 @@ namespace OculusLibrary.DataExtraction
             if (string.IsNullOrWhiteSpace(description))
                 return description;
 
-            var output = Regex.Replace(description, @"\!\[\{(""(?<key>\w+)"":""?(?<value>\w+)""?,?)+\}\]\((?<url>[^)]+)\)", m =>
+            var output = Regex.Replace(description, @"\!\[\{(""(?<key>\w+)"":""?(?<value>\w+)""?,?)+\}\]\((?<url>[^)]+)\)(?<linebreaks>(\s*\r?\n)*)", m =>
             {
                 string type = null;
                 var keyCaptures = m.Groups["key"].Captures;
@@ -301,8 +301,9 @@ namespace OculusLibrary.DataExtraction
                     return string.Empty;
 
                 var url = m.Groups["url"].Value;
+                string linebreaks = m.Groups["linebreaks"]?.Value;
 
-                return $"<img src=\"{url}\"/>";
+                return $"<img src=\"{url}\"/>{linebreaks}";
             }, RegexOptions.ExplicitCapture);
 
             return Regex.Replace(output, "\r?\n", "<br>$0");
