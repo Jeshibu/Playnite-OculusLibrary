@@ -24,12 +24,19 @@ namespace OculusLibrary
         public override LibraryClient Client => new OculusClient(PlayniteApi);
 
         private readonly IOculusPathSniffer pathSniffer;
-        private readonly AggregateOculusMetadataCollector metadataCollector;
-        private readonly OculusApiScraper apiScraper;
         private readonly OculusManifestScraper manifestScraper;
         private readonly ILogger logger = LogManager.GetLogger();
-        private readonly IGraphQLClient graphQLClient;
         private OculusLibrarySettingsViewModel settings;
+
+        private AggregateOculusMetadataCollector MetadataCollector
+        {
+            get
+            {
+                var graphQLClient = new GraphQLClient(PlayniteApi);
+                var apiScraper = new OculusApiScraper(graphQLClient);
+                return new AggregateOculusMetadataCollector(manifestScraper, apiScraper, PlayniteApi, settings.Settings);
+            }
+        }
 
         public OculusLibraryPlugin(IPlayniteAPI api) : base(api)
         {
@@ -37,10 +44,7 @@ namespace OculusLibrary
             {
                 settings = new OculusLibrarySettingsViewModel(this, api);
                 pathSniffer = new OculusPathSniffer(new RegistryValueProvider(), new PathNormaliser(new WMODriveQueryProvider()));
-                graphQLClient = new GraphQLClient(api);
-                apiScraper = new OculusApiScraper(graphQLClient);
                 manifestScraper = new OculusManifestScraper(pathSniffer);
-                metadataCollector = new AggregateOculusMetadataCollector(manifestScraper, apiScraper, api, settings.Settings);
             }
             catch (Exception ex)
             {
@@ -59,7 +63,7 @@ namespace OculusLibrary
             logger.Info("GetGames");
             try
             {
-                return metadataCollector.GetGames(settings.Settings, args.CancelToken);
+                return MetadataCollector.GetGames(settings.Settings, args.CancelToken);
             }
             catch (NotAuthenticatedException)
             {
@@ -93,7 +97,7 @@ namespace OculusLibrary
 
         public override LibraryMetadataProvider GetMetadataDownloader()
         {
-            return metadataCollector;
+            return MetadataCollector;
         }
 
         public override ISettings GetSettings(bool firstRunSettings)

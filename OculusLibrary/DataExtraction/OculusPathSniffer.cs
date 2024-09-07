@@ -1,12 +1,9 @@
 ﻿using Microsoft.Win32;
-using OculusLibrary.DataExtraction;
 using OculusLibrary.OS;
 using Playnite.SDK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OculusLibrary.DataExtraction
 {
