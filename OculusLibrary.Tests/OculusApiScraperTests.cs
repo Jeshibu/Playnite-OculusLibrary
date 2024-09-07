@@ -13,7 +13,7 @@ namespace OculusLibrary.Tests
         [Fact]
         public async Task Asgards_Wrath_Parses_Correctly()
         {
-            var subject = Setup("Asgard's Wrath", out var settings);
+            var subject = Setup("Asgard's Wrath", Branding.Oculus, out var settings);
             string appId = "1180401875303371";
 
             var data = subject.GetMetadata(appId, settings, true);
@@ -37,7 +37,7 @@ namespace OculusLibrary.Tests
         [Fact]
         public async Task Sprint_Vector_Parses_Correctly()
         {
-            var subject = Setup("Sprint Vector", out var settings);
+            var subject = Setup("Sprint Vector", Branding.Meta, out var settings);
             string appId = "1425858557493354";
 
             var data = subject.GetMetadata(appId, settings, true);
@@ -47,7 +47,7 @@ namespace OculusLibrary.Tests
             ReleaseDateEquals(2018, 2, 2, data.ReleaseDate.Value);
             Assert.Equal(appId, data.GameId);
             Assert.NotNull(data.BackgroundImage?.Path);
-            Assert.Equal(new MetadataNameProperty("Oculus"), data.Source);
+            Assert.Equal(new MetadataNameProperty("Meta"), data.Source);
             MetadataPropertyCollectionsMatch(data.Features, new[] { "Single Player", "Multiplayer", "VR", "VR Standing", "VR Seated", "VR Room-Scale", "VR Motion Controllers" });
             MetadataPropertyCollectionsMatch(data.Platforms, new[] { "Oculus Rift", "Oculus Rift S" }, new[] { "pc_windows" });
             MetadataPropertyCollectionsMatch(data.Tags, new[] { "VR Comfort: Intense" });
@@ -61,7 +61,7 @@ namespace OculusLibrary.Tests
         [Fact]
         public async Task Description_images_are_parsed()
         {
-            var subject = Setup("Flight 74", out var settings);
+            var subject = Setup("Flight 74", Branding.Oculus, out var settings);
 
             var data = subject.GetMetadata("1234", settings, true);
             Assert.Equal("Flight 74", data.Name);
@@ -72,7 +72,7 @@ namespace OculusLibrary.Tests
         [Fact]
         public async Task Description_videos_are_removed()
         {
-            var subject = Setup("Taiko Frenzy", out var settings);
+            var subject = Setup("Taiko Frenzy", Branding.Meta, out var settings);
 
             var data = subject.GetMetadata("1234", settings, true);
             Assert.Equal("Taiko Frenzy", data.Name);
@@ -114,13 +114,13 @@ namespace OculusLibrary.Tests
 
         }
 
-        private OculusApiScraper Setup(string gameName, out OculusLibrarySettings settings)
+        private OculusApiScraper Setup(string gameName, Branding branding, out OculusLibrarySettings settings)
         {
             var jsonContent = File.ReadAllText($@".\{gameName}.json");
 
             var webclient = new FakeWebclient(jsonContent);
 
-            settings = new OculusLibrarySettings { BackgroundSource = BackgroundSource.Hero };
+            settings = new OculusLibrarySettings { BackgroundSource = BackgroundSource.Hero, Branding = branding };
 
             return new OculusApiScraper(webclient);
         }
