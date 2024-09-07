@@ -1,13 +1,15 @@
 ﻿Id: OculusLibraryPlugin_Playnite_Plugin
-Name: Oculus Library Importer
+Name: Meta Quest Library Importer
 Author: Jeshibu
 Version: 2.5.2
 Module: OculusLibrary.dll
 Type: GameLibrary
-Icon: Resources\oculusicon.png
+Icon: Resources\metaicon.png
 Links:
-  - Name: Oculus/Meta store
+  - Name: Oculus/Meta PCVR app store
     Url: https://www.meta.com/experiences/pcvr/
+  - Name: Meta Quest app store
+    Url: https://www.meta.com/experiences/
   - Name: GitHub repository
     Url: https://github.com/Jeshibu/Playnite-OculusLibrary/
   - Name: Support my work on Ko-fi

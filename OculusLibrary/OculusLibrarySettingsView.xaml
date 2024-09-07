@@ -58,7 +58,7 @@
             <ComboBox IsReadOnly="True" IsEditable="False" ItemsSource="{Binding BackgroundSourceOptions}" SelectedValue="{Binding Settings.BackgroundSource}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
         </StackPanel>
         <StackPanel Margin="0,20,0,0" Orientation="Horizontal">
-            <TextBlock TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,5,0">Branding:</TextBlock>
+            <TextBlock TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,5,0">Branding (requires restart):</TextBlock>
             <ComboBox IsReadOnly="True" IsEditable="False" ItemsSource="{Binding BrandingOptions}" SelectedItem="{Binding Settings.Branding}"/>
         </StackPanel>
     </StackPanel>

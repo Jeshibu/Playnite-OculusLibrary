@@ -197,6 +197,12 @@ namespace OculusLibrary
         };
 
         public Branding[] BrandingOptions { get; } = new[] { Branding.Meta, Branding.Oculus };
+
+        public override void EndEdit()
+        {
+            OculusLibraryPlugin.UpdateYaml(Settings, Logger);
+            base.EndEdit();
+        }
     }
 
     public enum AuthStatus
