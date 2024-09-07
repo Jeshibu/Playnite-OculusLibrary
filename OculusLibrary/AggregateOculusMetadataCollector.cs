@@ -38,7 +38,6 @@ namespace OculusLibrary
                 catch (Exception ex)
                 {
                     logger.Error(ex, "Error fetching manifest metadata");
-                    return null;
                 }
             }
 
@@ -60,6 +59,9 @@ namespace OculusLibrary
             logger.Info("Online games fetching passed");
 
             var gamesById = onlineGames.ToDictionary(g => g.GameId);
+
+            if (!settings.ImportOculusAppGames)
+                return gamesById.Values;
 
             var manifestGames = manifestScraper.GetGames(minimal: true);
             foreach (var game in manifestGames)
