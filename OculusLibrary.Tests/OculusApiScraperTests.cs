@@ -58,6 +58,28 @@ namespace OculusLibrary.Tests
             Assert.Equal(82, data.CommunityScore);
         }
 
+        [Fact]
+        public async Task Description_images_are_parsed()
+        {
+            var subject = Setup("Flight 74", out var settings);
+
+            var data = subject.GetMetadata("1234", settings, true);
+            Assert.Equal("Flight 74", data.Name);
+            Assert.DoesNotContain("![{", data.Description);
+            Assert.Contains("<img src=\"https://scontent.oculuscdn.com/v/t64.5771-25/39035449_2750905201734369_6818732176437659600_n.png?_nc_cat=103&ccb=1-7&_nc_sid=6e7a0a&_nc_ohc=1RXPKwkUeocQ7kNvgG-Ve8i&_nc_ht=scontent.oculuscdn.com&oh=00_AYCvsPGrnJKa24TIuuEQAqKigYHQZ4m0mXE1kmPLuin9Mg&oe=66E276D2\"/>", data.Description);
+        }
+
+        [Fact]
+        public async Task Description_videos_are_removed()
+        {
+            var subject = Setup("Taiko Frenzy", out var settings);
+
+            var data = subject.GetMetadata("1234", settings, true);
+            Assert.Equal("Taiko Frenzy", data.Name);
+            Assert.DoesNotContain("![{", data.Description);
+            Assert.DoesNotContain(".mp4", data.Description);
+        }
+
         private void ReleaseDateEquals(int expectedYear, int expectedMonth, int expectedDay, ReleaseDate actual)
         {
             Assert.Equal(expectedYear, actual.Year);

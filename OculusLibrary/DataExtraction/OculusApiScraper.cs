@@ -69,8 +69,7 @@ namespace OculusLibrary.DataExtraction
 
             data.GameId = json.Id;
             data.Name = json.DisplayName;
-            if (!string.IsNullOrWhiteSpace(json.DisplayLongDescription))
-                data.Description = Regex.Replace(json.DisplayLongDescription, "\r?\n", "<br>$0");
+            data.Description = ParseDescription(json.DisplayLongDescription);
 
             data.CommunityScore = GetAverageRating(json.RatingAggregates);
             logger.Info($"parsing release date: {json.ReleaseInfo?.DisplayDate}");
@@ -278,6 +277,35 @@ namespace OculusLibrary.DataExtraction
                 return new MetadataNameProperty(name);
             };
             SetPropertiesForCollection(input, target, func);
+        }
+
+        private string ParseDescription(string description)
+        {
+            if (string.IsNullOrWhiteSpace(description))
+                return description;
+
+            var output = Regex.Replace(description, @"\!\[\{(""(?<key>\w+)"":""?(?<value>\w+)""?,?)+\}\]\((?<url>[^)]+)\)", m =>
+            {
+                string type = null;
+                var keyCaptures = m.Groups["key"].Captures;
+                for (int i = 0; i < keyCaptures.Count; i++)
+                {
+                    var keyCapture = keyCaptures[i];
+                    if (keyCapture.Value != "type")
+                        continue;
+
+                    type = m.Groups["value"].Captures[i].Value;
+                }
+
+                if (type != "image")
+                    return string.Empty;
+
+                var url = m.Groups["url"].Value;
+
+                return $"<img src=\"{url}\"/>";
+            }, RegexOptions.ExplicitCapture);
+
+            return Regex.Replace(output, "\r?\n", "<br>$0");
         }
     }
 }
