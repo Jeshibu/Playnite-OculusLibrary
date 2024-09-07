@@ -89,3 +89,13 @@ Packages:
     Changelog:
       - Fixed exception due to null-valued cookies
       - Made input features more consistently named (no localization)
+  - Version: 2.6
+    RequiredApiVersion: 6.4.0
+    ReleaseDate: 2024-09-07
+    PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.6/Oculus.pext
+    Changelog:
+      - Added branding option to select between Meta and Oculus (Meta is now default)
+      - Images in game descriptions are now properly parsed
+      - Videos in game descriptions are now removed
+      - Fixed importing via Oculus app/Meta Quest Link setting being ignored
+      - Fixed missing manifest directory breaking import
