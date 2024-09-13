@@ -10,7 +10,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Controls;
-using YamlDotNet.Serialization;
 
 namespace OculusLibrary
 {
@@ -183,20 +182,14 @@ namespace OculusLibrary
         {
             try
             {
-                var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "extension.yaml");
-                var yamlContent = new Deserializer().Deserialize(File.ReadAllText(filePath)) as IDictionary<object, object>;
-                if (settings.Branding == Branding.Meta)
-                {
-                    yamlContent["Name"] = "Meta Quest Library Importer";
-                    yamlContent["Icon"] = @"Resources\metaicon.png";
-                }
-                else
-                {
-                    yamlContent["Name"] = "Oculus Library Importer";
-                    yamlContent["Icon"] = @"Resources\oculusicon.png";
-                }
-                var serialized = new Serializer().Serialize(yamlContent);
-                File.WriteAllText(filePath, serialized);
+                //Originally this was a direct extension.yaml edit, but YamlDotNet is also used by the Metadata Local plugin
+                //which uses version 5.4.0, which can't just take a file path and output a Dictionary<object,object>
+                //So that's too much of a pain, now we have this hackier method of just keeping two copies of extension.yaml
+                //and copying and overwriting to switch branding
+                var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                var source = Path.Combine(dir, $"extension_{settings.Branding}.yaml");
+                var target = Path.Combine(dir, "extension.yaml");
+                File.Copy(source, target, overwrite: true);
             }
             catch (Exception ex)
             {

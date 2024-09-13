@@ -99,3 +99,9 @@ Packages:
       - Videos in game descriptions are now removed
       - Fixed importing via Oculus app/Meta Quest Link setting being ignored
       - Fixed missing manifest directory breaking import
+  - Version: 2.6.1
+    RequiredApiVersion: 6.4.0
+    ReleaseDate: 2024-09-14
+    PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.6.1/Oculus.pext
+    Changelog:
+      - Fixed DLL conflict Playnite crash when saving settings
