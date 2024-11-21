@@ -75,7 +75,7 @@ namespace OculusLibrary.DataExtraction
             logger.Info($"parsing release date: {json.ReleaseInfo?.DisplayDate}");
             data.ReleaseDate = ParseReleaseDate(json.ReleaseInfo?.DisplayDate);
             data.Version = json.LatestSupportedBinary?.Version;
-            data.Links.Add(new Link("Oculus Store", GetStoreUrl(json.Id)));
+            data.Links.Add(new Link($"{settings.Branding} Store", GetStoreUrl(json.Id)));
             if (!string.IsNullOrEmpty(json.WebsiteUrl))
                 data.Links.Add(new Link("Website", json.WebsiteUrl));
 
