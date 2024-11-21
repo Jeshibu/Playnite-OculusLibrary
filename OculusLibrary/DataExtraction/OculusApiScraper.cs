@@ -27,7 +27,7 @@ namespace OculusLibrary.DataExtraction
             if (!settings.ImportAnyOnline || cancellationToken.IsCancellationRequested)
                 return new GameMetadata[0];
 
-            var accessToken = WebClient.GetAccessToken();
+            var accessToken = WebClient.GetAccessToken(cancellationToken);
             if (accessToken == null)
                 throw new NotAuthenticatedException();
 
@@ -305,6 +305,13 @@ namespace OculusLibrary.DataExtraction
 
                 return $"<img src=\"{url}\"/>{linebreaks}";
             }, RegexOptions.ExplicitCapture);
+
+            output = Regex.Replace(output, @"##\\?", "");
+            output = Regex.Replace(output, @"\*\*(?<text>[^*]+)\*\*", m =>
+            {
+                var textMatch = m.Groups["text"].Value.Trim();
+                return $"<b>{textMatch}</b>";
+            });
 
             return Regex.Replace(output, "\r?\n", "<br>$0");
         }
