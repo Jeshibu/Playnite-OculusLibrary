@@ -3,6 +3,7 @@ using Playnite.SDK.Models;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -137,7 +138,7 @@ namespace OculusLibrary.Tests
             {
             }
 
-            public string GetAccessToken()
+            public string GetAccessToken(CancellationToken cancellationToken = default)
             {
                 throw new System.NotImplementedException();
             }
@@ -147,7 +148,7 @@ namespace OculusLibrary.Tests
                 throw new System.NotImplementedException();
             }
 
-            public string GetMetadata(string appId, bool setLocale)
+            public string GetMetadata(string appId, bool setLocale, CancellationToken cancellationToken = default)
             {
                 return JsonContent;
             }

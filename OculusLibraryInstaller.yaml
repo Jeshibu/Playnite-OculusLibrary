@@ -105,3 +105,11 @@ Packages:
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.6.1/Oculus.pext
     Changelog:
       - Fixed DLL conflict Playnite crash when saving settings
+  - Version: 2.6.2
+    RequiredApiVersion: 6.4.0
+    ReleaseDate: 2024-11-21
+    PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.6.2/Oculus.pext
+    Changelog:
+      - Fixed library fetching never completing
+      - Store links now use Meta/Oculus branding setting
+      - Descriptions now handle bold text correctly and remove video links
