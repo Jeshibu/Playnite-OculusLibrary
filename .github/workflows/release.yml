@@ -10,10 +10,10 @@ jobs:
     runs-on: windows-2019
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Nuget.exe
-        uses: NuGet/setup-nuget@v1
+        uses: NuGet/setup-nuget@v2
 
       - name: Nuget Restore 
         run: nuget restore .\OculusLibrary.sln
@@ -40,7 +40,7 @@ jobs:
            Get-ChildItem -Filter *.pext | Rename-Item -NewName Oculus.pext
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           draft: true

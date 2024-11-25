@@ -1,7 +1,7 @@
 ﻿Id: OculusLibraryPlugin_Playnite_Plugin
 Name: Meta Quest Library Importer
 Author: Jeshibu
-Version: 2.6.2 # Don't forget to change in extension_Meta.yaml and extension_Oculus.yaml too!
+Version: 2.6.3 # Don't forget to change in extension_Meta.yaml and extension_Oculus.yaml too!
 Module: OculusLibrary.dll
 Type: GameLibrary
 Icon: Resources\metaicon.png

@@ -113,3 +113,9 @@ Packages:
       - Fixed library fetching never completing
       - Store links now use Meta/Oculus branding setting
       - Descriptions now handle bold text correctly and remove video links
+  - Version: 2.6.3
+    RequiredApiVersion: 6.4.0
+    ReleaseDate: 2024-11-25
+    PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.6.3/Oculus.pext
+    Changelog:
+      - Fixed extension constantly thinking it was 2.6.1 and wanting to update
