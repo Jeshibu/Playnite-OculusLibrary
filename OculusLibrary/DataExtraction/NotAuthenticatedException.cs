@@ -1,8 +1,7 @@
 ﻿using System;
 
-namespace OculusLibrary.DataExtraction
+namespace OculusLibrary.DataExtraction;
+
+internal class NotAuthenticatedException : Exception
 {
-    internal class NotAuthenticatedException : Exception
-    {
-    }
 }

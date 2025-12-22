@@ -1,4 +1,4 @@
-on: 
+on:
   push:
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
@@ -7,37 +7,31 @@ name: Release Build
 
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-2025
     steps:
       - name: checkout
         uses: actions/checkout@v4
 
-      - name: Setup Nuget.exe
-        uses: NuGet/setup-nuget@v2
-
-      - name: Nuget Restore 
-        run: nuget restore .\OculusLibrary.sln
-
-      - name: Build (DotNET4.6.2)
+      - name: Build
         run: |
-           cd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\"
-           .\MSBuild.exe $Env:GITHUB_WORKSPACE\OculusLibrary.sln -p:Configuration=Release -restore
-      
+          cd "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\"
+          .\MSBuild.exe $Env:GITHUB_WORKSPACE\OculusLibrary.slnx -p:Configuration=Release -restore
+
       - name: Run unit tests
         run: |
-           & "$Env:GITHUB_WORKSPACE\packages\xunit.runner.console.2.4.2\tools\net462\xunit.console.x86.exe" "$Env:GITHUB_WORKSPACE\OculusLibrary.Tests\bin\Release\OculusLibrary.Tests.dll"
+          & "$Env:GITHUB_WORKSPACE\packages\xunit.runner.console.2.4.2\tools\net462\xunit.console.x86.exe" "$Env:GITHUB_WORKSPACE\OculusLibrary.Tests\bin\Release\OculusLibrary.Tests.dll"
 
       - name: Setup Playnite
         run: |
-           Invoke-WebRequest -Uri "https://github.com/JosefNemec/Playnite/releases/download/10.34/Playnite1034.zip" -OutFile "$Env:GITHUB_WORKSPACE\Playnite.zip"
-           Expand-Archive "$Env:GITHUB_WORKSPACE\Playnite.zip" -DestinationPath "$Env:GITHUB_WORKSPACE\Playnite"
+          Invoke-WebRequest -Uri "https://github.com/JosefNemec/Playnite/releases/download/10.46/10.46.7z" -OutFile "$Env:GITHUB_WORKSPACE\Playnite.7z"
+          & "$env:ProgramFiles\7-Zip\7z.exe" x "$env:GITHUB_WORKSPACE\Playnite.7z" "-o$env:GITHUB_WORKSPACE\Playnite"
 
       - name: Pack with Playnite
         run: |
-           cd "$Env:GITHUB_WORKSPACE\Playnite"
-           .\Toolbox.exe pack "$Env:GITHUB_WORKSPACE\OculusLibrary\bin\Release\" "$Env:GITHUB_WORKSPACE\"
-           cd "$Env:GITHUB_WORKSPACE"
-           Get-ChildItem -Filter *.pext | Rename-Item -NewName Oculus.pext
+          cd "$Env:GITHUB_WORKSPACE\Playnite"
+          .\Toolbox.exe pack "$Env:GITHUB_WORKSPACE\OculusLibrary\bin\Release\" "$Env:GITHUB_WORKSPACE\"
+          cd "$Env:GITHUB_WORKSPACE"
+          Get-ChildItem -Filter *.pext | Rename-Item -NewName Oculus.pext
 
       - name: Release
         uses: softprops/action-gh-release@v2

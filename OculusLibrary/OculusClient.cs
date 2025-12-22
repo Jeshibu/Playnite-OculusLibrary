@@ -3,55 +3,54 @@ using Playnite.SDK;
 using System.Diagnostics;
 using System.IO;
 
-namespace OculusLibrary
+namespace OculusLibrary;
+
+class OculusClient : LibraryClient
 {
-    class OculusClient : LibraryClient
+    bool uninstallEntryFetched = false;
+    private UninstallProgram oculusUninstallEntry;
+    private readonly IPlayniteAPI playniteAPI;
+
+    private UninstallProgram OculusUninstallEntry
     {
-        bool uninstallEntryFetched = false;
-        private UninstallProgram oculusUninstallEntry;
-        private readonly IPlayniteAPI playniteAPI;
-
-        private UninstallProgram OculusUninstallEntry
+        get
         {
-            get
-            {
-                if (uninstallEntryFetched) //don't keep trying if it's not installed
-                    return oculusUninstallEntry;
-
-                if (oculusUninstallEntry == null)
-                {
-                    oculusUninstallEntry = Programs.GetOculusUninstallProgram();
-                    uninstallEntryFetched = true;
-                }
-
+            if (uninstallEntryFetched) //don't keep trying if it's not installed
                 return oculusUninstallEntry;
-            }
 
-            set => oculusUninstallEntry = value;
-        }
-
-        public override bool IsInstalled => OculusUninstallEntry != null;
-        public override string Icon { get; }
-
-        public OculusClient(IPlayniteAPI playniteAPI, string iconPath)
-        {
-            this.playniteAPI = playniteAPI;
-            this.Icon = iconPath;
-        }
-
-        public override void Open()
-        {
-            if (!IsInstalled)
-                return;
-
-            var path = Path.Combine(OculusUninstallEntry.InstallLocation, @"Support\oculus-client\OculusClient.exe");
-            if (!File.Exists(path))
+            if (oculusUninstallEntry == null)
             {
-                playniteAPI.Dialogs.ShowErrorMessage($"Could not find {path}");
-                return;
+                oculusUninstallEntry = Programs.GetOculusUninstallProgram();
+                uninstallEntryFetched = true;
             }
 
-            Process.Start(path);
+            return oculusUninstallEntry;
         }
+
+        set => oculusUninstallEntry = value;
+    }
+
+    public override bool IsInstalled => OculusUninstallEntry != null;
+    public override string Icon { get; }
+
+    public OculusClient(IPlayniteAPI playniteAPI, string iconPath)
+    {
+        this.playniteAPI = playniteAPI;
+        this.Icon = iconPath;
+    }
+
+    public override void Open()
+    {
+        if (!IsInstalled)
+            return;
+
+        var path = Path.Combine(OculusUninstallEntry.InstallLocation, @"Support\oculus-client\OculusClient.exe");
+        if (!File.Exists(path))
+        {
+            playniteAPI.Dialogs.ShowErrorMessage($"Could not find {path}");
+            return;
+        }
+
+        Process.Start(path);
     }
 }

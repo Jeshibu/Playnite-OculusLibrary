@@ -1,10 +1,9 @@
 ﻿using Playnite.SDK.Models;
 using System.Collections.Generic;
 
-namespace OculusLibrary.DataExtraction
+namespace OculusLibrary.DataExtraction;
+
+public class ExtendedGameMetadata : GameMetadata
 {
-    public class ExtendedGameMetadata : GameMetadata
-    {
-        public List<string> BackgroundImageUrls { get; set; } = new List<string>();
-    }
+    public List<string> BackgroundImageUrls { get; set; } = [];
 }

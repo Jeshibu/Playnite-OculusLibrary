@@ -4,40 +4,39 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace OculusLibrary.OS
+namespace OculusLibrary.OS;
+
+public class RegistryValueProvider : IRegistryValueProvider
 {
-    public class RegistryValueProvider : IRegistryValueProvider
+    private ILogger logger = LogManager.GetLogger();
+    public RegistryValueProvider() { }
+
+    public List<string> GetSubKeysForPath(
+        RegistryView platform,
+        RegistryHive hive,
+        string path)
     {
-        private ILogger logger = LogManager.GetLogger();
-        public RegistryValueProvider() { }
+        RegistryKey rootKey = RegistryKey.OpenBaseKey(hive, platform);
 
-        public List<string> GetSubKeysForPath(
-            RegistryView platform,
-            RegistryHive hive,
-            string path)
-        {
-            RegistryKey rootKey = RegistryKey.OpenBaseKey(hive, platform);
+        var output = rootKey.OpenSubKey(path)?.GetSubKeyNames()?.ToList();
 
-            var output = rootKey.OpenSubKey(path)?.GetSubKeyNames()?.ToList();
+        logger.Debug($"GetSubKeysForPath: platform: {platform}, hive: {hive}, path: {path}, output: {string.Join(Environment.NewLine, output ?? new List<string>())}");
 
-            logger.Debug($"GetSubKeysForPath: platform: {platform}, hive: {hive}, path: {path}, output: {string.Join(Environment.NewLine, output ?? new List<string>())}");
+        return output;
+    }
 
-            return output;
-        }
+    public string GetValueForPath(
+        RegistryView platform,
+        RegistryHive hive,
+        string path,
+        string keyName)
+    {
+        RegistryKey rootKey = RegistryKey.OpenBaseKey(hive, platform);
 
-        public string GetValueForPath(
-            RegistryView platform,
-            RegistryHive hive,
-            string path,
-            string keyName)
-        {
-            RegistryKey rootKey = RegistryKey.OpenBaseKey(hive, platform);
+        var output = rootKey.OpenSubKey(path).GetValue(keyName).ToString();
 
-            var output = rootKey.OpenSubKey(path).GetValue(keyName).ToString();
+        logger.Debug($"GetValueForPath: platform: {platform}, hive: {hive}, path: {path}, keyName: {keyName}, output: {output}");
 
-            logger.Debug($"GetValueForPath: platform: {platform}, hive: {hive}, path: {path}, keyName: {keyName}, output: {output}");
-
-            return output;
-        }
+        return output;
     }
 }

@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Management;
 
-namespace OculusLibrary.OS
+namespace OculusLibrary.OS;
+
+public interface IWMODriveQueryProvider
 {
-    public interface IWMODriveQueryProvider
-    {
-        List<WMODrive> GetDriveData();
-    }
+    List<WMODrive> GetDriveData();
 }

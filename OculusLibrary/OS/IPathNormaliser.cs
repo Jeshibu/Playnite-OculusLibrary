@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace OculusLibrary.OS
+namespace OculusLibrary.OS;
+
+public interface IPathNormaliser: IDisposable
 {
-    public interface IPathNormaliser: IDisposable
-    {
-        string Normalise(string path);
-    }
+    string Normalise(string path);
 }

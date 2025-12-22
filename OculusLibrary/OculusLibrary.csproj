@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <LangVersion>12</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -56,6 +57,7 @@
   <ItemGroup>
     <Compile Include="AggregateOculusMetadataCollector.cs" />
     <Compile Include="DataExtraction\ExtendedGameMetadata.cs" />
+    <Compile Include="DataExtraction\IGraphQLClient.cs" />
     <Compile Include="DataExtraction\IOculusPathSniffer.cs" />
     <Compile Include="DataExtraction\NotAuthenticatedException.cs" />
     <Compile Include="DataExtraction\OculusApiScraper.cs" />

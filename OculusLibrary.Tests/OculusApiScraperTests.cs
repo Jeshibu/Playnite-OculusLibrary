@@ -67,7 +67,9 @@ namespace OculusLibrary.Tests
             var data = subject.GetMetadata("1234", settings, true);
             Assert.Equal("Flight 74", data.Name);
             Assert.DoesNotContain("![{", data.Description);
-            Assert.Contains("<img src=\"https://scontent.oculuscdn.com/v/t64.5771-25/39035449_2750905201734369_6818732176437659600_n.png?_nc_cat=103&ccb=1-7&_nc_sid=6e7a0a&_nc_ohc=1RXPKwkUeocQ7kNvgG-Ve8i&_nc_ht=scontent.oculuscdn.com&oh=00_AYCvsPGrnJKa24TIuuEQAqKigYHQZ4m0mXE1kmPLuin9Mg&oe=66E276D2\"/>", data.Description);
+            Assert.Contains(
+                "<img src=\"https://scontent.oculuscdn.com/v/t64.5771-25/39035449_2750905201734369_6818732176437659600_n.png?_nc_cat=103&ccb=1-7&_nc_sid=6e7a0a&_nc_ohc=1RXPKwkUeocQ7kNvgG-Ve8i&_nc_ht=scontent.oculuscdn.com&oh=00_AYCvsPGrnJKa24TIuuEQAqKigYHQZ4m0mXE1kmPLuin9Mg&oe=66E276D2\"/>",
+                data.Description);
         }
 
         [Fact]
@@ -112,7 +114,6 @@ namespace OculusLibrary.Tests
                 if (!contains)
                     Assert.Fail($"Spec property {specProp} not found");
             }
-
         }
 
         private OculusApiScraper Setup(string gameName, Branding branding, out OculusLibrarySettings settings)
@@ -126,31 +127,20 @@ namespace OculusLibrary.Tests
             return new OculusApiScraper(webclient);
         }
 
-        private class FakeWebclient : IGraphQLClient
+        private class FakeWebclient(string jsonContent) : IGraphQLClient
         {
-            public FakeWebclient(string jsonContent)
-            {
-                JsonContent = jsonContent;
-            }
-            public string JsonContent { get; }
-
             public void Dispose()
             {
             }
 
-            public string GetAccessToken(CancellationToken cancellationToken = default)
-            {
-                throw new System.NotImplementedException();
-            }
-
-            public string GetLibrary(string accessToken, string docId)
-            {
-                throw new System.NotImplementedException();
-            }
-
             public string GetMetadata(string appId, bool setLocale, CancellationToken cancellationToken = default)
             {
-                return JsonContent;
+                return jsonContent;
+            }
+
+            public OculusLibraryGames GetGames(OculusLibrarySettings settings, CancellationToken cancellationToken = default)
+            {
+                throw new System.NotImplementedException();
             }
         }
     }

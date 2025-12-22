@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Stuff/">
+    <File Path=".github/workflows/release.yml" />
+    <File Path="OculusLibraryInstaller.yaml" />
+    <File Path="README.md" />
+    <File Path=".gitignore" />
+  </Folder>
+  <Project Path="OculusLibrary.Tests/OculusLibrary.Tests.csproj" />
+  <Project Path="OculusLibrary/OculusLibrary.csproj" />
+</Solution>

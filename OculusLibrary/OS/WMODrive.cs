@@ -1,8 +1,7 @@
-﻿namespace OculusLibrary.OS
+﻿namespace OculusLibrary.OS;
+
+public class WMODrive
 {
-    public class WMODrive
-    {
-        public string DeviceId { get; set; }
-        public string DriveLetter { get; set; }
-    }
+    public string DeviceId { get; set; }
+    public string DriveLetter { get; set; }
 }
