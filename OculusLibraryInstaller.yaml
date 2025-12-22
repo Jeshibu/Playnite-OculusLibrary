@@ -1,7 +1,7 @@
 AddonId: 'OculusLibraryPlugin_Playnite_Plugin'
 Packages:
-  - Version: 2.0
-    RequiredApiVersion: 6.0.0
+  - Version: '2.0'
+    RequiredApiVersion: '6.0.0'
     ReleaseDate: 2022-01-10
     PackageUrl: https://github.com/mr-ransel/Playnite-OculusLibrary/releases/download/v2.0.0/OculusLibraryPlugin_Playnite_Plugin_2_0_0.pext
     Changelog:
@@ -9,21 +9,21 @@ Packages:
       - Added support for uninstalled games
       - Added GraphQL API metadata lookup instead of web UI scraper
       - Gets real metadata instead of just executable file names for game names
-  - Version: 2.1
-    RequiredApiVersion: 6.2.1
+  - Version: '2.1'
+    RequiredApiVersion: '6.2.1'
     ReleaseDate: 2022-02-16
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.1.0/OculusLibraryPlugin_Playnite_Plugin_2_1_0.pext
     Changelog:
       - Split metadata collection from import process, allowing for use as a store metadata source and speeding up the initial import
-  - Version: 2.2
-    RequiredApiVersion: 6.4.0
+  - Version: '2.2'
+    RequiredApiVersion: '6.4.0'
     ReleaseDate: 2022-09-23
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.2.0/OculusLibraryPlugin_Playnite_Plugin_2_2_0.pext
     Changelog:
       - Added file size fetching from "Official Store" metadata
       - Some extra exception handling and logging
-  - Version: 2.3
-    RequiredApiVersion: 6.4.0
+  - Version: '2.3'
+    RequiredApiVersion: '6.4.0'
     ReleaseDate: 2022-12-20
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.3.0/Oculus.pext
     Changelog:
@@ -33,40 +33,40 @@ Packages:
       - Removed play actions in favor of dynamically provided play actions (when upgrading, all play actions will be removed from Oculus games)
       - Added icon to "Update Game Library" menu option
       - Small fixes to metadata collection
-  - Version: 2.3.1
-    RequiredApiVersion: 6.4.0
+  - Version: '2.3.1'
+    RequiredApiVersion: '6.4.0'
     ReleaseDate: 2022-12-24
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.3.1/Oculus.pext
     Changelog:
       - Fixed error during game import when the game's Oculus store page has been removed
-  - Version: 2.3.2
-    RequiredApiVersion: 6.4.0
+  - Version: '2.3.2'
+    RequiredApiVersion: '6.4.0'
     ReleaseDate: 2023-01-13
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.3.2/Oculus.pext
     Changelog:
       - Added missing icon to Oculus client menu item
       - Fixed game descriptions not having line breaks
-  - Version: 2.4
-    RequiredApiVersion: 6.4.0
+  - Version: '2.4'
+    RequiredApiVersion: '6.4.0'
     ReleaseDate: 2023-10-25
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.4/Oculus.pext
     Changelog:
       - Fixed broken metadata collection (due to the move from oculus.com to meta.com)
-  - Version: 2.4.1
-    RequiredApiVersion: 6.4.0
+  - Version: '2.4.1'
+    RequiredApiVersion: '6.4.0'
     ReleaseDate: 2023-10-25
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.4.1/Oculus.pext
     Changelog:
       - Fixed plugin loading when Revive is not installed
-  - Version: 2.4.2
-    RequiredApiVersion: 6.4.0
+  - Version: '2.4.2'
+    RequiredApiVersion: '6.4.0'
     ReleaseDate: 2023-11-12
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.4.2/Oculus.pext
     Changelog:
       - Fixed game import breaking when metadata collection fails
       - Unfortunately, metadata collection is still broken for USA users (and maybe others). This is a partial fix until I figure out how to make it work globally.
-  - Version: 2.5
-    RequiredApiVersion: 6.4.0
+  - Version: '2.5'
+    RequiredApiVersion: '6.4.0'
     ReleaseDate: 2023-11-25
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.5/Oculus.pext
     Changelog:
@@ -75,22 +75,22 @@ Packages:
       - Added background source setting (hero/trailer/screenshots)
       - Added setting to disable game imports via Oculus app (for Quest-only users)
       - Known issue; metadata is localized, and single/multiplayer features might not parse correctly, alongside release dates
-  - Version: 2.5.1
-    RequiredApiVersion: 6.4.0
+  - Version: '2.5.1'
+    RequiredApiVersion: '6.4.0'
     ReleaseDate: 2023-12-01
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.5.1/Oculus.pext
     Changelog:
       - Fixed client launching to account for new file location
       - Made not-authenticated error notification clickable to open the plugin settings
-  - Version: 2.5.2
-    RequiredApiVersion: 6.4.0
+  - Version: '2.5.2'
+    RequiredApiVersion: '6.4.0'
     ReleaseDate: 2024-06-23
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.5.2/Oculus.pext
     Changelog:
       - Fixed exception due to null-valued cookies
       - Made input features more consistently named (no localization)
-  - Version: 2.6
-    RequiredApiVersion: 6.4.0
+  - Version: '2.6'
+    RequiredApiVersion: '6.4.0'
     ReleaseDate: 2024-09-07
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.6/Oculus.pext
     Changelog:
@@ -99,22 +99,22 @@ Packages:
       - Videos in game descriptions are now removed
       - Fixed importing via Oculus app/Meta Quest Link setting being ignored
       - Fixed missing manifest directory breaking import
-  - Version: 2.6.1
-    RequiredApiVersion: 6.4.0
+  - Version: '2.6.1'
+    RequiredApiVersion: '6.4.0'
     ReleaseDate: 2024-09-14
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.6.1/Oculus.pext
     Changelog:
       - Fixed DLL conflict Playnite crash when saving settings
-  - Version: 2.6.2
-    RequiredApiVersion: 6.4.0
+  - Version: '2.6.2'
+    RequiredApiVersion: '6.4.0'
     ReleaseDate: 2024-11-21
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.6.2/Oculus.pext
     Changelog:
       - Fixed library fetching never completing
       - Store links now use Meta/Oculus branding setting
       - Descriptions now handle bold text correctly and remove video links
-  - Version: 2.6.3
-    RequiredApiVersion: 6.4.0
+  - Version: '2.6.3'
+    RequiredApiVersion: '6.4.0'
     ReleaseDate: 2024-11-25
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.6.3/Oculus.pext
     Changelog:

@@ -33,8 +33,8 @@ public class UninstallProgram
 
 public static class Programs
 {
-    private static readonly string[] scanFileExclusionMasks = new string[]
-    {
+    private static readonly string[] scanFileExclusionMasks =
+    [
         "uninst",
         "setup",
         @"unins\d+",
@@ -49,7 +49,7 @@ public static class Programs
         @"^pythonw\.exe$",
         @"^zsync\.exe$",
         @"^zsyncmake\.exe$"
-    };
+    ];
 
     private static ILogger logger = LogManager.GetLogger();
 

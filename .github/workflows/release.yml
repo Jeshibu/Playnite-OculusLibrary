@@ -19,7 +19,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          & "$Env:GITHUB_WORKSPACE\packages\xunit.runner.console.2.4.2\tools\net462\xunit.console.x86.exe" "$Env:GITHUB_WORKSPACE\OculusLibrary.Tests\bin\Release\OculusLibrary.Tests.dll"
+          & "$Env:GITHUB_WORKSPACE\packages\xunit.runner.console.2.8.1\tools\net462\xunit.console.x86.exe" "$Env:GITHUB_WORKSPACE\OculusLibrary.Tests\bin\Release\OculusLibrary.Tests.dll"
 
       - name: Setup Playnite
         run: |
@@ -29,7 +29,7 @@ jobs:
       - name: Pack with Playnite
         run: |
           cd "$Env:GITHUB_WORKSPACE\Playnite"
-          .\Toolbox.exe pack "$Env:GITHUB_WORKSPACE\OculusLibrary\bin\Release\" "$Env:GITHUB_WORKSPACE\"
+          .\Toolbox.exe pack "$Env:GITHUB_WORKSPACE\OculusLibrary\bin\Release\net462\" "$Env:GITHUB_WORKSPACE\"
           cd "$Env:GITHUB_WORKSPACE"
           Get-ChildItem -Filter *.pext | Rename-Item -NewName Oculus.pext
 

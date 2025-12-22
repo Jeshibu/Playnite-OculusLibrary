@@ -20,7 +20,7 @@ public class RegistryValueProvider : IRegistryValueProvider
 
         var output = rootKey.OpenSubKey(path)?.GetSubKeyNames()?.ToList();
 
-        logger.Debug($"GetSubKeysForPath: platform: {platform}, hive: {hive}, path: {path}, output: {string.Join(Environment.NewLine, output ?? new List<string>())}");
+        logger.Debug($"GetSubKeysForPath: platform: {platform}, hive: {hive}, path: {path}, output: {string.Join(Environment.NewLine, output ?? [])}");
 
         return output;
     }

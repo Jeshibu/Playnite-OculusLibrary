@@ -100,7 +100,7 @@ public class OculusLibrarySettingsViewModel : PluginSettingsViewModel<OculusLibr
 
     public override bool VerifySettings(out List<string> errors)
     {
-        errors = new List<string>();
+        errors = [];
         if (Settings.UseRevive && !File.Exists(Settings.RevivePath))
         {
             errors.Add("Invalid ReviveInjector.exe path");
@@ -123,7 +123,7 @@ public class OculusLibrarySettingsViewModel : PluginSettingsViewModel<OculusLibr
         try
         {
             string loginUrl = "https://www.meta.com/login/?next=https%3A%2F%2Fsecure.oculus.com%2Fmy%2Fprofile%2F";
-            List<Cookie> cookies = new List<Cookie>();
+            List<Cookie> cookies = [];
             using (var view = PlayniteApi.WebViews.CreateView(675, 540, Colors.Black))
             {
                 view.LoadingChanged += (s, e) =>
@@ -196,7 +196,7 @@ public class OculusLibrarySettingsViewModel : PluginSettingsViewModel<OculusLibr
         { BackgroundSource.TrailerThumbnail, "Trailer thumbnail (is usually key art)" },
     };
 
-    public Branding[] BrandingOptions { get; } = new[] { Branding.Meta, Branding.Oculus };
+    public Branding[] BrandingOptions { get; } = [Branding.Meta, Branding.Oculus];
 
     public override void EndEdit()
     {

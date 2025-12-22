@@ -67,7 +67,7 @@ public class AggregateOculusMetadataCollector : LibraryMetadataProvider
         foreach (var game in manifestGames)
         {
             if (cancellationToken.IsCancellationRequested)
-                return Enumerable.Empty<GameMetadata>();
+                return [];
 
             if (gamesById.TryGetValue(game.GameId, out var onlineGame))
             {
