@@ -1,3 +1,4 @@
+using OculusLibrary.DataExtraction.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -7,7 +8,7 @@ namespace OculusLibrary.DataExtraction;
 public interface IGraphQLClient : IDisposable
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="appId"></param>
     /// <param name="setLocale">Set the locale (an extra request potentially slowing things down) so that things like player modes and dates are en-US instead of IP-localized</param>

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using OculusLibrary.DataExtraction.Models;
 using Playnite.SDK;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ public class GraphQLClient(IPlayniteAPI playniteApi) : IGraphQLClient
     }
     private WebClient WebClient { get; } = new();
     private IWebView WebView { get; } = playniteApi.WebViews.CreateOffscreenView(new WebViewSettings { JavaScriptEnabled = true });
-    private readonly ILogger logger = LogManager.GetLogger();
+    private readonly ILogger _logger = LogManager.GetLogger();
 
     private string GetLibraryString(string accessToken, string docId)
     {
@@ -43,18 +44,18 @@ public class GraphQLClient(IPlayniteAPI playniteApi) : IGraphQLClient
         var items = entitlements.Edges.Select(e => e.Node.Item).ToList();
         return items;
     }
-    
+
     public OculusLibraryGames GetGames(OculusLibrarySettings settings, CancellationToken cancellationToken = default)
     {
         var output = new OculusLibraryGames();
-        
+
         if (!settings.ImportAnyOnline || cancellationToken.IsCancellationRequested)
             return output;
 
         var accessToken = GetAccessToken(cancellationToken);
         if (accessToken == null)
             throw new NotAuthenticatedException();
-        
+
         if (settings.ImportRiftOnline && !cancellationToken.IsCancellationRequested)
             output.RiftGames.AddRange(GetLibraryJson(accessToken, "6549375561785664", u => u.ActivePcEntitlements));
 
@@ -94,7 +95,7 @@ public class GraphQLClient(IPlayniteAPI playniteApi) : IGraphQLClient
 
     private string SetLocale(Cookie[] cookies)
     {
-        var data = new Dictionary<string, string>()
+        var data = new Dictionary<string, string>
         {
             { "variables", """{"input":{"non_ecomm_locale":"en_US","site_type":"DOLLY","actor_id":"0","client_mutation_id":"2"}}""" },
             { "doc_id", "5141701172554610" },
@@ -104,7 +105,7 @@ public class GraphQLClient(IPlayniteAPI playniteApi) : IGraphQLClient
 
     private WebResponse GetBrowserResponse(string storePageUrl, CancellationToken cancellationToken)
     {
-        logger.Info($"GetBrowserResponse: {storePageUrl}");
+        _logger.Info($"GetBrowserResponse: {storePageUrl}");
 
         WebView.NavigateAndWait(storePageUrl);
 
@@ -117,15 +118,17 @@ public class GraphQLClient(IPlayniteAPI playniteApi) : IGraphQLClient
                                   .Select(c => new Cookie(c.Name, c.Value, c.Path, c.Domain))
                                   .ToArray();
 
-        logger.Info($"GetBrowserResponse complete with {response.Cookies.Length} cookies: {storePageUrl}");
+        _logger.Info($"GetBrowserResponse complete with {response.Cookies.Length} cookies: {storePageUrl}");
 
         return response;
     }
 
     private string PostWithWebclient(string address, IDictionary<string, string> data, Cookie[] cookies)
     {
-        logger.Info($@"PostWithWebclient: {address} with {cookies.Length} cookies
-data: {DictionaryToString(data)}");
+        _logger.Info($"""
+                     PostWithWebclient: {address} with {cookies.Length} cookies
+                     data: {DictionaryToString(data)}
+                     """);
 
         var nameValueCollection = new NameValueCollection();
         foreach (var kvp in data)
@@ -139,7 +142,7 @@ data: {DictionaryToString(data)}");
         var bytes = WebClient.UploadValues(address, "POST", nameValueCollection);
         WebClient.Headers.Clear();
 
-        logger.Info($"PostWithWebclient complete: {address}");
+        _logger.Info($"PostWithWebclient complete: {address}");
 
         return Encoding.UTF8.GetString(bytes);
     }

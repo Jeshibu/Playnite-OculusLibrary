@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace OculusLibrary.DataExtraction;
+namespace OculusLibrary.DataExtraction.Models;
 
 public class OculusMetadataJsonResponse
 {

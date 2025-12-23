@@ -81,7 +81,7 @@ public static class Programs
                             continue;
                         }
 
-                        program = new UninstallProgram()
+                        program = new UninstallProgram
                         {
                             DisplayIcon = prog.GetValue("DisplayIcon")?.ToString(),
                             DisplayVersion = prog.GetValue("DisplayVersion")?.ToString(),

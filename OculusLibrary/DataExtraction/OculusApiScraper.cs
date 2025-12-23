@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using OculusLibrary.DataExtraction.Models;
 using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;

@@ -17,7 +17,7 @@ public partial class OculusLibrarySettingsView : UserControl
 
     private void Browse_Click(object sender, RoutedEventArgs e)
     {
-        OpenFileDialog picker = new OpenFileDialog()
+        OpenFileDialog picker = new OpenFileDialog
         {
             Filter = "ReviveInjector.exe|ReviveInjector.exe|.exe files|*.exe",
             Multiselect = false,

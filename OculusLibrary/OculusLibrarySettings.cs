@@ -72,7 +72,7 @@ public class OculusLibrarySettingsViewModel : PluginSettingsViewModel<OculusLibr
         }
         else
         {
-            Settings = new OculusLibrarySettings() { Version = 3 };
+            Settings = new OculusLibrarySettings { Version = 3 };
             SeedRevivePath();
         }
         Settings.PropertyChanged += Settings_PropertyChanged;

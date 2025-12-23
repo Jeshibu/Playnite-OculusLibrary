@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/Stuff/">
+    <File Path=".editorconfig" />
     <File Path=".github/workflows/release.yml" />
     <File Path="OculusLibraryInstaller.yaml" />
     <File Path="README.md" />
