@@ -30,7 +30,6 @@ public class GraphQLClient(IPlayniteAPI playniteApi) : IGraphQLClient
         var body = new Dictionary<string, string>
         {
             { "access_token", accessToken },
-            { "variables", "{}" },
             { "doc_id", docId },
         };
         return PostWithWebclient("https://graph.oculus.com/graphql?locale=en_US", body, []);
@@ -57,13 +56,13 @@ public class GraphQLClient(IPlayniteAPI playniteApi) : IGraphQLClient
             throw new NotAuthenticatedException();
 
         if (settings.ImportRiftOnline && !cancellationToken.IsCancellationRequested)
-            output.RiftGames.AddRange(GetLibraryJson(accessToken, "6549375561785664", u => u.ActivePcEntitlements));
+            output.RiftGames.AddRange(GetLibraryJson(accessToken, "9431935310238631", u => u.ActivePcEntitlements));
 
         if (settings.ImportQuestOnline && !cancellationToken.IsCancellationRequested)
-            output.QuestGames.AddRange(GetLibraryJson(accessToken, "6260775224011087", u => u.ActiveAndroidEntitlements));
+            output.QuestGames.AddRange(GetLibraryJson(accessToken, "29383114651302983", u => u.ActiveAndroidEntitlements));
 
         if (settings.ImportGearGoOnline && !cancellationToken.IsCancellationRequested)
-            output.GearGames.AddRange(GetLibraryJson(accessToken, "6040003812794294", u => u.ActiveAndroidEntitlements));
+            output.GearGames.AddRange(GetLibraryJson(accessToken, "29143116735333849", u => u.ActiveAndroidEntitlements));
 
         return output;
     }
@@ -87,7 +86,7 @@ public class GraphQLClient(IPlayniteAPI playniteApi) : IGraphQLClient
     public string GetAccessToken(CancellationToken cancellationToken = default)
     {
         var response = GetBrowserResponse("https://secure.oculus.com/my/profile/", cancellationToken);
-        var accessTokenCookie = response.Cookies.SingleOrDefault(c => c.Domain == ".oculus.com" && c.Name == "oc_ac_at");
+        var accessTokenCookie = response.Cookies.SingleOrDefault(c => c.Domain == ".oculus.com" && c.Name == "oc_ac_at" && !c.Expired);
         return accessTokenCookie?.Value;
     }
 
@@ -135,8 +134,6 @@ public class GraphQLClient(IPlayniteAPI playniteApi) : IGraphQLClient
             nameValueCollection.Add(kvp.Key, kvp.Value);
 
         WebClient.Headers.Clear();
-        WebClient.Headers[HttpRequestHeader.Cookie] = GetCookieHeader(address, cookies);
-        WebClient.Headers[HttpRequestHeader.UserAgent] = "PostmanRuntime/7.35.0"; //why does this work and a regular browser user agent string doesn't
         WebClient.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
 
         var bytes = WebClient.UploadValues(address, "POST", nameValueCollection);
