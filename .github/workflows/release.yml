@@ -18,8 +18,7 @@ jobs:
           .\MSBuild.exe $Env:GITHUB_WORKSPACE\OculusLibrary.slnx -p:Configuration=Release -restore
 
       - name: Run unit tests
-        run: |
-          & "$env:USERPROFILE\.nuget\packages\xunit.runner.console.2.8.1\tools\net462\xunit.console.x86.exe" "$Env:GITHUB_WORKSPACE\OculusLibrary.Tests\bin\Release\OculusLibrary.Tests.dll"
+        run: dotnet test ./OculusLibrary.Tests/OculusLibrary.Tests.csproj
 
       - name: Setup Playnite
         run: |
