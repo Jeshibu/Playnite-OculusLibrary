@@ -62,7 +62,7 @@ public class OculusLibraryPlugin : LibraryPlugin
         logger.Info("GetGames");
         try
         {
-            return MetadataCollector.GetGames(settings.Settings, args.CancelToken);
+            return MetadataCollector.GetGames(args.CancelToken);
         }
         catch (NotAuthenticatedException)
         {
@@ -91,22 +91,13 @@ public class OculusLibraryPlugin : LibraryPlugin
         Tags = [],
     };
 
-    private static string GetPluginName(OculusLibrarySettings settings) => settings.Branding == Branding.Meta ? "Meta" : "Oculus";
+    private static string GetPluginName(OculusLibrarySettings settings) => settings.Branding.ToString();
 
-    public override LibraryMetadataProvider GetMetadataDownloader()
-    {
-        return MetadataCollector;
-    }
+    public override LibraryMetadataProvider GetMetadataDownloader() => MetadataCollector;
 
-    public override ISettings GetSettings(bool firstRunSettings)
-    {
-        return settings;
-    }
+    public override ISettings GetSettings(bool firstRunSettings) => settings;
 
-    public override UserControl GetSettingsView(bool firstRunView)
-    {
-        return new OculusLibrarySettingsView();
-    }
+    public override UserControl GetSettingsView(bool firstRunView) => new OculusLibrarySettingsView();
 
     public override IEnumerable<PlayController> GetPlayActions(GetPlayActionsArgs args)
     {
@@ -119,8 +110,8 @@ public class OculusLibraryPlugin : LibraryPlugin
             string warning = $"No install manifest data found for {args.Game.Name}";
             logger.Warn(warning);
             PlayniteApi.Dialogs.ShowErrorMessage(warning);
+            yield break;
         }
-
 
         if (settings.Settings.UseOculus)
         {
@@ -182,9 +173,9 @@ public class OculusLibraryPlugin : LibraryPlugin
             //which uses version 5.4.0, which can't just take a file path and output a Dictionary<object,object>
             //So that's too much of a pain, now we have this hackier method of just keeping two copies of extension.yaml
             //and copying and overwriting to switch branding
-            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var source = Path.Combine(dir, $"extension_{settings.Branding}.yaml");
-            var target = Path.Combine(dir, "extension.yaml");
+            string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+            string source = Path.Combine(dir, $"extension_{settings.Branding}.yaml");
+            string target = Path.Combine(dir, "extension.yaml");
             File.Copy(source, target, overwrite: true);
         }
         catch (Exception ex)

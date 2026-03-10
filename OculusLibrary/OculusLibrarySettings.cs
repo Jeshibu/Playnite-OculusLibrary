@@ -11,25 +11,17 @@ namespace OculusLibrary;
 
 public class OculusLibrarySettings : ObservableObject
 {
-    private bool useRevive = false;
-    private bool useOculus = true;
-    private string revivePath;
-    private bool importOculusApp = true;
-    private bool importRiftOnline = false;
-    private bool importQuestOnline = false;
-    private bool importGearGoOnline = false;
-    private BackgroundSource backgroundSource = BackgroundSource.TrailerThumbnail;
+    public bool UseOculus { get; set => SetValue(ref field, value); } = true;
 
-    public bool UseOculus { get => useOculus; set => SetValue(ref useOculus, value); }
-    public bool UseRevive { get => useRevive; set => SetValue(ref useRevive, value); }
-    public string RevivePath { get => revivePath; set => SetValue(ref revivePath, value); }
+    public bool UseRevive { get; set => SetValue(ref field, value); }
+    public string RevivePath { get; set => SetValue(ref field, value); }
 
-    public bool ImportOculusAppGames { get => importOculusApp; set => SetValue(ref importOculusApp, value); }
-    public bool ImportRiftOnline { get => importRiftOnline; set => SetOnlineImportValue(ref importRiftOnline, value); }
-    public bool ImportQuestOnline { get => importQuestOnline; set => SetOnlineImportValue(ref importQuestOnline, value); }
-    public bool ImportGearGoOnline { get => importGearGoOnline; set => SetOnlineImportValue(ref importGearGoOnline, value); }
+    public bool ImportOculusAppGames { get; set => SetValue(ref field, value); } = true;
+    public bool ImportRiftOnline { get; set => SetOnlineImportValue(ref field, value); }
+    public bool ImportQuestOnline { get; set => SetOnlineImportValue(ref field, value); }
+    public bool ImportGearGoOnline { get; set => SetOnlineImportValue(ref field, value); }
 
-    public BackgroundSource BackgroundSource { get => backgroundSource; set => SetValue(ref backgroundSource, value); }
+    public BackgroundSource BackgroundSource { get; set => SetValue(ref field, value); } = BackgroundSource.TrailerThumbnail;
 
     public Branding Branding { get; set; } = Branding.Meta;
 
@@ -110,13 +102,10 @@ public class OculusLibrarySettingsViewModel : PluginSettingsViewModel<OculusLibr
         return true;
     }
 
-    public RelayCommand<object> LoginCommand
+    public RelayCommand<object> LoginCommand => new(a =>
     {
-        get => new RelayCommand<object>((a) =>
-        {
-            Login();
-        });
-    }
+        Login();
+    });
 
     private void Login()
     {

@@ -8,21 +8,10 @@ using System.Threading;
 
 namespace OculusLibrary;
 
-public class AggregateOculusMetadataCollector : LibraryMetadataProvider
+public class AggregateOculusMetadataCollector(OculusManifestScraper manifestScraper, OculusApiScraper apiScraper, IPlayniteAPI api, OculusLibrarySettings settings)
+    : LibraryMetadataProvider
 {
-    private readonly OculusManifestScraper manifestScraper;
-    private readonly OculusApiScraper apiScraper;
-    private readonly IPlayniteAPI api;
-    private readonly OculusLibrarySettings settings;
-    private readonly ILogger logger = LogManager.GetLogger();
-
-    public AggregateOculusMetadataCollector(OculusManifestScraper manifestScraper, OculusApiScraper apiScraper, IPlayniteAPI api, OculusLibrarySettings settings)
-    {
-        this.manifestScraper = manifestScraper;
-        this.apiScraper = apiScraper;
-        this.api = api;
-        this.settings = settings;
-    }
+    private readonly ILogger _logger = LogManager.GetLogger();
 
     public override GameMetadata GetMetadata(Game game)
     {
@@ -37,7 +26,7 @@ public class AggregateOculusMetadataCollector : LibraryMetadataProvider
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "Error fetching manifest metadata");
+                _logger.Error(ex, "Error fetching manifest metadata");
             }
         }
 
@@ -47,16 +36,16 @@ public class AggregateOculusMetadataCollector : LibraryMetadataProvider
         }
         catch (Exception ex)
         {
-            logger.Error(ex, "Error fetching API metadata");
+            _logger.Error(ex, "Error fetching API metadata");
             return null;
         }
     }
 
-    public IEnumerable<GameMetadata> GetGames(OculusLibrarySettings settings, CancellationToken cancellationToken)
+    public IEnumerable<GameMetadata> GetGames(CancellationToken cancellationToken)
     {
         var onlineGames = apiScraper.GetGames(settings, cancellationToken);
 
-        logger.Info("Online games fetching passed");
+        _logger.Info("Online games fetching passed");
 
         var gamesById = onlineGames.ToDictionary(g => g.GameId);
 
@@ -76,8 +65,9 @@ public class AggregateOculusMetadataCollector : LibraryMetadataProvider
                 continue;
             }
 
-            if (!GameExistsInLibrary(game.GameId))
-            {
+            if (GameExistsInLibrary(game.GameId))
+                continue;
+
                 try
                 {
                     //for new games, we have to immediately set the name, because game name isn't overridden by a post-import metadata pass (by default)
@@ -88,12 +78,12 @@ public class AggregateOculusMetadataCollector : LibraryMetadataProvider
                 }
                 catch (Exception ex)
                 {
-                    logger.Error(ex, "Error getting game name");
+                _logger.Error(ex, "Error getting game name");
                 }
 
                 gamesById.Add(game.GameId, game);
             }
-        }
+
         return gamesById.Values;
     }
 

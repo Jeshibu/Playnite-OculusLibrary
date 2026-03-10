@@ -5,39 +5,27 @@ using System.IO;
 
 namespace OculusLibrary;
 
-class OculusClient : LibraryClient
+internal class OculusClient(IPlayniteAPI playniteApi, string iconPath) : LibraryClient
 {
-    bool uninstallEntryFetched = false;
-    private UninstallProgram oculusUninstallEntry;
-    private readonly IPlayniteAPI playniteAPI;
+    private bool _uninstallEntryFetched = false;
+    private UninstallProgram _oculusUninstallEntry;
 
     private UninstallProgram OculusUninstallEntry
     {
         get
         {
-            if (uninstallEntryFetched) //don't keep trying if it's not installed
-                return oculusUninstallEntry;
+            if (_uninstallEntryFetched || _oculusUninstallEntry != null) //don't keep trying if it's not installed, or return cached value
+                return _oculusUninstallEntry;
 
-            if (oculusUninstallEntry == null)
-            {
-                oculusUninstallEntry = Programs.GetOculusUninstallProgram();
-                uninstallEntryFetched = true;
-            }
-
-            return oculusUninstallEntry;
+            _uninstallEntryFetched = true;
+            return _oculusUninstallEntry = Programs.GetOculusUninstallProgram();
         }
 
-        set => oculusUninstallEntry = value;
+        set => _oculusUninstallEntry = value;
     }
 
     public override bool IsInstalled => OculusUninstallEntry != null;
-    public override string Icon { get; }
-
-    public OculusClient(IPlayniteAPI playniteAPI, string iconPath)
-    {
-        this.playniteAPI = playniteAPI;
-        this.Icon = iconPath;
-    }
+    public override string Icon => iconPath;
 
     public override void Open()
     {
@@ -47,7 +35,7 @@ class OculusClient : LibraryClient
         var path = Path.Combine(OculusUninstallEntry.InstallLocation, @"Support\oculus-client\OculusClient.exe");
         if (!File.Exists(path))
         {
-            playniteAPI.Dialogs.ShowErrorMessage($"Could not find {path}");
+            playniteApi.Dialogs.ShowErrorMessage($"Could not find {path}");
             return;
         }
 

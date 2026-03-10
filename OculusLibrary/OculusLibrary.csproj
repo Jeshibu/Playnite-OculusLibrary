@@ -5,7 +5,7 @@
     <RootNamespace>OculusLibrary</RootNamespace>
     <AssemblyName>OculusLibrary</AssemblyName>
     <TargetFramework>net462</TargetFramework>
-    <LangVersion>12</LangVersion>
+    <LangVersion>14</LangVersion>
     <Company>Jeshibu</Company>
     <Copyright>2025</Copyright>
     <Description>Playnite Library provider for Meta/Oculus</Description>

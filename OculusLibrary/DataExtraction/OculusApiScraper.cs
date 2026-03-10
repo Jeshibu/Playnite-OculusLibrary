@@ -169,7 +169,7 @@ public class OculusApiScraper(IGraphQLClient webClient = null)
         if (oculusJsonName.StartsWith("Rift"))
             return $"Oculus {oculusJsonName}";
 
-        else return oculusJsonName;
+        return oculusJsonName;
     }
 
     private string GetFeatureFromInteractionMode(string interactionMode)
@@ -200,19 +200,22 @@ public class OculusApiScraper(IGraphQLClient webClient = null)
 
     private string GetFeatureFromInputDevice(TagItem inputDevice)
     {
-        switch (inputDevice.Tag)
+        return inputDevice.Tag switch
         {
-            case "GAMEPAD": return "VR Gamepad";
-            case "OCULUS_TOUCH": return "VR Motion Controllers";
-            case "GAMEPAD_VIA_TOUCH": return "VR Motion Controllers (As Gamepad)";
-            case "RACING_WHEEL": return "Racing Wheel Support"; //found on Dirt Rally
-            case "FLIGHT_STICK": return "Flight Stick Support"; //found on End Space
-            case "KEYBOARD_MOUSE": return "Input: Keyboard & Mouse";
-            case "HAND_TRACKING": return "Hand Tracking";
+            "GAMEPAD" => "VR Gamepad",
+            "OCULUS_TOUCH" => "VR Motion Controllers",
+            "GAMEPAD_VIA_TOUCH" => "VR Motion Controllers (As Gamepad)",
+            "RACING_WHEEL" => "Racing Wheel Support", //found on Dirt Rally
+            "FLIGHT_STICK" => "Flight Stick Support", //found on End Space
+            "KEYBOARD_MOUSE" => "Input: Keyboard & Mouse",
+            "HAND_TRACKING" => "Hand Tracking",
+            _ => GetUnknownInputDeviceName()
+        };
 
-            default: //localized and unknown input devices
-                logger.Info($"Unknown input device: {inputDevice.Tag} | {inputDevice.Name}");
-                return $"Input: {inputDevice.Name}";
+        string GetUnknownInputDeviceName()
+        {
+            logger.Info($"Unknown input device: {inputDevice.Tag} | {inputDevice.Name}");
+            return $"Input: {inputDevice.Name}";
         }
     }
 
@@ -232,9 +235,7 @@ public class OculusApiScraper(IGraphQLClient webClient = null)
         {
             string name = nameParser(i);
 
-            if (name == null) return null;
-
-            return new MetadataNameProperty(name);
+            return name == null ? null : new MetadataNameProperty(name);
         }
 
         SetPropertiesForCollection(input, target, PropertySelector);
@@ -246,7 +247,7 @@ public class OculusApiScraper(IGraphQLClient webClient = null)
         SetPropertiesForCollection<string>(input, target, nameParser);
     }
 
-    private string ParseDescription(string description)
+    private static string ParseDescription(string description)
     {
         if (string.IsNullOrWhiteSpace(description))
             return description;
