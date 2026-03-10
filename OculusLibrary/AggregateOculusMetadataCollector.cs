@@ -47,7 +47,22 @@ public class AggregateOculusMetadataCollector(OculusManifestScraper manifestScra
 
         _logger.Info("Online games fetching passed");
 
-        var gamesById = onlineGames.ToDictionary(g => g.GameId);
+        Dictionary<string, GameMetadata> gamesById = new();
+        foreach (var game in onlineGames)
+        {
+            if (gamesById.TryGetValue(game.GameId, out var previouslyAddedGame))
+            {
+                var newPlatforms = game.Platforms.Except(previouslyAddedGame.Platforms).ToList();
+                _logger.Info($"Adding platforms {string.Join(", ", newPlatforms)} to {game.Name} ({game.GameId}, {string.Join(", ", previouslyAddedGame.Platforms)})");
+
+                foreach (var platform in newPlatforms)
+                    previouslyAddedGame.Platforms.Add(platform);
+            }
+            else
+            {
+                gamesById.Add(game.GameId, game);
+            }
+        }
 
         if (!settings.ImportOculusAppGames)
             return gamesById.Values;
@@ -68,21 +83,21 @@ public class AggregateOculusMetadataCollector(OculusManifestScraper manifestScra
             if (GameExistsInLibrary(game.GameId))
                 continue;
 
-                try
-                {
-                    //for new games, we have to immediately set the name, because game name isn't overridden by a post-import metadata pass (by default)
-                    var metadata = apiScraper.GetMetadata(game.GameId, settings, setLocale: true);
+            try
+            {
+                //for new games, we have to immediately set the name, because game name isn't overridden by a post-import metadata pass (by default)
+                var metadata = apiScraper.GetMetadata(game.GameId, settings, setLocale: true);
 
-                    if (metadata != null)
-                        game.Name = metadata.Name;
-                }
-                catch (Exception ex)
-                {
-                _logger.Error(ex, "Error getting game name");
-                }
-
-                gamesById.Add(game.GameId, game);
+                if (metadata != null)
+                    game.Name = metadata.Name;
             }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error getting game name");
+            }
+
+            gamesById.Add(game.GameId, game);
+        }
 
         return gamesById.Values;
     }
