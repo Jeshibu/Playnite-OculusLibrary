@@ -5,18 +5,14 @@
     <AssemblyName>OculusLibrary.Tests</AssemblyName>
     <TargetFramework>net462</TargetFramework>
     <TestProjectType>UnitTest</TestProjectType>
-    <LangVersion>12</LangVersion>
+    <LangVersion>14</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="PlayniteSDK" Version="6.4.0" />
     <PackageReference Include="xunit" Version="2.8.1" />
-    <PackageReference Include="xunit.runner.console" Version="2.8.1">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.1">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    <PackageReference Include="xunit.runner.console" Version="2.8.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.1" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
