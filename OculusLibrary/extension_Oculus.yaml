@@ -10,6 +10,8 @@ Links:
     Url: https://www.meta.com/experiences/pcvr/
   - Name: Meta Quest app store
     Url: https://www.meta.com/experiences/
+  - Name: Revive (Run Oculus PC games from SteamVR)
+    Url: https://github.com/LibreVR/Revive
   - Name: GitHub repository
     Url: https://github.com/Jeshibu/Playnite-OculusLibrary/
   - Name: Support my work on Ko-fi

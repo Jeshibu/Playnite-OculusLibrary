@@ -119,3 +119,10 @@ Packages:
     PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.6.3/Oculus.pext
     Changelog:
       - Fixed extension constantly thinking it was 2.6.1 and wanting to update
+  - Version: '2.6.4'
+    RequiredApiVersion: '6.14.0'
+    ReleaseDate: 2026-03-10
+    PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.6.4/Oculus.pext
+    Changelog:
+      - 'Fixed "Bad Request" error when importing games'
+      - 'Fixed error when importing Quest Go games that also exist on Quest'
