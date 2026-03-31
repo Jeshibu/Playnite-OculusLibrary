@@ -80,6 +80,7 @@ public class GraphQLClient(IWebViewFactory webViewFactory) : IGraphQLClient
                 try
                 {
                     if (call.Request.Method != "POST"
+                        || call.Response.StatusCode != 200
                         || !call.Request.Url.StartsWith("https://www.meta.com/ocapi/graphql")
                         || !call.Request.Headers.TryGetValue("X-FB-Friendly-Name", out string friendlyName)
                         || friendlyName != "MDCAppStoreAppPDPBelowFoldRootQuery")
