@@ -5,143 +5,155 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
-namespace OculusLibrary.Tests
+namespace OculusLibrary.Tests;
+
+public class OculusApiScraperTests
 {
-    public class OculusApiScraperTests
+    [Fact]
+    public void Asgards_Wrath_Parses_Correctly()
     {
-        [Fact]
-        public void Asgards_Wrath_Parses_Correctly()
-        {
-            var subject = Setup("Asgard's Wrath", Branding.Oculus, out var settings);
-            string appId = "1180401875303371";
+        var subject = Setup("asgards-wrath", Branding.Oculus, out var settings);
+        string appId = "1180401875303371";
 
-            var data = subject.GetMetadata(appId, settings, true);
-            Assert.Equal("Asgard's Wrath", data.Name);
-            Assert.NotNull(data.Description);
-            Assert.Equal("1.6.0", data.Version);
-            ReleaseDateEquals(2019, 10, 9, data.ReleaseDate.Value);
-            Assert.Equal(appId, data.GameId);
-            Assert.NotNull(data.BackgroundImage?.Path);
-            Assert.Equal(new MetadataNameProperty("Oculus"), data.Source);
-            MetadataPropertyCollectionsMatch(data.Features, ["Single Player", "VR", "VR Standing", "VR Seated", "VR Room-Scale", "VR Motion Controllers"]);
-            MetadataPropertyCollectionsMatch(data.Platforms, ["Meta Quest", "Meta Quest 2", "Meta Quest 3", "Meta Quest Pro"], ["pc_windows"]);
-            MetadataPropertyCollectionsMatch(data.Tags, ["VR Comfort: Moderate"]);
-            MetadataPropertyCollectionsMatch(data.Developers, ["Sanzaru"]);
-            MetadataPropertyCollectionsMatch(data.Publishers, ["Oculus"]);
-            MetadataPropertyCollectionsMatch(data.AgeRatings, ["PEGI 18"]);
-            MetadataPropertyCollectionsMatch(data.Genres, ["Action", "Adventure", "RPG"]);
-            Assert.Equal(89, data.CommunityScore);
+        var data = subject.GetMetadata(appId, settings);
+        Assert.Equal("Asgard's Wrath", data.Name);
+        Assert.NotNull(data.Description);
+        Assert.Equal("1.6.0", data.Version);
+        ReleaseDateEquals(2019, 10, 9, data.ReleaseDate);
+        Assert.Equal(appId, data.GameId);
+        Assert.NotNull(data.BackgroundImage?.Path);
+        Assert.Equal(new MetadataNameProperty("Oculus"), data.Source);
+        MetadataPropertyCollectionsMatch(data.Features, ["Single Player", "VR", "VR Standing", "VR Seated", "VR Room-Scale", "VR Motion Controllers"]);
+        MetadataPropertyCollectionsMatch(data.Platforms, ["Oculus Rift", "Oculus Rift S"], ["pc_windows"]);
+        MetadataPropertyCollectionsMatch(data.Tags, ["VR Comfort: Moderate"]);
+        MetadataPropertyCollectionsMatch(data.Developers, ["Sanzaru"]);
+        MetadataPropertyCollectionsMatch(data.Publishers, ["Oculus"]);
+        MetadataPropertyCollectionsMatch(data.Genres, ["Action", "Adventure", "RPG"]);
+        Assert.Equal(89, data.CommunityScore);
+        MetadataPropertyCollectionsMatch(data.AgeRatings, ["PEGI 18"]);
+    }
+
+    [Fact]
+    public void Sprint_Vector_Parses_Correctly()
+    {
+        var subject = Setup("sprint-vector", Branding.Meta, out var settings);
+        string appId = "1425858557493354";
+
+        var data = subject.GetMetadata(appId, settings);
+        Assert.Equal("Sprint Vector", data.Name);
+        Assert.NotNull(data.Description);
+        Assert.Equal("0.0.0.302317", data.Version);
+        ReleaseDateEquals(2018, 2, 2, data.ReleaseDate);
+        Assert.Equal(appId, data.GameId);
+        Assert.NotNull(data.BackgroundImage?.Path);
+        Assert.Equal(new MetadataNameProperty("Meta"), data.Source);
+        MetadataPropertyCollectionsMatch(data.Features, ["Single Player", "Multiplayer", "VR", "VR Standing", "VR Seated", "VR Room-Scale", "VR Motion Controllers"]);
+        MetadataPropertyCollectionsMatch(data.Platforms, ["Oculus Rift", "Oculus Rift S"], ["pc_windows"]);
+        MetadataPropertyCollectionsMatch(data.Tags, ["VR Comfort: Intense"]);
+        MetadataPropertyCollectionsMatch(data.Developers, ["Survios"]);
+        MetadataPropertyCollectionsMatch(data.Publishers, ["Survios"]);
+        MetadataPropertyCollectionsMatch(data.Genres, ["Action", "Racing", "Sports"]);
+        Assert.Equal(82, data.CommunityScore);
+        MetadataPropertyCollectionsMatch(data.AgeRatings, ["PEGI 3"]);
+    }
+
+    [Fact]
+    public void ChronostrikeDoesNotCrash()
+    {
+        var subject = Setup("chronostrike", Branding.Meta, out var settings);
+        string appId = "24697269806585974";
+
+        var data = subject.GetMetadata(appId, settings);
+        Assert.Equal("Chronostrike", data.Name);
+    }
+
+    [Fact]
+    public void Description_images_are_parsed()
+    {
+        var subject = Setup("flight-74", Branding.Oculus, out var settings);
+
+        var data = subject.GetMetadata("1234", settings);
+        Assert.Equal("Flight 74", data.Name);
+        Assert.DoesNotContain("![{", data.Description);
+        Assert.Contains(
+            "<img src=\"https://scontent.oculuscdn.com/v/t64.5771-25/39035449_2750905201734369_6818732176437659600_n.webp?stp=dst-webp&_nc_cat=103&ccb=1-7&_nc_sid=6e7a0a&_nc_ohc=sLmjODHRfHgQ7kNvwGQLZ5V&_nc_oc=Adkm-BeD7sBbs0ALeY8-XNxUMUc6Gc9sKODywa2s72gaoWbThPwmNe31tgn7aWOHCcQ&_nc_zt=3&_nc_ht=scontent.oculuscdn.com&_nc_ss=8&oh=00_Afx_pwS2yDrjDDLC6OnSGjbm8ZJGR4xuKS1cJMUaMVgtrg&oe=69BE6A5B\"/>",
+            data.Description);
+    }
+
+    [Fact]
+    public void Description_videos_are_removed()
+    {
+        var subject = Setup("taiko-frenzy", Branding.Meta, out var settings);
+
+        var data = subject.GetMetadata("1234", settings);
+        Assert.Equal("Taiko Frenzy", data.Name);
+        Assert.DoesNotContain("![{", data.Description);
+        Assert.DoesNotContain(".mp4", data.Description);
+    }
+
+    private static void ReleaseDateEquals(int expectedYear, int expectedMonth, int expectedDay, ReleaseDate? actual)
+    {
+        Assert.NotNull(actual);
+        Assert.Equal(expectedYear, actual.Value.Year);
+        Assert.Equal(expectedMonth, actual.Value.Month);
+        Assert.Equal(expectedDay, actual.Value.Day);
+    }
+
+    private static void MetadataPropertyCollectionsMatch(HashSet<MetadataProperty> metadataProperties, string[] namePropertyValues, string[] specPropertyValues = null)
+    {
+        var expectedStrings = namePropertyValues.ToList();
+        expectedStrings.AddRange(specPropertyValues ?? []);
+        string expected = string.Join(", ", expectedStrings);
+        string actual = string.Join(", ", metadataProperties);
+
+        if (expectedStrings.Count != metadataProperties.Count)
+            Assert.Fail($"Expected {expectedStrings.Count} items [{expected}], found {metadataProperties.Count} items [{actual}]");
+        Assert.Equal(namePropertyValues.Length + (specPropertyValues?.Length ?? 0), metadataProperties.Count);
+        foreach (var nameProp in namePropertyValues)
+        {
+            bool contains = metadataProperties.OfType<MetadataNameProperty>().Any(x => x.Name == nameProp);
+            if (!contains)
+                Assert.Fail($"Name property {nameProp} not found in collection [{actual}]");
         }
 
-        [Fact]
-        public void Sprint_Vector_Parses_Correctly()
-        {
-            var subject = Setup("Sprint Vector", Branding.Meta, out var settings);
-            string appId = "1425858557493354";
+        if (specPropertyValues == null)
+            return;
 
-            var data = subject.GetMetadata(appId, settings, true);
-            Assert.Equal("Sprint Vector", data.Name);
-            Assert.NotNull(data.Description);
-            Assert.Equal("0.0.0.302317", data.Version);
-            ReleaseDateEquals(2018, 2, 2, data.ReleaseDate.Value);
-            Assert.Equal(appId, data.GameId);
-            Assert.NotNull(data.BackgroundImage?.Path);
-            Assert.Equal(new MetadataNameProperty("Meta"), data.Source);
-            MetadataPropertyCollectionsMatch(data.Features, ["Single Player", "Multiplayer", "VR", "VR Standing", "VR Seated", "VR Room-Scale", "VR Motion Controllers"]);
-            MetadataPropertyCollectionsMatch(data.Platforms, ["Oculus Rift", "Oculus Rift S"], ["pc_windows"]);
-            MetadataPropertyCollectionsMatch(data.Tags, ["VR Comfort: Intense"]);
-            MetadataPropertyCollectionsMatch(data.Developers, ["Survios"]);
-            MetadataPropertyCollectionsMatch(data.Publishers, ["Survios"]);
-            MetadataPropertyCollectionsMatch(data.AgeRatings, ["PEGI 3"]);
-            MetadataPropertyCollectionsMatch(data.Genres, ["Action", "Racing", "Sports"]);
-            Assert.Equal(82, data.CommunityScore);
+        foreach (var specProp in specPropertyValues)
+        {
+            bool contains = metadataProperties.OfType<MetadataSpecProperty>().Any(x => x.Id == specProp);
+            if (!contains)
+                Assert.Fail($"Spec property {specProp} not found in collection [{actual}]");
+        }
+    }
+
+    private static OculusApiScraper Setup(string fileNameNoExt, Branding branding, out OculusLibrarySettings settings)
+    {
+        var webclient = new FakeGraphQLClient(fileNameNoExt);
+
+        settings = new OculusLibrarySettings { BackgroundSource = BackgroundSource.Hero, Branding = branding };
+
+        return new OculusApiScraper(webclient);
+    }
+
+    private class FakeGraphQLClient(string fileNameNoExt) : IGraphQLClient
+    {
+        public void Dispose()
+        {
         }
 
-        [Fact]
-        public void Description_images_are_parsed()
+        public async Task<OculusMetadataRaw> GetMetadataAsync(string appId, CancellationToken cancellationToken = default) => new()
         {
-            var subject = Setup("Flight 74", Branding.Oculus, out var settings);
+            PageSource = File.ReadAllText($"./testdata/{fileNameNoExt}.html"),
+            XhrResponse = File.ReadAllText($"./testdata/{fileNameNoExt}.json"),
+        };
 
-            var data = subject.GetMetadata("1234", settings, true);
-            Assert.Equal("Flight 74", data.Name);
-            Assert.DoesNotContain("![{", data.Description);
-            Assert.Contains(
-                "<img src=\"https://scontent.oculuscdn.com/v/t64.5771-25/39035449_2750905201734369_6818732176437659600_n.png?_nc_cat=103&ccb=1-7&_nc_sid=6e7a0a&_nc_ohc=1RXPKwkUeocQ7kNvgG-Ve8i&_nc_ht=scontent.oculuscdn.com&oh=00_AYCvsPGrnJKa24TIuuEQAqKigYHQZ4m0mXE1kmPLuin9Mg&oe=66E276D2\"/>",
-                data.Description);
-        }
-
-        [Fact]
-        public void Description_videos_are_removed()
+        public OculusLibraryGames GetGames(OculusLibrarySettings settings, CancellationToken cancellationToken = default)
         {
-            var subject = Setup("Taiko Frenzy", Branding.Meta, out var settings);
-
-            var data = subject.GetMetadata("1234", settings, true);
-            Assert.Equal("Taiko Frenzy", data.Name);
-            Assert.DoesNotContain("![{", data.Description);
-            Assert.DoesNotContain(".mp4", data.Description);
-        }
-
-        private void ReleaseDateEquals(int expectedYear, int expectedMonth, int expectedDay, ReleaseDate actual)
-        {
-            Assert.Equal(expectedYear, actual.Year);
-            Assert.Equal(expectedMonth, actual.Month);
-            Assert.Equal(expectedDay, actual.Day);
-        }
-
-        private void MetadataPropertyCollectionsMatch(HashSet<MetadataProperty> metadataProperties, string[] namePropertyValues, string[] specPropertyValues = null)
-        {
-            string propertyString = string.Join(", ", metadataProperties.Select(x => x.ToString()).OrderBy(x => x).ToArray());
-            var expectedStrings = namePropertyValues.ToList();
-            expectedStrings.AddRange(specPropertyValues ?? []);
-            string expectedString = string.Join(", ", expectedStrings);
-
-            Assert.Equal(namePropertyValues.Length + (specPropertyValues?.Length ?? 0), metadataProperties.Count);
-            foreach (var nameProp in namePropertyValues)
-            {
-                bool contains = metadataProperties.OfType<MetadataNameProperty>().Any(x => x.Name == nameProp);
-                if (!contains)
-                    Assert.Fail($"Name property {nameProp} not found");
-            }
-
-            if (specPropertyValues == null)
-                return;
-
-            foreach (var specProp in specPropertyValues)
-            {
-                bool contains = metadataProperties.OfType<MetadataSpecProperty>().Any(x => x.Id == specProp);
-                if (!contains)
-                    Assert.Fail($"Spec property {specProp} not found");
-            }
-        }
-
-        private OculusApiScraper Setup(string gameName, Branding branding, out OculusLibrarySettings settings)
-        {
-            var jsonContent = File.ReadAllText($@".\{gameName}.json");
-
-            var webclient = new FakeWebclient(jsonContent);
-
-            settings = new OculusLibrarySettings { BackgroundSource = BackgroundSource.Hero, Branding = branding };
-
-            return new OculusApiScraper(webclient);
-        }
-
-        private class FakeWebclient(string jsonContent) : IGraphQLClient
-        {
-            public void Dispose()
-            {
-            }
-
-            public string GetMetadata(string appId, bool setLocale, CancellationToken cancellationToken = default)
-            {
-                return jsonContent;
-            }
-
-            public OculusLibraryGames GetGames(OculusLibrarySettings settings, CancellationToken cancellationToken = default)
-            {
-                throw new NotImplementedException();
-            }
+            throw new NotImplementedException();
         }
     }
 }

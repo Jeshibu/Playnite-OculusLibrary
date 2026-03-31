@@ -2,6 +2,4 @@
 
 namespace OculusLibrary.DataExtraction;
 
-internal class NotAuthenticatedException : Exception
-{
-}
+internal class NotAuthenticatedException : Exception;

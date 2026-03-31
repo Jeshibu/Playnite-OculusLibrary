@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using AngleSharp.Parser.Html;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OculusLibrary.DataExtraction.Models;
 using Playnite.SDK;
 using Playnite.SDK.Models;
@@ -7,18 +9,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace OculusLibrary.DataExtraction;
 
-public class OculusApiScraper(IGraphQLClient webClient = null)
+public class OculusApiScraper(IGraphQLClient graphQLClient = null)
 {
-    private readonly ILogger logger = LogManager.GetLogger();
+    private readonly ILogger _logger = LogManager.GetLogger();
+    private readonly Random _random = new();
 
     private static string GetStoreUrl(string appId) => $"https://www.meta.com/experiences/{appId}/";
 
     public IEnumerable<GameMetadata> GetGames(OculusLibrarySettings settings, CancellationToken cancellationToken)
     {
-        var response = webClient.GetGames(settings, cancellationToken);
+        var response = graphQLClient.GetGames(settings, cancellationToken);
 
         var output = new List<GameMetadata>();
         output.AddRange(response.RiftGames.Select(i => ToGameMetadata(i, settings, new MetadataSpecProperty("pc_windows"))));
@@ -27,80 +31,185 @@ public class OculusApiScraper(IGraphQLClient webClient = null)
         return output;
     }
 
-    public ExtendedGameMetadata GetMetadata(string appId, OculusLibrarySettings settings, bool setLocale, ExtendedGameMetadata data = null)
+    public ExtendedGameMetadata GetMetadata(string appId, OculusLibrarySettings settings, ExtendedGameMetadata data = null)
     {
-        var json = GetOculusMetadata(appId, setLocale);
-        if (json?.Data?.Item == null) return data;
-        var metadata = ToGameMetadata(json.Data.Item, settings, data);
+        var json = GetOculusMetadata(appId);
+        if (json?.AppDetails?.display_name == null && json?.LdJsonProduct?.name == null)
+            return data;
+        var metadata = ToGameMetadata(json, settings, data);
         return metadata;
     }
 
-    private ExtendedGameMetadata ToGameMetadata(OculusJsonResponseDataNode json, OculusLibrarySettings settings, ExtendedGameMetadata data = null)
+    private ExtendedGameMetadata ToGameMetadata(MetadataBundled oculusMetadata, OculusLibrarySettings settings, ExtendedGameMetadata data = null)
     {
         data ??= OculusLibraryPlugin.GetBaseMetadata(settings);
         data.Features.Add(new MetadataNameProperty("VR"));
 
-        data.GameId = json.Id;
-        data.Name = json.DisplayName;
-        data.Description = ParseDescription(json.DisplayLongDescription);
+        data.GameId = oculusMetadata.AppDetails?.id ?? oculusMetadata.LdJsonProduct?.sku;
+        data.Name = oculusMetadata.AppDetails?.display_name ?? oculusMetadata.LdJsonProduct?.name;
+        data.Description = ParseDescription(oculusMetadata.Description?.app_store_item.display_long_description ?? oculusMetadata.LdJsonProduct?.description);
 
-        data.CommunityScore = GetAverageRating(json.RatingAggregates);
-        logger.Info($"parsing release date: {json.ReleaseInfo?.DisplayDate}");
-        data.ReleaseDate = ParseReleaseDate(json.ReleaseInfo?.DisplayDate);
-        data.Version = json.LatestSupportedBinary?.Version;
-        data.Links.Add(new($"{settings.Branding} Store", GetStoreUrl(json.Id)));
-        if (!string.IsNullOrEmpty(json.WebsiteUrl))
-            data.Links.Add(new("Website", json.WebsiteUrl));
+        var starRating = oculusMetadata.OnPageAppStoreItem?.quality_rating_aggregate;
+        if (starRating > 0)
+            data.CommunityScore = (int)(starRating * 20);
 
-        string rating = json.IarcCert?.IarcRating?.AgeRatingText;
+        _logger.Info($"parsing release date: {oculusMetadata.AppDetails?.release_info?.display_date}");
+        data.ReleaseDate = ParseReleaseDate(oculusMetadata.AppDetails?.release_info?.display_date);
+        data.Version = oculusMetadata.AppDetails?.latest_supported_binary?.version;
+        data.Links.Add(new($"{settings.Branding} Store", oculusMetadata.LdJsonProduct?.url ?? GetStoreUrl(data.GameId)));
+        if (!string.IsNullOrEmpty(oculusMetadata.AppDetails?.website_url))
+            data.Links.Add(new("Website", oculusMetadata.AppDetails.website_url));
+
+        string rating = oculusMetadata.OnPageAppStoreItem?.content_rating?.age_rating_text;
         if (!string.IsNullOrEmpty(rating))
             data.AgeRatings.Add(new MetadataNameProperty(rating));
 
-        //platforms
-        if (json.Platform == "PC") //the other options are ANDROID (Go, GearVR) and ANDROID_6DOF (Quest, Quest 2) but those are covered via HMD
+        if (oculusMetadata.Reviews?.platform == "PC") //the other options are ANDROID (Go, GearVR) and ANDROID_6DOF (Quest, Quest 2) but those are covered via HMD
             data.Platforms.Add(new MetadataSpecProperty("pc_windows"));
-        SetPropertiesForCollection(json.SupportedHmdPlatforms, data.Platforms, GetHmdPlatformName);
+        SetPropertiesForCollection(oculusMetadata.AppDetails?.supported_platforms_i18n ?? oculusMetadata.LdJsonProduct?.availableOnDevice, data.Platforms, GetHmdPlatformName);
 
-        if (settings.BackgroundSource == BackgroundSource.TrailerThumbnail && json.Trailer?.Thumbnail?.Uri != null)
-            data.BackgroundImage = new MetadataFile(json.Trailer.Thumbnail?.Uri);
+        List<string> backgroundImageUrls = [];
 
-        if (json.Screenshots?.Count > 0
-            && (settings.BackgroundSource == BackgroundSource.Screenshots
-                || (settings.BackgroundSource == BackgroundSource.TrailerThumbnail && data.BackgroundImage == null)))
+        if (settings.BackgroundSource == BackgroundSource.TrailerThumbnail)
         {
-            var random = new Random();
-            var uri = json.Screenshots.OrderBy(s => random.Next(int.MaxValue)).First().Uri;
-            data.BackgroundImage = new MetadataFile(uri);
+            if (oculusMetadata?.LdJsonProduct?.image?.Length > 0)
+                backgroundImageUrls.Add(oculusMetadata.LdJsonProduct.image[0]._id);
+
+            else if (oculusMetadata.OnPageAppStoreItem?.trailer?.thumbnail?.Uri != null)
+                backgroundImageUrls.Add(oculusMetadata.OnPageAppStoreItem.trailer.thumbnail.Uri);
         }
 
-        if ((data.BackgroundImage == null || settings.BackgroundSource == BackgroundSource.Hero) && json.Hero?.Uri != null)
-            data.BackgroundImage = new MetadataFile(json.Hero.Uri);
+        if (settings.BackgroundSource == BackgroundSource.Screenshots || backgroundImageUrls.Count == 0)
+        {
+            if (oculusMetadata.LdJsonProduct?.image?.Length > 3)
+                backgroundImageUrls.AddRange(oculusMetadata.LdJsonProduct.image.Skip(3).Select(s => s._id));
 
-        SetPropertiesForCollection(json.UserInteractionModeNames, data.Features, GetFeatureFromInteractionMode);
-        SetPropertiesForCollection(json.SupportedPlayerModes, data.Features, GetFeatureFromPlayerMode);
-        SetPropertiesForCollection(json.SupportedInputDevicesList, data.Features, GetFeatureFromInputDevice);
-        SetPropertiesForCollection(SplitCompanies(json.DeveloperName), data.Developers);
-        SetPropertiesForCollection(SplitCompanies(json.PublisherName), data.Publishers);
-        SetPropertiesForCollection(json.GenreNames, data.Genres);
+            else if (oculusMetadata.OnPageAppStoreItem?.screenshots?.Count > 0)
+                backgroundImageUrls.AddRange(oculusMetadata.OnPageAppStoreItem.screenshots.Select(s => s.Uri));
+        }
 
-        var comfortRating = GetComfortRating(json.ComfortRating);
+        if ((data.BackgroundImage == null || settings.BackgroundSource == BackgroundSource.Hero) && oculusMetadata.OnPageAppStoreItem?.hero_image?.Uri != null)
+            backgroundImageUrls.Add(oculusMetadata.OnPageAppStoreItem.hero_image.Uri);
+
+        data.BackgroundImage = backgroundImageUrls?.Count switch
+        {
+            null or 0 => null,
+            1 => new(backgroundImageUrls[0]),
+            _ => new(backgroundImageUrls[_random.Next(backgroundImageUrls.Count)])
+        };
+
+        if (oculusMetadata.LdJsonProduct?.image?.Length > 2)
+            data.CoverImage = new(oculusMetadata.LdJsonProduct.image.Skip(2).First()._id);
+
+        SetPropertiesForCollection(oculusMetadata.AppDetails?.user_interaction_mode_names, data.Features, GetFeatureFromInteractionMode);
+        SetPropertiesForCollection(oculusMetadata.AppDetails?.supported_player_modes, data.Features, GetFeatureFromPlayerMode);
+        SetPropertiesForCollection(oculusMetadata.AppDetails?.supported_input_device_names, data.Features, GetInputFeature);
+        SetPropertiesForCollection(SplitCompanies(oculusMetadata.AppDetails?.developer_name ?? TrimOrganizationSchema(oculusMetadata.LdJsonProduct?.creator?._id)), data.Developers);
+        SetPropertiesForCollection(SplitCompanies(oculusMetadata.AppDetails?.publisher_name ?? TrimOrganizationSchema(oculusMetadata.LdJsonProduct?.publisher?._id)), data.Publishers);
+        SetPropertiesForCollection(oculusMetadata.AppDetails?.genre_names ?? oculusMetadata.LdJsonProduct?.applicationSubCategory, data.Genres);
+
+        var comfortRating = GetComfortRating(oculusMetadata.AppDetails?.comfort_rating);
         if (comfortRating != null)
             data.Tags.Add(new MetadataNameProperty(comfortRating));
 
-        if (ulong.TryParse(json.LatestSupportedBinary?.TotalInstalledSpace, out ulong size))
+        if (ulong.TryParse(oculusMetadata.AppDetails?.latest_supported_binary?.total_installed_space, out ulong size))
             data.InstallSize = size;
-
-        if (!string.IsNullOrWhiteSpace(json.IconImage?.Uri))
-            data.Icon = new MetadataFile(json.IconImage.Uri);
 
         return data;
     }
 
-    private OculusMetadataJsonResponse GetOculusMetadata(string appId, bool setLocale)
+    private static string TrimOrganizationSchema(string organizationSchemaUrl)
     {
-        var jsonStr = webClient.GetMetadata(appId, setLocale);
-        var data = JsonConvert.DeserializeObject<OculusMetadataJsonResponse>(jsonStr);
-        return data;
+        if (string.IsNullOrEmpty(organizationSchemaUrl))
+            return null;
+
+        const string organizationUrlRoot = "https://www.meta.com/#/schema/Organization/";
+        if (organizationSchemaUrl.StartsWith(organizationUrlRoot))
+            return organizationSchemaUrl.Substring(organizationUrlRoot.Length);
+
+        return organizationSchemaUrl;
+    }
+
+    private class MetadataBundled
+    {
+        public PageSourceAppStoreItem OnPageAppStoreItem { get; set; }
+        public DescriptionDataRoot Description { get; set; }
+        public AppDetailsData AppDetails { get; set; }
+        public ReviewData Reviews { get; set; }
+        public LdJsonProduct LdJsonProduct { get; set; }
+    }
+
+    private MetadataBundled GetOculusMetadata(string appId)
+    {
+        var metadataRaw = Task.Run(async () => await graphQLClient.GetMetadataAsync(appId)).GetAwaiter().GetResult();
+
+        if (metadataRaw == null)
+            return null;
+
+        var output = new MetadataBundled
+        {
+            OnPageAppStoreItem = GetPageSourceAppStoreItem(metadataRaw.PageSource),
+            LdJsonProduct = GetLdJsonData(metadataRaw.PageSource),
+        };
+
+        if (metadataRaw.XhrResponse != null)
+        {
+            var jsonLines = metadataRaw.XhrResponse.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
+            output.Description = DeserializeJsonLine<DescriptionDataRoot>(jsonLines, null);
+            output.AppDetails = DeserializeJsonLine<AppDetailsData>(jsonLines, "MDCAppStoreV2ParityAppPDPInfo_app$defer$MDCAppStoreV2ParityAppDetails_app");
+            output.Reviews = DeserializeJsonLine<ReviewData>(jsonLines, "MDCAppStoreV2ParityAppPDPInfo_app$defer$MDCAppStoreV2ParityAppPDPReviews_app");
+        }
+
+        return output;
+    }
+
+    private static LdJsonProduct GetLdJsonData(string pageSource)
+    {
+        var doc = new HtmlParser().Parse(pageSource);
+
+        string ldJson = doc.QuerySelector("script[type='application/ld+json']")?.InnerHtml;
+        if (ldJson == null)
+            return null;
+
+        var ldObj = JObject.Parse(ldJson);
+        if (ldObj["@graph"] is not JArray graphObjects)
+            return null;
+
+        foreach (var graphObject in graphObjects)
+        {
+            if (graphObject["@type"] is not JArray types)
+                continue;
+
+            var typeList = types.ToObject<List<string>>();
+            if (typeList.Contains("Product"))
+                return graphObject.ToObject<LdJsonProduct>();
+        }
+
+        return null;
+    }
+
+    private static PageSourceAppStoreItem GetPageSourceAppStoreItem(string pageSource)
+    {
+        var match = Regex.Match(pageSource, """
+                                            "app_store_item":(?<app>\{.+\}),"viewer":\{"user":
+                                            """);
+        if (!match.Success)
+            return null;
+
+        string str = match.Groups["app"].Value;
+        return JsonConvert.DeserializeObject<PageSourceAppStoreItem>(str);
+    }
+
+    private static TData DeserializeJsonLine<TData>(List<string> lines, string label) where TData : class
+    {
+        foreach (string line in lines)
+        {
+            var labeledObj = JsonConvert.DeserializeObject<AppStoreLabeledObject>(line);
+            if (labeledObj.label == label)
+                return JsonConvert.DeserializeObject<AppStoreRootObject<TData>>(line).data;
+        }
+
+        return null;
     }
 
     private static GameMetadata ToGameMetadata(OculusLibraryResponseItem item, OculusLibrarySettings settings, params MetadataProperty[] platforms)
@@ -113,14 +222,14 @@ public class OculusApiScraper(IGraphQLClient webClient = null)
         return output;
     }
 
-    private static int GetAverageRating(IEnumerable<StarRatingAggregate> aggregates)
+    private static int GetAverageRating(Quality_rating_histogram_aggregate_all[] aggregates)
     {
         long totalRating = 0;
         int totalCount = 0;
         foreach (var agg in aggregates)
         {
-            totalRating += (long)agg.StarRating * (long)agg.Count;
-            totalCount += agg.Count;
+            totalRating += (long)agg.star_rating * (long)agg.count;
+            totalCount += agg.count;
         }
 
         if (totalCount == 0) return 0;
@@ -134,6 +243,12 @@ public class OculusApiScraper(IGraphQLClient webClient = null)
         "COMFORTABLE_FOR_FEW" => "VR Comfort: Intense",
         "NOT_RATED" => "VR Comfort: Unrated",
         _ => null
+    };
+
+    private static string GetInputFeature(string inputFeature) => inputFeature.ToLowerInvariant() switch
+    {
+        "touch controllers" => "VR Motion Controllers",
+        _ => inputFeature
     };
 
     /// <summary>
@@ -180,7 +295,7 @@ public class OculusApiScraper(IGraphQLClient webClient = null)
             case "eén speler": //until I figure out how to actually consistently get en-us localization this is a workaround
                 return "Single Player";
             default:
-                logger.Warn("Unknown interaction mode: " + interactionMode);
+                _logger.Warn("Unknown interaction mode: " + interactionMode);
                 return interactionMode;
         }
     }
@@ -193,29 +308,8 @@ public class OculusApiScraper(IGraphQLClient webClient = null)
             case "STANDING": return "VR Standing";
             case "ROOM_SCALE": return "VR Room-Scale";
             default:
-                logger.Warn("Unknown player mode: " + playerMode);
+                _logger.Warn("Unknown player mode: " + playerMode);
                 return null;
-        }
-    }
-
-    private string GetFeatureFromInputDevice(TagItem inputDevice)
-    {
-        return inputDevice.Tag switch
-        {
-            "GAMEPAD" => "VR Gamepad",
-            "OCULUS_TOUCH" => "VR Motion Controllers",
-            "GAMEPAD_VIA_TOUCH" => "VR Motion Controllers (As Gamepad)",
-            "RACING_WHEEL" => "Racing Wheel Support", //found on Dirt Rally
-            "FLIGHT_STICK" => "Flight Stick Support", //found on End Space
-            "KEYBOARD_MOUSE" => "Input: Keyboard & Mouse",
-            "HAND_TRACKING" => "Hand Tracking",
-            _ => GetUnknownInputDeviceName()
-        };
-
-        string GetUnknownInputDeviceName()
-        {
-            logger.Info($"Unknown input device: {inputDevice.Tag} | {inputDevice.Name}");
-            return $"Input: {inputDevice.Name}";
         }
     }
 
@@ -243,6 +337,9 @@ public class OculusApiScraper(IGraphQLClient webClient = null)
 
     private static void SetPropertiesForCollection(IEnumerable<string> input, HashSet<MetadataProperty> target, Func<string, string> nameParser = null)
     {
+        if (input == null)
+            return;
+
         nameParser ??= x => x;
         SetPropertiesForCollection<string>(input, target, nameParser);
     }

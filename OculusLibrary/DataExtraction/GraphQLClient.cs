@@ -4,6 +4,7 @@ using Playnite.SDK;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -13,7 +14,7 @@ using System.Web;
 
 namespace OculusLibrary.DataExtraction;
 
-public class GraphQLClient(IPlayniteAPI playniteApi) : IGraphQLClient
+public class GraphQLClient(IWebViewFactory webViewFactory) : IGraphQLClient
 {
     private class WebResponse
     {
@@ -21,8 +22,8 @@ public class GraphQLClient(IPlayniteAPI playniteApi) : IGraphQLClient
         public Cookie[] Cookies { get; set; }
         public string Content { get; set; }
     }
+
     private WebClient WebClient { get; } = new();
-    private IWebView WebView { get; } = playniteApi.WebViews.CreateOffscreenView(new WebViewSettings { JavaScriptEnabled = true });
     private readonly ILogger _logger = LogManager.GetLogger();
 
     private string GetLibraryString(string accessToken, string docId)
@@ -67,20 +68,58 @@ public class GraphQLClient(IPlayniteAPI playniteApi) : IGraphQLClient
         return output;
     }
 
-    public string GetMetadata(string appId, bool setLocale, CancellationToken cancellationToken = default)
+    public async Task<OculusMetadataRaw> GetMetadataAsync(string appId, CancellationToken cancellationToken = default)
     {
-        var response = GetBrowserResponse(GetStoreUrl(appId), cancellationToken);
-
-        if (setLocale)
-            SetLocale(response.Cookies);
-
-        var body = new Dictionary<string, string>
+        TaskCompletionSource<string> metadataXhr = new();
+        var s = new WebViewSettings
         {
-            { "variables", $$"""{"itemId":"{{appId}}","hmdType":"RIFT","requestPDPAssetsAsPNG":false}""" },
-            { "doc_id", "7101363079925397" },
-        };
+            JavaScriptEnabled = true,
+            PassResourceContentStreamToCallback = true,
+            ResourceLoadedCallback = call =>
+            {
+                try
+                {
+                    if (call.Request.Method != "POST"
+                        || !call.Request.Url.StartsWith("https://www.meta.com/ocapi/graphql")
+                        || !call.Request.Headers.TryGetValue("X-FB-Friendly-Name", out string friendlyName)
+                        || friendlyName != "MDCAppStoreAppPDPBelowFoldRootQuery")
+                    {
+                        return;
+                    }
 
-        return PostWithWebclient("https://www.meta.com/ocapi/graphql?forced_locale=en_US", body, response.Cookies);
+                    if (!call.ResponseContent.CanSeek || !call.ResponseContent.CanRead)
+                    {
+                        _logger.Error($"Can't read/seek response content for {call.Request.Url}, friendly name: {friendlyName}");
+                        return;
+                    }
+
+                    call.ResponseContent.Seek(0, SeekOrigin.Begin);
+                    using var streamReader = new StreamReader(call.ResponseContent, Encoding.UTF8);
+                    string responseContent = streamReader.ReadToEnd();
+
+                    if (!string.IsNullOrWhiteSpace(responseContent))
+                        metadataXhr.SetResult(responseContent);
+                }
+                catch (Exception e)
+                {
+                    _logger.Error(e, $"Error getting metadata for app {appId}");
+                }
+            }
+        };
+        using var webView = webViewFactory.CreateOffscreenView(s);
+        webView.Navigate(GetStoreUrl(appId));
+
+        var completedTask = await Task.WhenAny(metadataXhr.Task, Task.Delay(TimeSpan.FromSeconds(10), cancellationToken));
+        if (completedTask != metadataXhr.Task)
+            return null;
+
+        string pageSource = await webView.GetPageSourceAsync();
+
+        return new()
+        {
+            PageSource = pageSource,
+            XhrResponse = metadataXhr.Task.Result,
+        };
     }
 
     public string GetAccessToken(CancellationToken cancellationToken = default)
@@ -90,29 +129,20 @@ public class GraphQLClient(IPlayniteAPI playniteApi) : IGraphQLClient
         return accessTokenCookie?.Value;
     }
 
-    private static string GetStoreUrl(string appId) => $"https://www.meta.com/en-us/experiences/{appId}/";
-
-    private string SetLocale(Cookie[] cookies)
-    {
-        var data = new Dictionary<string, string>
-        {
-            { "variables", """{"input":{"non_ecomm_locale":"en_US","site_type":"DOLLY","actor_id":"0","client_mutation_id":"2"}}""" },
-            { "doc_id", "5141701172554610" },
-        };
-        return PostWithWebclient("https://www.meta.com/api/graphql/", data, cookies);
-    }
+    private static string GetStoreUrl(string appId) => $"https://www.meta.com/experiences/-/{appId}/";
 
     private WebResponse GetBrowserResponse(string storePageUrl, CancellationToken cancellationToken)
     {
         _logger.Info($"GetBrowserResponse: {storePageUrl}");
 
-        WebView.NavigateAndWait(storePageUrl);
+        using var webView = webViewFactory.CreateOffscreenView(new() { JavaScriptEnabled = true });
+        webView.NavigateAndWait(storePageUrl);
 
         var response = new WebResponse();
 
-        response.Content = Timeout(WebView.GetPageSourceAsync(), cancellationToken, timeoutSeconds: 30).GetAwaiter().GetResult();
+        response.Content = Timeout(webView.GetPageSourceAsync(), cancellationToken, timeoutSeconds: 30).GetAwaiter().GetResult();
 
-        response.Cookies = WebView.GetCookies()
+        response.Cookies = webView.GetCookies()
                                   .Where(c => c.Value != null)
                                   .Select(c => new Cookie(c.Name, c.Value, c.Path, c.Domain))
                                   .ToArray();
@@ -125,9 +155,9 @@ public class GraphQLClient(IPlayniteAPI playniteApi) : IGraphQLClient
     private string PostWithWebclient(string address, IDictionary<string, string> data, Cookie[] cookies)
     {
         _logger.Info($"""
-                     PostWithWebclient: {address} with {cookies.Length} cookies
-                     data: {DictionaryToString(data)}
-                     """);
+                      PostWithWebclient: {address} with {cookies.Length} cookies
+                      data: {DictionaryToString(data)}
+                      """);
 
         var nameValueCollection = new NameValueCollection();
         foreach (var kvp in data)
@@ -156,7 +186,6 @@ public class GraphQLClient(IPlayniteAPI playniteApi) : IGraphQLClient
     public void Dispose()
     {
         WebClient.Dispose();
-        WebView.Dispose();
     }
 
     private static string DictionaryToString(IDictionary<string, string> dictionary)
@@ -166,6 +195,7 @@ public class GraphQLClient(IPlayniteAPI playniteApi) : IGraphQLClient
         {
             stringBuilder.AppendLine($"{kvp.Key}: {kvp.Value}");
         }
+
         return stringBuilder.ToString();
     }
 
@@ -181,11 +211,9 @@ public class GraphQLClient(IPlayniteAPI playniteApi) : IGraphQLClient
             await Task.Delay(1000, cancellationToken);
             elapsed++;
         }
+
         return default;
     }
 
-    ~GraphQLClient()
-    {
-        this.Dispose();
-    }
+    ~GraphQLClient() => Dispose();
 }

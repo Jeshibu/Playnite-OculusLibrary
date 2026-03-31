@@ -18,22 +18,22 @@ public class OculusLibraryPlugin : LibraryPlugin
     public static Guid PluginId = new("77346DD6-B0CC-4F7D-80F0-C1D138CCAE58");
     public override Guid Id { get; } = PluginId;
 
-    public override string Name => GetPluginName(settings.Settings);
-    public override string LibraryIcon => Path.Combine(ResourcePath, settings?.Settings.Branding == Branding.Meta ? "metaicon.png" : "oculusicon.png");
+    public override string Name => GetPluginName(_settings.Settings);
+    public override string LibraryIcon => Path.Combine(ResourcePath, _settings?.Settings.Branding == Branding.Meta ? "metaicon.png" : "oculusicon.png");
     public override LibraryClient Client => new OculusClient(PlayniteApi, LibraryIcon);
 
-    private readonly OculusManifestScraper manifestScraper;
-    private readonly ILogger logger = LogManager.GetLogger();
-    private readonly OculusLibrarySettingsViewModel settings;
+    private readonly OculusManifestScraper _manifestScraper;
+    private readonly ILogger _logger = LogManager.GetLogger();
+    private readonly OculusLibrarySettingsViewModel _settings;
     private static readonly string ResourcePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "Resources");
 
     private AggregateOculusMetadataCollector MetadataCollector
     {
         get
         {
-            var graphQLClient = new GraphQLClient(PlayniteApi);
+            var graphQLClient = new GraphQLClient(PlayniteApi.WebViews);
             var apiScraper = new OculusApiScraper(graphQLClient);
-            return new AggregateOculusMetadataCollector(manifestScraper, apiScraper, PlayniteApi, settings.Settings);
+            return new AggregateOculusMetadataCollector(_manifestScraper, apiScraper, PlayniteApi, _settings.Settings);
         }
     }
 
@@ -41,13 +41,13 @@ public class OculusLibraryPlugin : LibraryPlugin
     {
         try
         {
-            settings = new OculusLibrarySettingsViewModel(this, api);
+            _settings = new OculusLibrarySettingsViewModel(this, api);
             var pathSniffer = new OculusPathSniffer(new RegistryValueProvider(), new PathNormaliser(new WMODriveQueryProvider()));
-            manifestScraper = new OculusManifestScraper(pathSniffer);
+            _manifestScraper = new OculusManifestScraper(pathSniffer);
         }
         catch (Exception ex)
         {
-            logger.Error(ex, "Error in OculusLibraryPlugin constructor");
+            _logger.Error(ex, "Error in OculusLibraryPlugin constructor");
             throw;
         }
     }
@@ -59,20 +59,20 @@ public class OculusLibraryPlugin : LibraryPlugin
 
     public override IEnumerable<GameMetadata> GetGames(LibraryGetGamesArgs args)
     {
-        logger.Info("GetGames");
+        _logger.Info("GetGames");
         try
         {
             return MetadataCollector.GetGames(args.CancelToken);
         }
         catch (NotAuthenticatedException)
         {
-            logger.Error("Not authenticated");
+            _logger.Error("Not authenticated");
             PlayniteApi.Notifications.Add(new("oculus-not-authenticated", $"{this.Name} user not authenticated", NotificationType.Error, () => OpenSettingsView()));
             return [];
         }
         catch (Exception ex)
         {
-            logger.Error(ex, "Error getting Oculus games");
+            _logger.Error(ex, "Error getting Oculus games");
             PlayniteApi.Notifications.Add(new("oculus-import-error", $"Error during {this.Name} library import: {ex.Message}", NotificationType.Error));
             return [];
         }
@@ -95,7 +95,7 @@ public class OculusLibraryPlugin : LibraryPlugin
 
     public override LibraryMetadataProvider GetMetadataDownloader() => MetadataCollector;
 
-    public override ISettings GetSettings(bool firstRunSettings) => settings;
+    public override ISettings GetSettings(bool firstRunSettings) => _settings;
 
     public override UserControl GetSettingsView(bool firstRunView) => new OculusLibrarySettingsView();
 
@@ -104,16 +104,16 @@ public class OculusLibraryPlugin : LibraryPlugin
         if (args.Game.PluginId != Id)
             yield break;
 
-        var manifestData = manifestScraper.GetManifest(args.Game.GameId, installedOnly: true);
+        var manifestData = _manifestScraper.GetManifest(args.Game.GameId, installedOnly: true);
         if (manifestData == null || !File.Exists(manifestData.ExecutableFullPath))
         {
             string warning = $"No install manifest data found for {args.Game.Name}";
-            logger.Warn(warning);
+            _logger.Warn(warning);
             PlayniteApi.Dialogs.ShowErrorMessage(warning);
             yield break;
         }
 
-        if (settings.Settings.UseOculus)
+        if (_settings.Settings.UseOculus)
         {
             yield return new AutomaticPlayController(args.Game)
             {
@@ -139,18 +139,18 @@ public class OculusLibraryPlugin : LibraryPlugin
             };
         }
 
-        if (settings.Settings.UseRevive)
+        if (_settings.Settings.UseRevive)
         {
             if (!string.IsNullOrEmpty(manifestData.LaunchParameters) && !manifestData.LaunchParameters.StartsWith(" "))
                 manifestData.LaunchParameters = " " + manifestData.LaunchParameters;
 
             string relativeExePath = manifestData.ExecutableFullPath.Replace(manifestData.LibraryBasePath, string.Empty).TrimStart('\\');
             string arguments = $"/app {manifestData.CanonicalName} /library {manifestData.LibraryKey} \"{relativeExePath}\"{manifestData.LaunchParameters}";
-            logger.Debug($"Revive arguments: {arguments}");
+            _logger.Debug($"Revive arguments: {arguments}");
             yield return new AutomaticPlayController(args.Game)
             {
                 Type = AutomaticPlayActionType.File,
-                Path = settings.Settings.RevivePath,
+                Path = _settings.Settings.RevivePath,
                 Arguments = arguments,
                 Name = $"Play {args.Game.Name} with Revive (LAUNCH STEAMVR FIRST!)",
                 TrackingMode = TrackingMode.Directory,
@@ -161,7 +161,7 @@ public class OculusLibraryPlugin : LibraryPlugin
 
     public override void OnApplicationStopped(OnApplicationStoppedEventArgs args)
     {
-        UpdateYaml(settings.Settings, logger);
+        UpdateYaml(_settings.Settings, _logger);
         base.OnApplicationStopped(args);
     }
 
@@ -188,14 +188,14 @@ public class OculusLibraryPlugin : LibraryPlugin
     {
         bool upgraded = false;
         int latestVersion = 3;
-        if (settings.Settings.Version == latestVersion)
+        if (_settings.Settings.Version == latestVersion)
             return;
 
         var games = PlayniteApi.Database.Games.Where(g => g.PluginId == Id).ToList();
 
-        if (settings.Settings.Version < 2)
+        if (_settings.Settings.Version < 2)
         {
-            logger.Info($"Upgrading from version {settings.Settings.Version} to 2");
+            _logger.Info($"Upgrading from version {_settings.Settings.Version} to 2");
             foreach (var game in games)
             {
                 if (game.GameActions?.Count > 0)
@@ -206,12 +206,12 @@ public class OculusLibraryPlugin : LibraryPlugin
                 }
             }
 
-            settings.SeedRevivePath();
+            _settings.SeedRevivePath();
 
             upgraded = true;
         }
 
-        if (settings.Settings.Version < 3)
+        if (_settings.Settings.Version < 3)
         {
             var platforms = PlayniteApi.Database.Platforms.Where(p => p.Name.StartsWith("Oculus Meta ")).ToList();
             if (platforms.Any())
@@ -229,9 +229,9 @@ public class OculusLibraryPlugin : LibraryPlugin
 
         if (upgraded)
         {
-            logger.Debug($"Saving version after upgrade to {latestVersion}");
-            settings.Settings.Version = latestVersion;
-            SavePluginSettings(settings.Settings);
+            _logger.Debug($"Saving version after upgrade to {latestVersion}");
+            _settings.Settings.Version = latestVersion;
+            SavePluginSettings(_settings.Settings);
         }
     }
 }

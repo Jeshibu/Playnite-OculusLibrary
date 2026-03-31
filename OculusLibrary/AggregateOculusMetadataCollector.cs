@@ -32,7 +32,7 @@ public class AggregateOculusMetadataCollector(OculusManifestScraper manifestScra
 
         try
         {
-            return apiScraper.GetMetadata(game?.GameId, settings, setLocale: true, data: output);
+            return apiScraper.GetMetadata(game?.GameId, settings, data: output);
         }
         catch (Exception ex)
         {
@@ -86,7 +86,7 @@ public class AggregateOculusMetadataCollector(OculusManifestScraper manifestScra
             try
             {
                 //for new games, we have to immediately set the name, because game name isn't overridden by a post-import metadata pass (by default)
-                var metadata = apiScraper.GetMetadata(game.GameId, settings, setLocale: true);
+                var metadata = apiScraper.GetMetadata(game.GameId, settings);
 
                 if (metadata != null)
                     game.Name = metadata.Name;
