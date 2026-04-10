@@ -1,65 +1,71 @@
 ﻿<UserControl x:Class="OculusLibrary.OculusLibrarySettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:OculusLibrary"
              d:DataContext="{d:DesignInstance Type=local:OculusLibrarySettingsViewModel}"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel Margin="20" Width="Auto">
-        <CheckBox IsChecked="{Binding Settings.ImportOculusAppGames}" Content="Import games via the Meta Quest Link app (PCVR)" />
-        <StackPanel Margin="20,5,0,0">
-            <CheckBox IsEnabled="{Binding Settings.ImportOculusAppGames}" IsChecked="{Binding Settings.UseOculus}" Content="Use Meta Quest Link app to launch games"/>
-            <CheckBox IsEnabled="{Binding Settings.ImportOculusAppGames}" IsChecked="{Binding Settings.UseRevive}" Content="Use Revive to launch games via SteamVR" Margin="0,10,0,0"/>
-            <StackPanel Orientation="Horizontal" Margin="20,5,0,0" VerticalAlignment="Center">
-                <TextBlock Text="ReviveInjector.exe path:" Margin="0,0,5,0"/>
-                <TextBox Text="{Binding Settings.RevivePath}" IsEnabled="{Binding Settings.UseRevive}" MinWidth="250" x:Name="RevivePath"/>
-                <Button IsEnabled="{Binding Settings.UseRevive}" x:Name="BrowseButton" Click="Browse_Click" Content="&#xED25;" FontFamily="Segoe MDL2 Assets" ToolTip="Browse"/>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+        <StackPanel Margin="20" Width="Auto" CanVerticallyScroll="True">
+            <CheckBox IsChecked="{Binding Settings.ImportOculusAppGames}" Content="Import games via the Meta Quest Link app (PCVR)" />
+            <StackPanel Margin="20,5,0,0">
+                <CheckBox IsEnabled="{Binding Settings.ImportOculusAppGames}" IsChecked="{Binding Settings.UseOculus}" Content="Use Meta Quest Link app to launch games"/>
+                <CheckBox IsEnabled="{Binding Settings.ImportOculusAppGames}" IsChecked="{Binding Settings.UseRevive}" Content="Use Revive to launch games via SteamVR" Margin="0,10,0,0"/>
+                <StackPanel Orientation="Horizontal" Margin="20,5,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="ReviveInjector.exe path:" Margin="0,0,5,0"/>
+                    <TextBox Text="{Binding Settings.RevivePath}" IsEnabled="{Binding Settings.UseRevive}" MinWidth="250" x:Name="RevivePath"/>
+                    <Button IsEnabled="{Binding Settings.UseRevive}" x:Name="BrowseButton" Click="Browse_Click" Content="&#xED25;" FontFamily="Segoe MDL2 Assets" ToolTip="Browse"/>
+                </StackPanel>
+            </StackPanel>
+            <TextBlock Foreground="Red" Background="Black" Padding="10 5" Margin="0 30 0 0" TextWrapping="Wrap" MaxWidth="500" HorizontalAlignment="Left">
+                ⚠️ This can cause crashes due to some hard-to-pinpoint bug in the Playnite browser component.
+                If you're encountering crashes on this window, they can likely be resolved by pressing main menu > Settings > Advanced > Clear web cache.
+            </TextBlock>
+            <CheckBox IsChecked="{Binding Settings.ImportRiftOnline}" Content="Import Oculus Rift (PCVR) games from your Meta account" Margin="0,10,0,0"/>
+            <CheckBox IsChecked="{Binding Settings.ImportQuestOnline}" Content="Import Quest games from your Meta account" Margin="0,5,0,0"/>
+            <CheckBox IsChecked="{Binding Settings.ImportGearGoOnline}" Content="Import Gear VR/Oculus Go games from your Meta account" Margin="0,5,0,0"/>
+            <StackPanel Orientation="Horizontal" Margin="20,5,0,0">
+                <Button Content="Authenticate" Command="{Binding LoginCommand}" IsEnabled="{Binding Settings.ImportAnyOnline}"/>
+                <TextBlock VerticalAlignment="Center" Margin="10,0,0,0">
+                    <TextBlock.Tag>
+                        <PriorityBinding>
+                            <Binding Path="AuthStatus" IsAsync="True" />
+                            <Binding Source="{x:Static local:AuthStatus.Checking}" />
+                        </PriorityBinding>
+                    </TextBlock.Tag>
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+                            <Style.Triggers>
+                                <Trigger Property="Tag" Value="{x:Static local:AuthStatus.Checking}">
+                                    <Setter Property="Text" Value="Checking..." />
+                                </Trigger>
+                                <Trigger Property="Tag" Value="{x:Static local:AuthStatus.Ok}">
+                                    <Setter Property="Text" Value="Logged in" />
+                                </Trigger>
+                                <Trigger Property="Tag" Value="{x:Static local:AuthStatus.AuthRequired}">
+                                    <Setter Property="Text" Value="Requires authentication" />
+                                </Trigger>
+                                <Trigger Property="Tag" Value="{x:Static local:AuthStatus.Failed}">
+                                    <Setter Property="Text" Value="Failed to check authentication status" />
+                                </Trigger>
+                                <Trigger Property="Tag" Value="{x:Static local:AuthStatus.Disabled}">
+                                    <Setter Property="Text" Value="Disabled" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </StackPanel>
+            <StackPanel Margin="0,20,0,0" Orientation="Horizontal">
+                <TextBlock TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,5,0">Background image source:</TextBlock>
+                <ComboBox IsReadOnly="True" IsEditable="False" ItemsSource="{Binding BackgroundSourceOptions}" SelectedValue="{Binding Settings.BackgroundSource}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+            </StackPanel>
+            <StackPanel Margin="0,20,0,0" Orientation="Horizontal">
+                <TextBlock TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,5,0">Branding (requires restart):</TextBlock>
+                <ComboBox IsReadOnly="True" IsEditable="False" ItemsSource="{Binding BrandingOptions}" SelectedItem="{Binding Settings.Branding}"/>
             </StackPanel>
         </StackPanel>
-        <CheckBox IsChecked="{Binding Settings.ImportRiftOnline}" Content="Import Oculus Rift (PCVR) games from your Meta account" Margin="0,20,0,0"/>
-        <CheckBox IsChecked="{Binding Settings.ImportQuestOnline}" Content="Import Quest games from your Meta account" Margin="0,5,0,0"/>
-        <CheckBox IsChecked="{Binding Settings.ImportGearGoOnline}" Content="Import Gear VR/Oculus Go games from your Meta account" Margin="0,5,0,0"/>
-        <StackPanel Orientation="Horizontal" Margin="20,5,0,0">
-            <Button Content="Authenticate" Command="{Binding LoginCommand}" IsEnabled="{Binding Settings.ImportAnyOnline}"/>
-            <TextBlock VerticalAlignment="Center" Margin="10,0,0,0">
-                <TextBlock.Tag>
-                    <PriorityBinding>
-                        <Binding Path="AuthStatus" IsAsync="True" />
-                        <Binding Source="{x:Static local:AuthStatus.Checking}" />
-                    </PriorityBinding>
-                </TextBlock.Tag>
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
-                        <Style.Triggers>
-                            <Trigger Property="Tag" Value="{x:Static local:AuthStatus.Checking}">
-                                <Setter Property="Text" Value="Checking..." />
-                            </Trigger>
-                            <Trigger Property="Tag" Value="{x:Static local:AuthStatus.Ok}">
-                                <Setter Property="Text" Value="Logged in" />
-                            </Trigger>
-                            <Trigger Property="Tag" Value="{x:Static local:AuthStatus.AuthRequired}">
-                                <Setter Property="Text" Value="Requires authentication" />
-                            </Trigger>
-                            <Trigger Property="Tag" Value="{x:Static local:AuthStatus.Failed}">
-                                <Setter Property="Text" Value="Failed to check authentication status" />
-                            </Trigger>
-                            <Trigger Property="Tag" Value="{x:Static local:AuthStatus.Disabled}">
-                                <Setter Property="Text" Value="Disabled" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
-        </StackPanel>
-        <StackPanel Margin="0,20,0,0" Orientation="Horizontal">
-            <TextBlock TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,5,0">Background image source:</TextBlock>
-            <ComboBox IsReadOnly="True" IsEditable="False" ItemsSource="{Binding BackgroundSourceOptions}" SelectedValue="{Binding Settings.BackgroundSource}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
-        </StackPanel>
-        <StackPanel Margin="0,20,0,0" Orientation="Horizontal">
-            <TextBlock TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,5,0">Branding (requires restart):</TextBlock>
-            <ComboBox IsReadOnly="True" IsEditable="False" ItemsSource="{Binding BrandingOptions}" SelectedItem="{Binding Settings.Branding}"/>
-        </StackPanel>
-    </StackPanel>
+    </ScrollViewer>
 </UserControl>

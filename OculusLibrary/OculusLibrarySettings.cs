@@ -1,10 +1,11 @@
 ﻿using Playnite.Common;
 using Playnite.SDK;
 using Playnite.SDK.Data;
+using Playnite.SDK.Events;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
-using System.Net;
 using System.Windows.Media;
 
 namespace OculusLibrary;
@@ -32,6 +33,9 @@ public class OculusLibrarySettings : ObservableObject
 
     private void SetOnlineImportValue(ref bool property, bool value)
     {
+        if (property == value)
+            return;
+
         SetValue(ref property, value);
         OnPropertyChanged(nameof(ImportAnyOnline));
     }
@@ -70,7 +74,7 @@ public class OculusLibrarySettingsViewModel : PluginSettingsViewModel<OculusLibr
         Settings.PropertyChanged += Settings_PropertyChanged;
     }
 
-    private void Settings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(Settings.ImportAnyOnline))
         {
@@ -112,31 +116,33 @@ public class OculusLibrarySettingsViewModel : PluginSettingsViewModel<OculusLibr
         try
         {
             string loginUrl = "https://www.meta.com/login/?next=https%3A%2F%2Fsecure.oculus.com%2Fmy%2Fprofile%2F";
-            List<Cookie> cookies = [];
-            using (var view = PlayniteApi.WebViews.CreateView(675, 540, Colors.Black))
+            using var view = PlayniteApi.WebViews.CreateView(675, 540, Colors.Black);
+
+            void OnViewOnLoadingChanged(object s, WebViewLoadingChangedEventArgs e)
             {
-                view.LoadingChanged += (s, e) =>
+                try
                 {
-                    try
-                    {
-                        if (e.IsLoading) return;
+                    if (e.IsLoading) return;
 
-                        var address = view.GetCurrentAddress();
+                    var address = view.GetCurrentAddress();
 
-                        if (address == "https://secure.oculus.com/my/profile/")
-                            view.Close();
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error(ex, "Error logging into Oculus");
-                    }
-                };
-
-                view.DeleteDomainCookies(".oculus.com");
-                view.DeleteDomainCookies(".www.meta.com");
-                view.Navigate(loginUrl);
-                view.OpenDialog();
+                    if (address == "https://secure.oculus.com/my/profile/")
+                        view.Close();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Error logging into Oculus");
+                }
             }
+
+            view.LoadingChanged += OnViewOnLoadingChanged;
+
+            view.DeleteDomainCookies(".oculus.com");
+            view.DeleteDomainCookies(".www.meta.com");
+            view.Navigate(loginUrl);
+            view.OpenDialog();
+
+            view.LoadingChanged -= OnViewOnLoadingChanged;
 
             OnPropertyChanged(nameof(AuthStatus));
         }
@@ -157,7 +163,7 @@ public class OculusLibrarySettingsViewModel : PluginSettingsViewModel<OculusLibr
             var view = PlayniteApi.WebViews.CreateOffscreenView();
             try
             {
-                string profileUrl = "https://secure.oculus.com/my/profile/";
+                const string profileUrl = "https://secure.oculus.com/my/profile/";
                 view.NavigateAndWait(profileUrl);
                 string actualUrl = view.GetCurrentAddress(); //this will be a login URL if not authenticated
 

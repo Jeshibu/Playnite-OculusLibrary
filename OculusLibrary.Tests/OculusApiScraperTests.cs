@@ -21,19 +21,21 @@ public class OculusApiScraperTests
         var data = subject.GetMetadata(appId, settings);
         Assert.Equal("Asgard's Wrath", data.Name);
         Assert.NotNull(data.Description);
-        Assert.Equal("1.6.0", data.Version);
-        ReleaseDateEquals(2019, 10, 9, data.ReleaseDate);
         Assert.Equal(appId, data.GameId);
         Assert.NotNull(data.BackgroundImage?.Path);
         Assert.Equal(new MetadataNameProperty("Oculus"), data.Source);
-        MetadataPropertyCollectionsMatch(data.Features, ["Single Player", "VR", "VR Standing", "VR Seated", "VR Room-Scale", "VR Motion Controllers"]);
         MetadataPropertyCollectionsMatch(data.Platforms, ["Oculus Rift", "Oculus Rift S"], ["pc_windows"]);
-        MetadataPropertyCollectionsMatch(data.Tags, ["VR Comfort: Moderate"]);
         MetadataPropertyCollectionsMatch(data.Developers, ["Sanzaru"]);
         MetadataPropertyCollectionsMatch(data.Publishers, ["Oculus"]);
         MetadataPropertyCollectionsMatch(data.Genres, ["Action", "Adventure", "RPG"]);
+        Assert.NotNull(data.CoverImage?.Path);
+        Assert.NotNull(data.BackgroundImage?.Path);
+
+        Assert.Equal("1.6.0", data.Version);
+        ReleaseDateEquals(2019, 10, 9, data.ReleaseDate);
+        MetadataPropertyCollectionsMatch(data.Features, ["Single Player", "VR", "VR Standing", "VR Seated", "VR Room-Scale", "VR Motion Controllers"]);
+        MetadataPropertyCollectionsMatch(data.Tags, ["VR Comfort: Moderate"]);
         Assert.Equal(89, data.CommunityScore);
-        MetadataPropertyCollectionsMatch(data.AgeRatings, ["PEGI 18"]);
     }
 
     [Fact]
@@ -45,19 +47,21 @@ public class OculusApiScraperTests
         var data = subject.GetMetadata(appId, settings);
         Assert.Equal("Sprint Vector", data.Name);
         Assert.NotNull(data.Description);
-        Assert.Equal("0.0.0.302317", data.Version);
-        ReleaseDateEquals(2018, 2, 2, data.ReleaseDate);
         Assert.Equal(appId, data.GameId);
         Assert.NotNull(data.BackgroundImage?.Path);
         Assert.Equal(new MetadataNameProperty("Meta"), data.Source);
-        MetadataPropertyCollectionsMatch(data.Features, ["Single Player", "Multiplayer", "VR", "VR Standing", "VR Seated", "VR Room-Scale", "VR Motion Controllers"]);
         MetadataPropertyCollectionsMatch(data.Platforms, ["Oculus Rift", "Oculus Rift S"], ["pc_windows"]);
-        MetadataPropertyCollectionsMatch(data.Tags, ["VR Comfort: Intense"]);
         MetadataPropertyCollectionsMatch(data.Developers, ["Survios"]);
         MetadataPropertyCollectionsMatch(data.Publishers, ["Survios"]);
         MetadataPropertyCollectionsMatch(data.Genres, ["Action", "Racing", "Sports"]);
-        Assert.Equal(82, data.CommunityScore);
-        MetadataPropertyCollectionsMatch(data.AgeRatings, ["PEGI 3"]);
+        Assert.NotNull(data.CoverImage?.Path);
+        Assert.NotNull(data.BackgroundImage?.Path);
+
+        Assert.Equal("0.0.0.302317", data.Version);
+        ReleaseDateEquals(2018, 2, 2, data.ReleaseDate);
+        MetadataPropertyCollectionsMatch(data.Features, ["Single Player", "Multiplayer", "VR", "VR Standing", "VR Seated", "VR Room-Scale", "VR Motion Controllers"]);
+        MetadataPropertyCollectionsMatch(data.Tags, ["VR Comfort: Intense"]);
+        Assert.Equal(83, data.CommunityScore);
     }
 
     [Fact]
@@ -81,6 +85,16 @@ public class OculusApiScraperTests
         Assert.Contains(
             "<img src=\"https://scontent.oculuscdn.com/v/t64.5771-25/39035449_2750905201734369_6818732176437659600_n.webp?stp=dst-webp&_nc_cat=103&ccb=1-7&_nc_sid=6e7a0a&_nc_ohc=sLmjODHRfHgQ7kNvwGQLZ5V&_nc_oc=Adkm-BeD7sBbs0ALeY8-XNxUMUc6Gc9sKODywa2s72gaoWbThPwmNe31tgn7aWOHCcQ&_nc_zt=3&_nc_ht=scontent.oculuscdn.com&_nc_ss=8&oh=00_Afx_pwS2yDrjDDLC6OnSGjbm8ZJGR4xuKS1cJMUaMVgtrg&oe=69BE6A5B\"/>",
             data.Description);
+    }
+
+    [Fact]
+    public void AgeRatingsAreParsed()
+    {
+        var subject = Setup("flight-74", Branding.Oculus, out var settings);
+
+        var data = subject.GetMetadata("1234", settings);
+
+        MetadataPropertyCollectionsMatch(data.AgeRatings, ["PEGI 7"]);
     }
 
     [Fact]

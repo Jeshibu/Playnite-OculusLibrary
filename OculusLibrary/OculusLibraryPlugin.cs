@@ -99,18 +99,6 @@ public class OculusLibraryPlugin : LibraryPlugin
 
     public override UserControl GetSettingsView(bool firstRunView) => new OculusLibrarySettingsView();
 
-    public override IEnumerable<MainMenuItem> GetMainMenuItems(GetMainMenuItemsArgs args)
-    {
-        void DebugGetMetadata(string gameId)
-        {
-            var game = new Game { GameId = gameId };
-            var metadata = MetadataCollector.GetMetadata(game);
-        }
-
-        yield return new() { MenuSection = "@Oculus/Meta", Description = "Debug: get Chronostrike metadata", Action = _ => DebugGetMetadata("24697269806585974")};
-        yield return new() { MenuSection = "@Oculus/Meta", Description = "Debug: get Ghost Town metadata", Action = _ => DebugGetMetadata("9531494193591052")};
-    }
-
     public override IEnumerable<PlayController> GetPlayActions(GetPlayActionsArgs args)
     {
         if (args.Game.PluginId != Id)

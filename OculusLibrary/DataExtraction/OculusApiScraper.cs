@@ -49,7 +49,7 @@ public class OculusApiScraper(IGraphQLClient graphQLClient = null)
         data.Name = oculusMetadata.AppDetails?.display_name ?? oculusMetadata.LdJsonProduct?.name;
         data.Description = ParseDescription(oculusMetadata.Description?.app_store_item.display_long_description ?? oculusMetadata.LdJsonProduct?.description);
 
-        var starRating = oculusMetadata.OnPageAppStoreItem?.quality_rating_aggregate;
+        var starRating = oculusMetadata.Reviews?.quality_rating_score ?? oculusMetadata.OnPageAppStoreItem?.quality_rating_aggregate;
         if (starRating > 0)
             data.CommunityScore = (int)(starRating * 20);
 
@@ -64,9 +64,11 @@ public class OculusApiScraper(IGraphQLClient graphQLClient = null)
         if (!string.IsNullOrEmpty(rating))
             data.AgeRatings.Add(new MetadataNameProperty(rating));
 
-        if (oculusMetadata.Reviews?.platform == "PC") //the other options are ANDROID (Go, GearVR) and ANDROID_6DOF (Quest, Quest 2) but those are covered via HMD
-            data.Platforms.Add(new MetadataSpecProperty("pc_windows"));
         SetPropertiesForCollection(oculusMetadata.AppDetails?.supported_platforms_i18n ?? oculusMetadata.LdJsonProduct?.availableOnDevice, data.Platforms, GetHmdPlatformName);
+
+        //the other platform options are ANDROID (Go, GearVR) and ANDROID_6DOF (Quest, Quest 2) but those are covered via HMD
+        if (oculusMetadata.Reviews?.platform == "PC" || data.Platforms.OfType<MetadataNameProperty>().Any(p => p.Name.Contains("Rift")))
+            data.Platforms.Add(new MetadataSpecProperty("pc_windows"));
 
         List<string> backgroundImageUrls = [];
 

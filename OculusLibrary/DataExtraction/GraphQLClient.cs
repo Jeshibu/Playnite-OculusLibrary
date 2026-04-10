@@ -52,7 +52,7 @@ public class GraphQLClient(IWebViewFactory webViewFactory) : IGraphQLClient
         if (!settings.ImportAnyOnline || cancellationToken.IsCancellationRequested)
             return output;
 
-        var accessToken = GetAccessToken(cancellationToken);
+        string accessToken = GetAccessToken(cancellationToken);
         if (accessToken == null)
             throw new NotAuthenticatedException();
 
@@ -75,22 +75,19 @@ public class GraphQLClient(IWebViewFactory webViewFactory) : IGraphQLClient
         {
             JavaScriptEnabled = true,
             PassResourceContentStreamToCallback = true,
+            ShouldPassResourceContentFunc = call => call.Request.Method == "POST"
+                                                    && call.Response.StatusCode == 200
+                                                    && call.Request.Url.StartsWith("https://www.meta.com/ocapi/graphql")
+                                                    && call.Request.Headers.TryGetValue("X-FB-Friendly-Name", out string friendlyName)
+                                                    && friendlyName == "MDCAppStoreAppPDPBelowFoldRootQuery",
             ResourceLoadedCallback = call =>
             {
                 try
                 {
-                    if (call.Request.Method != "POST"
-                        || call.Response.StatusCode != 200
-                        || !call.Request.Url.StartsWith("https://www.meta.com/ocapi/graphql")
-                        || !call.Request.Headers.TryGetValue("X-FB-Friendly-Name", out string friendlyName)
-                        || friendlyName != "MDCAppStoreAppPDPBelowFoldRootQuery")
+                    if (call.ResponseContent is not { CanSeek: true, CanRead: true })
                     {
-                        return;
-                    }
-
-                    if (!call.ResponseContent.CanSeek || !call.ResponseContent.CanRead)
-                    {
-                        _logger.Error($"Can't read/seek response content for {call.Request.Url}, friendly name: {friendlyName}");
+                        _logger.Error($"Can't read/seek response content for {call.Request.Url}, friendly name: MDCAppStoreAppPDPBelowFoldRootQuery");
+                        metadataXhr.SetResult(null);
                         return;
                     }
 
@@ -98,8 +95,7 @@ public class GraphQLClient(IWebViewFactory webViewFactory) : IGraphQLClient
                     using var streamReader = new StreamReader(call.ResponseContent, Encoding.UTF8);
                     string responseContent = streamReader.ReadToEnd();
 
-                    if (!string.IsNullOrWhiteSpace(responseContent))
-                        metadataXhr.SetResult(responseContent);
+                    metadataXhr.SetResult(responseContent);
                 }
                 catch (Exception e)
                 {
@@ -111,8 +107,6 @@ public class GraphQLClient(IWebViewFactory webViewFactory) : IGraphQLClient
         webView.Navigate(GetStoreUrl(appId));
 
         var completedTask = await Task.WhenAny(metadataXhr.Task, Task.Delay(TimeSpan.FromSeconds(10), cancellationToken));
-        if (completedTask != metadataXhr.Task)
-            return null;
 
         string pageSource = await webView.GetPageSourceAsync();
 

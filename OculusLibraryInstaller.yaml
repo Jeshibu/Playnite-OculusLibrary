@@ -126,3 +126,11 @@ Packages:
     Changelog:
       - 'Fixed "Bad Request" error when importing games'
       - 'Fixed error when importing Quest Go games that also exist on Quest'
+  - Version: '2.6.5'
+    RequiredApiVersion: '6.16.0'
+    ReleaseDate: 2026-04-10
+    PackageUrl: https://github.com/Jeshibu/Playnite-OculusLibrary/releases/download/v2.6.5/Oculus.pext
+    Changelog:
+      - '⚠️ WARNING: There is an unresolved issue in the Playnite browser component that can cause app crashes on the Oculus/Meta settings view. Use [main menu > Settings > Advanced > Clear web cache] to resolve it. Report the issue to me if it keeps happening.'
+      - 'Fixed metadata download always failing'
+      - 'Improved quality of covers and backgrounds metadata'

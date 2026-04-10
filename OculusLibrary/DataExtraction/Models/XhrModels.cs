@@ -95,7 +95,7 @@ public class Builder_profile
 public class ReviewData
 {
     public string display_name { get; set; }
-    public double quality_rating_score { get; set; }
+    public double? quality_rating_score { get; set; }
     public string platform { get; set; }
     public string id { get; set; }
     public object support_website_url { get; set; }
